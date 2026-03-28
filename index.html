@@ -1,0 +1,193 @@
+<!-- VERSION: 2.0.0 - SPANISH LOCALIZATION -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DolarVE | Finanzas en Tiempo Real</title>
+    <link rel="stylesheet" href="style.css?v=3.2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <div class="loader-logo">DolarVE</div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="app-toast">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="toast-message">Notificación</span>
+    </div>
+
+    <div class="app-container">
+        <!-- Pantalla de Inicio -->
+        <section id="home-screen" class="screen active">
+            <header>
+                <div class="header-title">
+                    <span class="header-subtitle">Oficial BCV</span>
+                    <h1>Bolívar Digital Pro</h1>
+                </div>
+                <div class="header-icon">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+            </header>
+
+            <div class="card">
+                <div class="card-title">USD / VES</div>
+                <div class="card-value"><span id="usd-bcv-price">---</span> <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">VES</span></div>
+                <div class="chart-mini">
+                    <svg viewBox="0 0 100 30" style="width: 100%; height: 100%; fill: none;">
+                        <path d="M0,25 Q10,15 20,20 T40,10 T60,25 T80,15 T100,20" stroke="var(--accent-green)" stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="card-footer">
+                    <span class="trend-up"><i class="fa-solid fa-arrow-trend-up"></i> +0.45%</span>
+                    <span style="color: var(--text-muted)" id="last-update-usd">Actualizado 5m ago</span>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">EUR / VES</div>
+                    <div class="card-value" style="font-size: 24px;" id="eur-bcv-price">---</div>
+                    <div class="trend-up" style="font-size: 12px;"><i class="fa-solid fa-arrow-trend-up"></i> +0.12%</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">USD / USDT</div>
+                    <div class="card-value" style="font-size: 24px;">1.00</div>
+                    <div class="trend-up" style="font-size: 12px; color: var(--text-muted);">0.00%</div>
+                </div>
+            </div>
+
+            <div style="padding: 20px 20px 10px;">
+                <h3 style="font-size: 16px; margin-bottom: 10px;">Sentimiento del Mercado</h3>
+                <div class="card" style="margin: 0; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                        <span>Bajista</span>
+                        <span>Alcista</span>
+                    </div>
+                    <div class="sentiment-bar">
+                        <div class="sentiment-fill" id="sentiment-fill-bcv" style="width: 85%;"></div>
+                    </div>
+                    <div style="text-align: center; font-size: 12px; font-weight: 600; margin-top: 5px; color: var(--accent-green);">
+                        85% Alcista
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 20px 20px 10px;">
+                <div class="card" style="margin: 0; padding: 15px; border-style: dashed; cursor: pointer;" onclick="showNotification('¡Funcionalidad en desarrollo para la próxima versión!')">
+                    <div class="btn-primary" style="text-align: center;">
+                        <i class="fa-solid fa-bolt"></i> Cambio Rápido VES a USD
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla Calculadora -->
+        <section id="calc-screen" class="screen">
+            <header>
+                <div class="header-title">
+                    <span class="header-subtitle">Divisas</span>
+                    <h1>Calculadora</h1>
+                </div>
+                <div class="header-icon" style="display: flex; align-items: center; gap: 5px;">
+                    <div id="currency-toggle-btn" style="cursor: pointer; padding: 10px; font-weight: 700; color: var(--accent-blue); font-size: 16px;">
+                        USD
+                    </div>
+                    <div id="swap-currency-btn" style="cursor: pointer; padding: 10px;">
+                        <i class="fa-solid fa-right-left"></i>
+                    </div>
+                </div>
+            </header>
+            <div class="calc-container">
+                <div class="calc-display">
+                    <div class="label" id="calc-from-label">MONTO USD</div>
+                    <div class="value" id="calc-from-value">1</div>
+                </div>
+                <div class="calc-display" style="background: rgba(0, 208, 132, 0.05); border-color: var(--accent-green);">
+                    <div class="label" id="calc-to-label" style="color: var(--accent-green)">RESULTADO VES</div>
+                    <div class="value" id="calc-to-value" style="color: var(--accent-green)">0.00</div>
+                </div>
+                <div class="calc-grid">
+                    <button class="calc-btn">1</button><button class="calc-btn">2</button><button class="calc-btn">3</button><button class="calc-btn operator">÷</button>
+                    <button class="calc-btn">4</button><button class="calc-btn">5</button><button class="calc-btn">6</button><button class="calc-btn operator">×</button>
+                    <button class="calc-btn">7</button><button class="calc-btn">8</button><button class="calc-btn">9</button><button class="calc-btn operator">-</button>
+                    <button class="calc-btn">.</button><button class="calc-btn">0</button><button class="calc-btn">C</button><button class="calc-btn operator">+</button>
+                    <button class="calc-btn action">CONVERTIR FONDOS</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla Cripto -->
+        <section id="crypto-screen" class="screen">
+            <header>
+                <div class="header-title">
+                    <span class="header-subtitle">Mercado Real</span>
+                    <h1>Criptoactivos</h1>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <div class="header-subtitle">Codicia y Miedo</div>
+                    <div class="stats-value" id="fear-greed-value">--</div>
+                    <div style="font-size: 12px; color: var(--accent-green)">Actualizado</div>
+                </div>
+                <div class="stats-card">
+                    <div class="header-subtitle">Dominio BTC</div>
+                    <div class="stats-value" id="btc-dominance">--%</div>
+                    <div style="font-size: 12px; color: var(--text-muted)">Global</div>
+                </div>
+            </div>
+
+            <div class="crypto-list" id="dynamic-crypto-list" style="margin-top: 20px;">
+                <!-- Filled via JS -->
+                <div style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
+                    <div class="loader-spinner" style="margin: 0 auto 15px;"></div>
+                    Cargando top 20 del mercado...
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla Ajustes -->
+        <section id="settings-screen" class="screen">
+            <header>
+                <div class="header-title">
+                    <span class="header-subtitle">Configuración</span>
+                    <h1>Ajustes</h1>
+                </div>
+            </header>
+            <div class="settings-list">
+                <div class="settings-item">
+                    <div>
+                        <div style="font-weight: 600;">Modo Oscuro</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Cambiar tema visual</div>
+                    </div>
+                    <div class="toggle-switch on" id="theme-toggle"><div class="toggle-circle"></div></div>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div style="font-weight: 600;">Idioma</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Seleccionar lenguaje</div>
+                    </div>
+                    <select id="lang-select" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); padding: 5px; border-radius: 5px;">
+                        <option value="es" selected>Español</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-calculator"></i><span>Calc</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Cripto</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
+        </nav>
+    </div>
+    <script src="app.js?v=3.2"></script>
+</body>
+</html>

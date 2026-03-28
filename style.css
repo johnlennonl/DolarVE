@@ -1,0 +1,459 @@
+/* Design System for DolarVE */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+:root {
+    --bg-color: #0B0E14;
+    --card-bg: #161B22;
+    --card-border: rgba(255, 255, 255, 0.05);
+    --text-main: #FFFFFF;
+    --text-muted: #8B949E;
+    --accent-green: #00D084;
+    --accent-blue: #3E8BFF;
+    --accent-red: #FF4D4D;
+    --font-main: 'Outfit', sans-serif;
+    --nav-height: 70px;
+    --safe-area-bottom: 20px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.light-theme {
+    --bg-color: #F0F2F5;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(0, 0, 0, 0.05);
+    --text-main: #1C1E21;
+    --text-muted: #65676B;
+}
+
+body.light-theme .bottom-nav {
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    line-height: 1.5;
+    overflow-x: hidden;
+    user-select: none;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+.app-container {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom));
+}
+
+/* Header Styles */
+header {
+    padding: 24px 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.header-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Card Components */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 10px 20px;
+    transition: transform 0.2s ease;
+}
+
+.card:active {
+    transform: scale(0.98);
+}
+
+.card-title {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.trend-up { color: var(--accent-green); }
+.trend-down { color: var(--accent-red); }
+
+/* Chart Placeholder */
+.chart-mini {
+    height: 60px;
+    width: 100%;
+    margin: 10px 0;
+    background: linear-gradient(180deg, rgba(0, 208, 132, 0.1) 0%, transparent 100%);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    height: var(--nav-height);
+    background: rgba(11, 14, 20, 0.8);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: var(--safe-area-bottom);
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 10px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-item.active {
+    color: var(--accent-blue);
+}
+
+.nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+/* Utilities */
+.btn-primary {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    width: 100%;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.grid-2 .card {
+    margin: 0;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Calculator Grid */
+.calc-container {
+    padding: 0 20px;
+}
+
+.calc-display {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.calc-display .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.calc-display .value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.calc-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 20px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.calc-btn:active {
+    background: var(--card-border);
+}
+
+.calc-btn.operator {
+    color: var(--accent-blue);
+}
+
+.calc-btn.action {
+    grid-column: span 4;
+    background: linear-gradient(90deg, var(--accent-blue), #2575fc);
+    color: white;
+    margin-top: 10px;
+}
+
+/* Crypto List */
+.crypto-list {
+    padding: 0 20px;
+}
+
+.crypto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.crypto-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.crypto-icon {
+    width: 40px;
+    height: 40px;
+    background: #2D333B;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.crypto-name div:first-child { font-weight: 600; }
+.crypto-name div:last-child { font-size: 12px; color: var(--text-muted); }
+
+.crypto-price { text-align: right; }
+.crypto-price div:first-child { font-weight: 600; }
+.crypto-price div:last-child { font-size: 12px; }
+
+/* Market Stats Widgets */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 0 20px;
+}
+
+.stats-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stats-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 5px 0;
+}
+
+.sentiment-bar {
+    height: 8px;
+    background: #2D333B;
+    border-radius: 4px;
+    margin: 10px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.sentiment-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-red), var(--accent-green));
+    width: 50%;
+    transition: width 1s ease;
+}
+
+/* Settings Styles */
+.settings-list {
+    padding: 0 20px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.toggle-switch {
+    width: 50px;
+    height: 26px;
+    background: #2D333B;
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.toggle-switch.on {
+    background: var(--accent-green);
+}
+
+.toggle-circle {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: var(--transition);
+}
+
+.toggle-switch.on .toggle-circle {
+    left: 27px;
+}
+
+/* Splash Screen / Loader */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    background: var(--bg-color);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-logo {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: pulse 2s infinite;
+}
+
+.loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--card-border);
+    border-top-color: var(--accent-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: var(--card-bg);
+    color: var(--text-main);
+    padding: 15px 25px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-green);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.4s ease;
+}
+
+.toast-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+body.light-theme .toast-notification {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
