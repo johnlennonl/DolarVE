@@ -3,10 +3,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- iOS Native App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DolarVE">
+    <!-- Opcional: <link rel="apple-touch-icon" href="tu-icono-192x192.png"> -->
+
     <title>DolarVE | Finanzas en Tiempo Real</title>
-    <link rel="stylesheet" href="style.css?v=3.2">
+    <link rel="stylesheet" href="style.css?v=4.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Splash Screen -->
@@ -37,28 +45,20 @@
             <div class="card">
                 <div class="card-title">USD / VES</div>
                 <div class="card-value"><span id="usd-bcv-price">---</span> <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">VES</span></div>
-                <div class="chart-mini">
-                    <svg viewBox="0 0 100 30" style="width: 100%; height: 100%; fill: none;">
-                        <path d="M0,25 Q10,15 20,20 T40,10 T60,25 T80,15 T100,20" stroke="var(--accent-green)" stroke-width="2" />
-                    </svg>
+                <div class="chart-mini" style="height: 80px; margin-top: 15px; background: transparent;">
+                    <canvas id="bcvChart"></canvas>
                 </div>
                 <div class="card-footer">
-                    <span class="trend-up"><i class="fa-solid fa-arrow-trend-up"></i> +0.45%</span>
+                    <span class="trend-up" id="usd-trend-indicator"><i class="fa-solid fa-arrow-trend-up"></i> +0.45%</span>
                     <span style="color: var(--text-muted)" id="last-update-usd">Actualizado 5m ago</span>
                 </div>
             </div>
 
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title">EUR / VES</div>
-                    <div class="card-value" style="font-size: 24px;" id="eur-bcv-price">---</div>
-                    <div class="trend-up" style="font-size: 12px;"><i class="fa-solid fa-arrow-trend-up"></i> +0.12%</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">USD / USDT</div>
-                    <div class="card-value" style="font-size: 24px;">1.00</div>
-                    <div class="trend-up" style="font-size: 12px; color: var(--text-muted);">0.00%</div>
-                </div>
+            <!-- Single Card for EUR / VES instead of Grid -->
+            <div class="card">
+                <div class="card-title">EUR / VES</div>
+                <div class="card-value" style="font-size: 24px;" id="eur-bcv-price">---</div>
+                <div class="trend-up" style="font-size: 12px;"><i class="fa-solid fa-arrow-trend-up"></i> +0.12%</div>
             </div>
 
             <div style="padding: 20px 20px 10px;">
@@ -112,10 +112,10 @@
                     <div class="value" id="calc-to-value" style="color: var(--accent-green)">0.00</div>
                 </div>
                 <div class="calc-grid">
-                    <button class="calc-btn">1</button><button class="calc-btn">2</button><button class="calc-btn">3</button><button class="calc-btn operator">÷</button>
-                    <button class="calc-btn">4</button><button class="calc-btn">5</button><button class="calc-btn">6</button><button class="calc-btn operator">×</button>
-                    <button class="calc-btn">7</button><button class="calc-btn">8</button><button class="calc-btn">9</button><button class="calc-btn operator">-</button>
-                    <button class="calc-btn">.</button><button class="calc-btn">0</button><button class="calc-btn">C</button><button class="calc-btn operator">+</button>
+                    <button class="calc-btn">1</button><button class="calc-btn">2</button><button class="calc-btn">3</button>
+                    <button class="calc-btn">4</button><button class="calc-btn">5</button><button class="calc-btn">6</button>
+                    <button class="calc-btn">7</button><button class="calc-btn">8</button><button class="calc-btn">9</button>
+                    <button class="calc-btn">.</button><button class="calc-btn">0</button><button class="calc-btn">C</button>
                     <button class="calc-btn action">CONVERTIR FONDOS</button>
                 </div>
             </div>
@@ -143,7 +143,11 @@
                 </div>
             </div>
 
-            <div class="crypto-list" id="dynamic-crypto-list" style="margin-top: 20px;">
+            <div style="padding: 0 20px; margin-top: 20px;">
+                <input type="text" id="crypto-search" placeholder="🔍 Buscar moneda o símbolo...">
+            </div>
+
+            <div class="crypto-list" id="dynamic-crypto-list" style="margin-top: 5px;">
                 <!-- Filled via JS -->
                 <div style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
                     <div class="loader-spinner" style="margin: 0 auto 15px;"></div>
@@ -188,6 +192,6 @@
             <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
         </nav>
     </div>
-    <script src="app.js?v=3.2"></script>
+    <script src="app.js?v=4.0"></script>
 </body>
 </html>

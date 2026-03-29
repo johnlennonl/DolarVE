@@ -1,11 +1,20 @@
-// DolarVE App Logic v3.0.0
+// DolarVE App Logic v4.0.0
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DolarVE APP LOADED');
+
+    // 1. Local Storage for Theme
+    const savedTheme = localStorage.getItem('dolarve_theme');
+    const themeToggle = document.getElementById('theme-toggle');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+        if(themeToggle) themeToggle.classList.remove('on');
+    }
     
     // Custom Toast Notification Logic
     window.showNotification = function(message) {
         const toast = document.getElementById('app-toast');
         const msgEl = document.getElementById('toast-message');
+        if(!toast || !msgEl) return;
         msgEl.innerText = message;
         toast.classList.add('show');
         if(window.navigator.vibrate) window.navigator.vibrate(50);
@@ -33,26 +42,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             themeToggle.classList.toggle('on');
             document.body.classList.toggle('light-theme');
+            localStorage.setItem('dolarve_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
         });
     }
 
-    // Calculator State
+    // Calculator State (with LocalStorage)
     let currentUsdRate = 0;
     let currentEurRate = 0;
-    let baseCurrency = 'USD'; // 'USD' or 'EUR'
-    let isForeignToVes = true; // true = Foreign to VES, false = VES to Foreign
-    let calcInput = "1";
+    let baseCurrency = localStorage.getItem('dolarve_base') || 'USD';
+    let isForeignToVes = localStorage.getItem('dolarve_direction') ? localStorage.getItem('dolarve_direction') === 'true' : true;
+    let calcInput = localStorage.getItem('dolarve_calc') || "1";
 
     const fromLabel = document.getElementById('calc-from-label');
     const toLabel = document.getElementById('calc-to-label');
     const fromValue = document.getElementById('calc-from-value');
     const toValue = document.getElementById('calc-to-value');
     const currencyToggleBtn = document.getElementById('currency-toggle-btn');
+    
+    if(currencyToggleBtn) currencyToggleBtn.innerText = baseCurrency;
+
+    function saveCalcState() {
+        localStorage.setItem('dolarve_base', baseCurrency);
+        localStorage.setItem('dolarve_direction', isForeignToVes);
+        localStorage.setItem('dolarve_calc', calcInput);
+    }
 
     function updateCalcDisplay() {
         const activeRate = baseCurrency === 'USD' ? currentUsdRate : currentEurRate;
@@ -73,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         fromLabel.innerText = isForeignToVes ? `MONTO ${baseCurrency}` : "MONTO VES";
         toLabel.innerText = isForeignToVes ? "RESULTADO VES" : `RESULTADO ${baseCurrency}`;
+        saveCalcState();
     }
 
     // Toggle Base Currency Btn (USD/EUR)
@@ -95,6 +114,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Chart.js Setup
+    let bcvChartInstance = null;
+    function initChart(currentPrice) {
+        const ctx = document.getElementById('bcvChart');
+        if(!ctx) return;
+        
+        const base = currentPrice;
+        // Mocking a realistic 7-day ascending curve ending at current price
+        const dataPoints = [base * 0.98, base * 0.985, base * 0.99, base * 0.992, base * 0.995, base * 0.998, base]; 
+        
+        if(bcvChartInstance) {
+            bcvChartInstance.data.datasets[0].data = dataPoints;
+            bcvChartInstance.update();
+            return;
+        }
+        
+        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 80);
+        gradient.addColorStop(0, 'rgba(0, 208, 132, 0.4)');
+        gradient.addColorStop(1, 'rgba(0, 208, 132, 0)');
+
+        bcvChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6', '7'],
+                datasets: [{
+                    data: dataPoints,
+                    borderColor: '#00D084',
+                    borderWidth: 2,
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: {
+                    x: { display: false },
+                    y: { display: false, min: base * 0.97, max: base * 1.01 }
+                },
+                layout: { padding: 0 }
+            }
+        });
+    }
+
     async function fetchData() {
         try {
             const usdRes = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
@@ -103,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
             document.getElementById('last-update-usd').innerText = `Actualizado: ${new Date().toLocaleTimeString()}`;
             updateCalcDisplay(); // Update calc with real initial rate
+            initChart(currentUsdRate); // Mount Chart.js
 
             const eurRes = await fetch('https://ve.dolarapi.com/v1/euros/oficial');
             const eurData = await eurRes.json();
@@ -156,6 +223,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fetchData();
+    // Crypto Search Logic
+    const searchInput = document.getElementById('crypto-search');
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.crypto-item');
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(term) ? 'flex' : 'none';
+            });
+        });
+    }
+
     setInterval(fetchData, 300000);
 
     document.querySelectorAll('button, .nav-item').forEach(btn => {
@@ -164,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Special click logic for calc buttons
+    // Special click logic for calc buttons (Numpad only)
     document.querySelectorAll('.calc-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             if (window.navigator.vibrate) window.navigator.vibrate(15);
@@ -172,12 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = e.target.innerText;
             if(val === 'C') {
                 calcInput = "0";
-            } else if (val === 'CONVERTIR FONDOS' || val === '+' || val === '-' || val === '×' || val === '÷') {
-                if(val === 'CONVERTIR FONDOS') {
-                    window.showNotification('¡Conversión simulada con éxito!');
-                } else {
-                    window.showNotification('Funciones avanzadas próximamente');
-                }
+            } else if (val === 'CONVERTIR FONDOS') {
+                window.showNotification('¡Conversión simulada con éxito!');
                 return;
             } else {
                 if(calcInput === "0" && val !== '.') calcInput = val;

@@ -51,7 +51,7 @@ body {
     margin: 0 auto;
     min-height: 100vh;
     position: relative;
-    padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom));
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px) + 30px);
 }
 
 /* Header Styles */
@@ -129,14 +129,14 @@ header {
     transform: translateX(-50%);
     width: 100%;
     max-width: 480px;
-    height: var(--nav-height);
+    height: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px));
     background: rgba(11, 14, 20, 0.8);
     backdrop-filter: blur(20px);
     border-top: 1px solid var(--card-border);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding-bottom: var(--safe-area-bottom);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
     z-index: 1000;
 }
 
@@ -225,8 +225,8 @@ header {
 
 .calc-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
 }
 
 .calc-btn {
@@ -250,10 +250,10 @@ header {
 }
 
 .calc-btn.action {
-    grid-column: span 4;
+    grid-column: span 3;
     background: linear-gradient(90deg, var(--accent-blue), #2575fc);
     color: white;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 /* Crypto List */
@@ -456,4 +456,27 @@ header {
 
 body.light-theme .toast-notification {
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Crypto Search Input */
+#crypto-search {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 15px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-size: 16px;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+#crypto-search:focus {
+    border-color: var(--accent-blue);
+}
+
+#crypto-search::placeholder {
+    color: var(--text-muted);
 }
