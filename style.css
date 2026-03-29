@@ -54,6 +54,13 @@ body {
     padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px) + 30px);
 }
 
+/* Fix for iOS App Mode (Notch/Dynamic Island) */
+@media all and (display-mode: standalone) {
+    .app-container {
+        padding-top: calc(env(safe-area-inset-top, 40px) + 10px);
+    }
+}
+
 /* Header Styles */
 header {
     padding: 24px 20px 10px;
