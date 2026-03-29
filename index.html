@@ -12,9 +12,11 @@
     <!-- Opcional: <link rel="apple-touch-icon" href="tu-icono-192x192.png"> -->
 
     <title>DolarVE | Finanzas en Tiempo Real</title>
-    <link rel="stylesheet" href="style.css?v=4.2">
+    <link rel="stylesheet" href="style.css?v=5.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <!-- Splash Screen -->
@@ -49,8 +51,20 @@
                     <canvas id="bcvChart"></canvas>
                 </div>
                 <div class="card-footer">
-                    <span class="trend-up" id="usd-trend-indicator"><i class="fa-solid fa-arrow-trend-up"></i> +0.45%</span>
-                    <span style="color: var(--text-muted)" id="last-update-usd">Actualizado 5m ago</span>
+                    <span class="trend-up" id="usd-trend-indicator"><i class="fa-solid fa-arrow-trend-up"></i> Calculando...</span>
+                    <span style="color: var(--text-muted)" id="last-update-usd">Actualizando...</span>
+                </div>
+            </div>
+
+            <!-- Chips for Paralelo and Euro -->
+            <div class="grid-2" style="padding: 0 20px 10px;">
+                <div class="card" style="margin: 0; padding: 15px;">
+                    <div class="card-title" style="font-size: 12px;">Paralelo ($)</div>
+                    <div class="card-value" style="font-size: 18px;" id="paralelo-price">---</div>
+                </div>
+                <div class="card" style="margin: 0; padding: 15px;">
+                    <div class="card-title" style="font-size: 12px;">Euro (€)</div>
+                    <div class="card-value" style="font-size: 18px;" id="euro-top-price">---</div>
                 </div>
             </div>
 
@@ -94,14 +108,18 @@
                     <h1>Calculadora</h1>
                 </div>
                 <div class="header-icon" style="display: flex; align-items: center; gap: 5px;">
-                    <div id="currency-toggle-btn" style="cursor: pointer; padding: 10px; font-weight: 700; color: var(--accent-blue); font-size: 16px;">
-                        USD
-                    </div>
                     <div id="swap-currency-btn" style="cursor: pointer; padding: 10px;">
                         <i class="fa-solid fa-right-left"></i>
                     </div>
                 </div>
             </header>
+            
+            <div class="rate-selector" style="padding: 0 20px 15px; display: flex; gap: 8px; overflow-x: auto;">
+                <button class="rate-chip active" data-rate="bcv">BCV</button>
+                <button class="rate-chip" data-rate="paralelo">Paralelo</button>
+                <button class="rate-chip" data-rate="eur">Euro</button>
+            </div>
+
             <div class="calc-container">
                 <div class="calc-display">
                     <div class="label" id="calc-from-label">MONTO USD</div>
@@ -116,7 +134,7 @@
                     <button class="calc-btn">4</button><button class="calc-btn">5</button><button class="calc-btn">6</button>
                     <button class="calc-btn">7</button><button class="calc-btn">8</button><button class="calc-btn">9</button>
                     <button class="calc-btn">.</button><button class="calc-btn">0</button><button class="calc-btn">C</button>
-                    <button class="calc-btn action">CONVERTIR FONDOS</button>
+                    <button class="calc-btn action" id="generate-receipt-btn"><i class="fa-solid fa-receipt"></i> GENERAR RECIBO</button>
                 </div>
             </div>
         </section>
@@ -192,6 +210,39 @@
             <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
         </nav>
     </div>
-    <script src="app.js?v=4.0"></script>
+
+    <!-- Hidden Receipt Template -->
+    <div id="receipt-template" style="position: absolute; left: -9999px; background: #161B22; color: white; width: 350px; padding: 30px; border-radius: 20px; font-family: 'Outfit', sans-serif;">
+        <h2 style="text-align: center; color: #00D084; margin-bottom: 5px;">DolarVE</h2>
+        <p style="text-align: center; color: #8B949E; font-size: 12px; margin-bottom: 25px;">Recibo de Conversión</p>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px;">
+            <span style="color: #8B949E;">Monto Origen:</span>
+            <strong id="rec-from">---</strong>
+        </div>
+        
+        <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 15px 0;">
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+            <span style="color: #8B949E;">Tasa (<span id="rec-rate-name">BCV</span>):</span>
+            <strong id="rec-rate-val">---</strong>
+        </div>
+        
+        <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 15px 0;">
+        
+        <div style="display: flex; justify-content: space-between; font-size: 22px; margin-top: 20px;">
+            <span>Total:</span>
+            <strong id="rec-to" style="color: #00D084;">---</strong>
+        </div>
+        
+        <p style="text-align: center; font-size: 10px; color: #65676B; margin-top: 40px;" id="rec-date">Fecha</p>
+    </div>
+
+    <script src="app.js?v=5.0"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>

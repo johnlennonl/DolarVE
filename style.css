@@ -257,6 +257,30 @@ header {
     background: linear-gradient(90deg, var(--accent-blue), #2575fc);
     color: white;
     margin-top: 5px;
+    font-size: 16px;
+}
+
+/* Rate Selector Chips */
+.rate-selector::-webkit-scrollbar {
+    display: none;
+}
+.rate-chip {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-family: var(--font-main);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.rate-chip.active {
+    background: rgba(0, 208, 132, 0.15);
+    color: var(--accent-green);
+    border-color: var(--accent-green);
 }
 
 /* Crypto List */
