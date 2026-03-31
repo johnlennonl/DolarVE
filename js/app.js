@@ -193,6 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
                 document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
             }
+            
+            if(window.updateQuickReference) window.updateQuickReference();
 
             updateCalcDisplay();
             initChart(currentUsdRate);
@@ -228,6 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('brecha-value').innerHTML = `${brecha.toFixed(2)}% ${trendIcon}`;
                 document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
             }
+            
+            if(window.updateQuickReference) window.updateQuickReference();
             
             localStorage.setItem('dolarve_offline_data', JSON.stringify({
                 usd: currentUsdRate,
@@ -524,33 +528,96 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- SHARE DAILY RATE LOGIC ---
+    const shareDailyBtn = document.getElementById('share-daily-rate-btn');
+    if(shareDailyBtn) {
+        shareDailyBtn.addEventListener('click', () => {
+            if(window.navigator.vibrate) window.navigator.vibrate(15);
+            
+            // Populate template
+            const bcvVal = currentUsdRate ? currentUsdRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2}) : '---';
+            const parVal = currentParaleloRate ? `${currentParaleloRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs` : '--- Bs';
+            const eurVal = currentEurRate ? `${currentEurRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs` : '--- Bs';
+            
+            document.getElementById('share-bcv-val').innerText = bcvVal;
+            document.getElementById('share-par-val').innerText = parVal;
+            document.getElementById('share-eur-val').innerText = eurVal;
+            document.getElementById('share-date-val').innerText = `Actualizado: Hoy, ${new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`;
+            
+            window.showNotification("Generando imagen para compartir...");
+            
+            setTimeout(async () => {
+                const templateDiv = document.getElementById('daily-rate-template');
+                try {
+                    const canvas = await html2canvas(templateDiv, { 
+                        backgroundColor: '#0d0d0d',
+                        scale: 3, 
+                        logging: false,
+                        windowWidth: 350,
+                        scrollX: 0,
+                        scrollY: 0,
+                        x: 0,
+                        y: 0 
+                    });
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    window.btnDataToShare = imgData;
+                    
+                    const overlay = document.getElementById('receipt-modal-overlay');
+                    const imgEl = document.getElementById('receipt-preview-img');
+                    
+                    if(overlay && imgEl) {
+                        imgEl.src = imgData;
+                        overlay.style.display = 'flex';
+                        setTimeout(() => overlay.style.opacity = '1', 10);
+                    }
+                } catch(e) { 
+                    console.error(e); 
+                    window.showNotification('Falló generación. Intente refrescar.');
+                }
+            }, 100);
+        });
+    }
+
     // --- SYSTEM NOTIFICATIONS LOGIC (BCV & EURO ONLY) ---
-    const toggleNotifications = document.getElementById('toggle-notifications');
+    const toggleAnimationsBtn = document.getElementById('toggle-animations-btn');
+    if(toggleAnimationsBtn) {
+        toggleAnimationsBtn.addEventListener('click', () => {
+            toggleAnimationsBtn.classList.toggle('on');
+            if(window.navigator.vibrate) window.navigator.vibrate(10);
+        });
+    }
+
+    const toggleNotifications = document.getElementById('toggle-notifications-btn');
     if (toggleNotifications) {
         // Sync Initial State
         const savedNotifs = localStorage.getItem('dolarve_notifs_enabled');
         if (savedNotifs === 'true' && Notification.permission === 'granted') {
-            toggleNotifications.checked = true;
+            toggleNotifications.classList.add('on');
+        } else {
+            toggleNotifications.classList.remove('on');
         }
 
-        toggleNotifications.addEventListener('change', async (e) => {
-            if (e.target.checked) {
+        toggleNotifications.addEventListener('click', async () => {
+            const isTurningOn = !toggleNotifications.classList.contains('on');
+            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            
+            if (isTurningOn) {
                 if (!('Notification' in window)) {
                     window.showNotification("Tu navegador no soporta Notificaciones.");
-                    e.target.checked = false;
                     return;
                 }
                 const perm = await Notification.requestPermission();
                 if (perm === 'granted') {
+                    toggleNotifications.classList.add('on');
                     localStorage.setItem('dolarve_notifs_enabled', 'true');
                     window.showNotification("Notificaciones activadas con éxito");
                     checkAndSendSystemNotification(currentUsdRate, currentEurRate, true);
                 } else {
-                    e.target.checked = false;
-                    localStorage.setItem('dolarve_notifs_enabled', 'false');
                     window.showNotification("Permiso denegado por el dispositivo");
                 }
             } else {
+                toggleNotifications.classList.remove('on');
                 localStorage.setItem('dolarve_notifs_enabled', 'false');
                 window.showNotification("Notificaciones desactivadas");
             }
@@ -619,17 +686,39 @@ document.addEventListener('DOMContentLoaded', () => {
             testNotifBtn.style.borderColor = "var(--card-border)";
             
             setTimeout(() => {
-                sendPush("¡Simulación DolarVE!", "El Dólar BCV acaba de saltar a 45.00 Bs. 🚀\n(Esto es una prueba del sistema)");
+                const bcv = currentUsdRate ? currentUsdRate.toLocaleString('es-VE') : '---';
+                const eur = currentEurRate ? currentEurRate.toLocaleString('es-VE') : '---';
+                sendPush("¡DolarVE Cambio Oficial!", `BCV a ${bcv} Bs | Euro a ${eur} Bs`);
                 
                 testNotifBtn.innerHTML = '<i class="fa-solid fa-check"></i> Prueba Enviada';
                 testNotifBtn.style.color = "var(--accent-green)";
                 testNotifBtn.style.borderColor = "var(--accent-green)";
                 
                 setTimeout(() => {
-                    testNotifBtn.innerHTML = '<i class="fa-solid fa-clock"></i> Probar Notificación (20 seg)';
+                    testNotifBtn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Emitir Señal de Prueba (20s)';
                 }, 4000);
             }, 20000);
         });
     }
+
+    // --- QUICK REFERENCE LOGIC ---
+    let currentReferenceAmount = 100;
+    
+    window.updateQuickReference = function() {
+        const bcvEl = document.getElementById('quick-ref-bcv');
+        const eurEl = document.getElementById('quick-ref-eur');
+        if(bcvEl && currentUsdRate) bcvEl.innerText = (currentUsdRate * currentReferenceAmount).toLocaleString('es-VE') + ' Bs';
+        if(eurEl && currentEurRate) eurEl.innerText = (currentEurRate * currentReferenceAmount).toLocaleString('es-VE') + ' Bs';
+    };
+
+    document.querySelectorAll('.quick-amt-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            document.querySelectorAll('.quick-amt-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentReferenceAmount = parseInt(e.target.getAttribute('data-amt'));
+            window.updateQuickReference();
+        });
+    });
 });
 

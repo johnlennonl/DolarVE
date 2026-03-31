@@ -273,8 +273,12 @@ header {
 }
 
 .calc-btn.danger-btn {
-    color: var(--accent-red);
-    background: rgba(255, 77, 77, 0.1);
+    background: #ff3b30;
+    color: #ffffff;
+    font-weight: 700;
+}
+.calc-btn.danger-btn:active {
+    background: #d32f2f;
 }
 
 /* Rate Selector Chips */
