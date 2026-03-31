@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (baseCurrency === 'paralelo') { activeRate = currentParaleloRate; rateName = 'USD (Paralelo)'; }
         if (baseCurrency === 'eur') { activeRate = currentEurRate; rateName = 'EUR'; }
         
-        if(!fromValue || activeRate === 0) return;
+        if(!fromValue) return;
         
         let displayStr = calcInput;
         // Format input purely for display
@@ -93,6 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const parsedInput = parseFloat(calcInput) || 0;
             fromValue.innerText = parsedInput.toLocaleString('en-US', {maximumFractionDigits: 4});
+        }
+        
+        if(activeRate === 0) {
+            toValue.innerText = "0.00";
+            return;
         }
         
         const num = parseFloat(calcInput) || 0;
@@ -541,11 +546,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Populate template
             const bcvVal = currentUsdRate ? currentUsdRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2}) : '---';
-            const parVal = currentParaleloRate ? `${currentParaleloRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs` : '--- Bs';
             const eurVal = currentEurRate ? `${currentEurRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs` : '--- Bs';
             
             document.getElementById('share-bcv-val').innerText = bcvVal;
-            document.getElementById('share-par-val').innerText = parVal;
             document.getElementById('share-eur-val').innerText = eurVal;
             document.getElementById('share-date-val').innerText = `Actualizado: Hoy, ${new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`;
             
