@@ -1,0 +1,16 @@
+{
+  "name": "DolarVE",
+  "short_name": "DolarVE",
+  "description": "Finanzas en Tiempo Real - BCV, Paralelo, Euro y Cripto",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}

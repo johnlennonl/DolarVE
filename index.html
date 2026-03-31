@@ -9,7 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DolarVE">
-    <!-- Opcional: <link rel="apple-touch-icon" href="tu-icono-192x192.png"> -->
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png">
 
     <title>DolarVE | Finanzas en Tiempo Real</title>
     <link rel="stylesheet" href="style.css?v=5.0">
@@ -200,6 +201,25 @@
                 </div>
             </header>
             <div class="settings-list">
+                <div class="setting-item">
+                    <span>📱 Animaciones de Transición</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-animations" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <span>🔔 Notificaciones BCV / Euro</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-notifications">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <button id="test-notification-btn" class="btn-primary" style="margin-top: 5px; margin-bottom: 15px; width: 100%; padding: 12px; font-weight: 600; background: var(--card-bg); border: 1px solid var(--accent-green); color: var(--accent-green); border-radius: 12px;">
+                    <i class="fa-solid fa-clock"></i> Probar Notificación (20 seg)
+                </button>
                 <div class="settings-item">
                     <div>
                         <div style="font-weight: 600;">Modo Oscuro</div>
@@ -272,6 +292,10 @@
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; text-align: center;">Historial 24h</div>
                 <div style="flex: 1; position: relative;">
                     <canvas id="cryptoDetailCanvas"></canvas>
+                    <div id="crypto-chart-error" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; justify-content: center; align-items: center; color: var(--text-muted); font-size: 13px; text-align: center; flex-direction: column; gap: 10px;">
+                        <i class="fa-solid fa-chart-line" style="font-size: 24px; opacity: 0.5;"></i>
+                        Gráfico no disponible
+                    </div>
                 </div>
             </div>
         </div>

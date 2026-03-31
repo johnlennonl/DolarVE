@@ -1,9 +1,11 @@
 const CACHE_NAME = 'dolarve-v5-cache';
 const urlsToCache = [
-  './',
-  './index.html',
-  './style.css?v=5.0',
-  './app.js?v=5.0',
+  '/',
+  '/index.html',
+  '/style.css?v=5.0',
+  '/app.js?v=5.0',
+  '/manifest.json',
+  '/logo.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap'
 ];

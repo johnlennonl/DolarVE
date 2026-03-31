@@ -234,6 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 eur: currentEurRate,
                 paralelo: currentParaleloRate
             }));
+            
+            checkAndSendSystemNotification(currentUsdRate, currentEurRate);
 
             updateCalcDisplay(); // Update calc with real initial rate
             initChart(currentUsdRate); // Mount Chart.js
@@ -324,14 +326,21 @@ document.addEventListener('DOMContentLoaded', () => {
             priceEl.style.color = change >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
             
             const ctx = document.getElementById('cryptoDetailCanvas');
+            const errorOverlay = document.getElementById('crypto-chart-error');
             if(!ctx) return;
             
-            // Show loading state on canvas
+            // Show loading state
             if(detailChartInstance) { detailChartInstance.destroy(); }
+            if(errorOverlay) errorOverlay.style.display = 'none';
+            ctx.style.display = 'block';
             
             try {
                 const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1`);
                 const data = await res.json();
+                
+                if (!res.ok || !data.prices || data.prices.length === 0) {
+                    throw new Error("No chart data available");
+                }
                 
                 const prices = data.prices.map(p => p[1]);
                 const labels = data.prices.map((p, i) => i);
@@ -368,6 +377,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } catch (e) {
                 console.error('Error fetching crypto chart:', e);
+                ctx.style.display = 'none';
+                if(errorOverlay) errorOverlay.style.display = 'flex';
             }
         }
     };
@@ -510,6 +521,114 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.href = window.btnDataToShare;
                 link.click();
             }
+        });
+    }
+
+    // --- SYSTEM NOTIFICATIONS LOGIC (BCV & EURO ONLY) ---
+    const toggleNotifications = document.getElementById('toggle-notifications');
+    if (toggleNotifications) {
+        // Sync Initial State
+        const savedNotifs = localStorage.getItem('dolarve_notifs_enabled');
+        if (savedNotifs === 'true' && Notification.permission === 'granted') {
+            toggleNotifications.checked = true;
+        }
+
+        toggleNotifications.addEventListener('change', async (e) => {
+            if (e.target.checked) {
+                if (!('Notification' in window)) {
+                    window.showNotification("Tu navegador no soporta Notificaciones.");
+                    e.target.checked = false;
+                    return;
+                }
+                const perm = await Notification.requestPermission();
+                if (perm === 'granted') {
+                    localStorage.setItem('dolarve_notifs_enabled', 'true');
+                    window.showNotification("Notificaciones activadas con éxito");
+                    checkAndSendSystemNotification(currentUsdRate, currentEurRate, true);
+                } else {
+                    e.target.checked = false;
+                    localStorage.setItem('dolarve_notifs_enabled', 'false');
+                    window.showNotification("Permiso denegado por el dispositivo");
+                }
+            } else {
+                localStorage.setItem('dolarve_notifs_enabled', 'false');
+                window.showNotification("Notificaciones desactivadas");
+            }
+        });
+    }
+
+    window.checkAndSendSystemNotification = function(newBcv, newEur, isWelcome = false) {
+        if (localStorage.getItem('dolarve_notifs_enabled') !== 'true' || Notification.permission !== 'granted') return;
+
+        if (isWelcome && newBcv && newEur) {
+            sendPush("DolarVE Alertas Activas", `BCV: ${newBcv.toLocaleString('es-VE')}Bs | Euro: ${newEur.toLocaleString('es-VE')}Bs.\nTe avisaré si cambian.`);
+            localStorage.setItem('dolarve_last_bcv', newBcv.toString());
+            localStorage.setItem('dolarve_last_eur', newEur.toString());
+            return;
+        }
+
+        const lastBcv = parseFloat(localStorage.getItem('dolarve_last_bcv')) || 0;
+        const lastEur = parseFloat(localStorage.getItem('dolarve_last_eur')) || 0;
+
+        let changes = [];
+        if (lastBcv !== 0 && newBcv !== lastBcv && newBcv !== 0) {
+            changes.push(`BCV a ${newBcv.toLocaleString('es-VE')} Bs`);
+        }
+        if (lastEur !== 0 && newEur !== lastEur && newEur !== 0) {
+            changes.push(`Euro a ${newEur.toLocaleString('es-VE')} Bs`);
+        }
+
+        if (changes.length > 0) {
+            sendPush("¡DolarVE Cambio Oficial!", changes.join(" | "));
+        }
+
+        // Always Update Memory
+        if (newBcv !== 0) localStorage.setItem('dolarve_last_bcv', newBcv.toString());
+        if (newEur !== 0) localStorage.setItem('dolarve_last_eur', newEur.toString());
+    }
+
+    function sendPush(title, body) {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(title, {
+                    body: body,
+                    icon: 'logo.png',
+                    badge: 'logo.png',
+                    vibrate: [200, 100, 200]
+                });
+            }).catch(err => {
+                new Notification(title, { body, icon: 'logo.png' });
+            });
+        } else {
+            new Notification(title, { body, icon: 'logo.png' });
+        }
+    }
+
+    // --- TEST NOTIFICATIONS BUTTON ---
+    const testNotifBtn = document.getElementById('test-notification-btn');
+    if (testNotifBtn) {
+        testNotifBtn.addEventListener('click', () => {
+            if (Notification.permission !== 'granted') {
+                window.showNotification("Debes Activar y Permitir las Notificaciones Arriba Primero ☝️");
+                return;
+            }
+            if(window.navigator.vibrate) window.navigator.vibrate(20);
+            
+            testNotifBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Bloquea tu celular ahora... (20s)';
+            testNotifBtn.style.color = "var(--text-muted)";
+            testNotifBtn.style.borderColor = "var(--card-border)";
+            
+            setTimeout(() => {
+                sendPush("¡Simulación DolarVE!", "El Dólar BCV acaba de saltar a 45.00 Bs. 🚀\n(Esto es una prueba del sistema)");
+                
+                testNotifBtn.innerHTML = '<i class="fa-solid fa-check"></i> Prueba Enviada';
+                testNotifBtn.style.color = "var(--accent-green)";
+                testNotifBtn.style.borderColor = "var(--accent-green)";
+                
+                setTimeout(() => {
+                    testNotifBtn.innerHTML = '<i class="fa-solid fa-clock"></i> Probar Notificación (20 seg)';
+                }, 4000);
+            }, 20000);
         });
     }
 });
