@@ -297,8 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btc-dominance').innerText = `${globalData.data.market_cap_percentage.btc.toFixed(1)}%`;
 
         } catch (e) {
-            console.warn('Crypto fetch error (rate limit):', e);
-            // Hide global error since fiat data succeeded. Crypto will just stay on prior state or empty.
+            console.warn('Crypto fetch error:', e);
+            const listContainer = document.getElementById('dynamic-crypto-list');
+            if(listContainer) {
+                listContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);"><i class="fa-solid fa-server" style="margin-bottom:10px; font-size: 20px;"></i><br>Servidor Cripto ocupado.<br>Intenta refrescar en un rato.</div>';
+            }
         }
     }
 
@@ -423,10 +426,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', (e) => {
             if (window.navigator.vibrate) window.navigator.vibrate(15);
             
-            const val = e.target.innerText;
-            if (val.trim() === 'C') {
+            const targetBtn = e.target.closest('.calc-btn');
+            if(!targetBtn) return;
+            
+            const val = targetBtn.innerText.trim();
+            if (val === 'C') {
                 calcInput = "0";
-            } else if (val.includes('GENERAR RECIBO')) {
+            } else if (val.includes('RECIBO')) {
                 if(calcInput === "0" || calcInput === "") return;
                 
                 let rateName = '';
@@ -457,6 +463,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             backgroundColor: '#0d0d0d',
                             scale: 3,
                             logging: false,
+                            useCORS: true,
+                            allowTaint: true,
                             windowWidth: 350,
                             scrollX: 0,
                             scrollY: 0,
@@ -483,6 +491,69 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 100);
                 return;
+            } else if(val.includes('COBRAR')) {
+                if(calcInput === "0" || calcInput === "") return;
+                
+                const pm = JSON.parse(localStorage.getItem('dolarve_pagomovil'));
+                if(!pm || !pm.banco || !pm.idNum || !pm.telNum) {
+                    window.showNotification('⚠️ Configura tus Datos de Cobro en Ajustes');
+                    setTimeout(() => {
+                        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                        document.querySelectorAll('.nav-item')[3].classList.add('active');
+                        document.getElementById('settings-screen').classList.add('active');
+                    }, 1500);
+                    return;
+                }
+                
+                let rateName = '';
+                let activeRate = 0;
+                if (baseCurrency === 'bcv') { activeRate = currentUsdRate; rateName = 'Oficial BCV'; }
+                if (baseCurrency === 'paralelo') { activeRate = currentParaleloRate; rateName = 'Dólar Paralelo'; }
+                if (baseCurrency === 'eur') { activeRate = currentEurRate; rateName = 'Euro Oficial'; }
+                
+                const num = parseFloat(calcInput) || 0;
+                if(num === 0 || activeRate === 0) return;
+                
+                const bsAmount = isForeignToVes ? (num * activeRate) : num;
+                const formattedBs = bsAmount.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                document.getElementById('charge-amount-val').innerText = formattedBs;
+                document.getElementById('charge-rate-val').innerText = rateName;
+                document.getElementById('charge-bank-val').innerText = pm.banco;
+                document.getElementById('charge-phone-val').innerText = `${pm.telPrefix}-${pm.telNum}`;
+                document.getElementById('charge-id-val').innerText = `${pm.idType}${pm.idNum}`;
+                document.getElementById('charge-date-val').innerText = `Fecha: ${new Date().toLocaleDateString('es-VE')}`;
+                
+                window.showNotification('Generando Solicitud...');
+                
+                setTimeout(async () => {
+                    const chargeDiv = document.getElementById('charge-template');
+                    try {
+                        const canvas = await html2canvas(chargeDiv, {
+                            backgroundColor: '#0d0d0d',
+                            scale: 3,
+                            logging: false,
+                            useCORS: true,
+                            allowTaint: true,
+                            windowWidth: 350,
+                            scrollX: 0,
+                            scrollY: 0,
+                            x: 0,
+                            y: 0 
+                        });
+                        const imgData = canvas.toDataURL('image/png');
+                        window.btnDataToShare = imgData;
+                        
+                        const overlay = document.getElementById('receipt-modal-overlay');
+                        const imgEl = document.getElementById('receipt-preview-img');
+                        if (overlay && imgEl) {
+                            imgEl.src = imgData;
+                            overlay.style.display = 'flex';
+                            setTimeout(() => { overlay.style.opacity = '1'; }, 10);
+                        }
+                    } catch(e) { window.showNotification('Error al generar Solicitud'); }
+                }, 100);
             } else {
                 if(calcInput === "0" && val !== '.') calcInput = val;
                 else if (val === '.' && calcInput.includes('.')) return; // Prevent double dots
@@ -561,6 +632,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         backgroundColor: '#0d0d0d',
                         scale: 3, 
                         logging: false,
+                        useCORS: true,
+                        allowTaint: true,
                         windowWidth: 350,
                         scrollX: 0,
                         scrollY: 0,
@@ -728,5 +801,56 @@ document.addEventListener('DOMContentLoaded', () => {
             window.updateQuickReference();
         });
     });
+    // --- PAGO MOVIL SETTINGS LOGIC ---
+    const pmBanco = document.getElementById('pm-banco');
+    const pmIdType = document.getElementById('pm-id-type');
+    const pmIdNum = document.getElementById('pm-id-num');
+    const pmTelPrefix = document.getElementById('pm-tel-prefix');
+    const pmTelNum = document.getElementById('pm-tel-num');
+    const savePmBtn = document.getElementById('save-pm-btn');
+
+    // Load saved data
+    const savedPm = JSON.parse(localStorage.getItem('dolarve_pagomovil')) || {};
+    if(savedPm.banco && pmBanco) pmBanco.value = savedPm.banco;
+    if(savedPm.idType && pmIdType) pmIdType.value = savedPm.idType;
+    if(savedPm.idNum && pmIdNum) pmIdNum.value = savedPm.idNum;
+    if(savedPm.telPrefix && pmTelPrefix) pmTelPrefix.value = savedPm.telPrefix;
+    if(savedPm.telNum && pmTelNum) pmTelNum.value = savedPm.telNum;
+
+    if(savePmBtn) {
+        savePmBtn.addEventListener('click', () => {
+            if(window.navigator.vibrate) window.navigator.vibrate(15);
+            
+            if(!pmBanco.value || !pmIdNum.value || !pmTelNum.value) {
+                window.showNotification("Por favor, llena todos los campos");
+                return;
+            }
+
+            const pmData = {
+                banco: pmBanco.value,
+                idType: pmIdType.value,
+                idNum: pmIdNum.value,
+                telPrefix: pmTelPrefix.value,
+                telNum: pmTelNum.value
+            };
+            
+            localStorage.setItem('dolarve_pagomovil', JSON.stringify(pmData));
+            
+            // Visual feedback
+            const originalText = savePmBtn.innerHTML;
+            savePmBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Guardado Exitosamente!';
+            savePmBtn.style.background = '#000';
+            savePmBtn.style.color = '#00D084';
+            savePmBtn.style.border = '1px solid #00D084';
+            setTimeout(() => {
+                savePmBtn.innerHTML = originalText;
+                savePmBtn.style.background = 'linear-gradient(90deg, #00D084, #00a669)';
+                savePmBtn.style.color = '#000';
+                savePmBtn.style.border = 'none';
+            }, 2500);
+            
+            window.showNotification("¡Datos de Pago Móvil guardados!");
+        });
+    }
 });
 

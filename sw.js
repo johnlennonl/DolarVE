@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dolarve-v8-cache';
+const CACHE_NAME = 'dolarve-v8.1-cache';
 const urlsToCache = [
   '/',
   '/index.html',
