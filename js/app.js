@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentUsdRate = usdData.promedio;
             document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
-            let updateTime = usdData.fechaActualizacion ? usdData.fechaActualizacion.split('T')[1].substring(0,5) : new Date().toLocaleTimeString();
+            let updateTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
             document.getElementById('last-update-usd').innerText = `Actualizado: ${updateTime}`;
             
             currentEurRate = eurData.promedio;
@@ -243,7 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             updateCalcDisplay(); // Update calc with real initial rate
             initChart(currentUsdRate); // Mount Chart.js
+        } catch (e) {
+            console.error('Fiat fetch error:', e);
+            window.showNotification('Error al cargar datos del BCV');
+        }
 
+        try {
             // Fetch Top 50 Cryptos
             const cryptoRes = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false');
             const cryptoData = await cryptoRes.json();
@@ -287,8 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btc-dominance').innerText = `${globalData.data.market_cap_percentage.btc.toFixed(1)}%`;
 
         } catch (e) {
-            console.error('Fetch error:', e);
-            window.showNotification('Error al cargar datos del mercado');
+            console.warn('Crypto fetch error (rate limit):', e);
+            // Hide global error since fiat data succeeded. Crypto will just stay on prior state or empty.
         }
     }
 
@@ -444,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const rcptDiv = document.getElementById('receipt-template');
                     try {
                         const canvas = await html2canvas(rcptDiv, { 
-                            backgroundColor: 'transparent',
+                            backgroundColor: '#0d0d0d',
                             scale: 3,
                             logging: false,
                             windowWidth: 350,
