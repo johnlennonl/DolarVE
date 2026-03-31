@@ -187,6 +187,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if(currentUsdRate) document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
             if(currentParaleloRate) document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
             if(currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
+            
+            if(currentUsdRate > 0 && currentParaleloRate > 0) {
+                const brecha = ((currentParaleloRate - currentUsdRate) / currentUsdRate) * 100;
+                document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
+                document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
+            }
+
             updateCalcDisplay();
             initChart(currentUsdRate);
             return;
@@ -214,6 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentParaleloRate = parData.promedio;
             document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
             
+            if(currentUsdRate > 0 && currentParaleloRate > 0) {
+                const brecha = ((currentParaleloRate - currentUsdRate) / currentUsdRate) * 100;
+                document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
+                const trendIcon = brecha > 0 ? '<i class="fa-solid fa-arrow-trend-up" style="font-size: 14px; color: var(--accent-red);"></i>' : '';
+                document.getElementById('brecha-value').innerHTML = `${brecha.toFixed(2)}% ${trendIcon}`;
+                document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
+            }
+            
             localStorage.setItem('dolarve_offline_data', JSON.stringify({
                 usd: currentUsdRate,
                 eur: currentEurRate,
@@ -223,8 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCalcDisplay(); // Update calc with real initial rate
             initChart(currentUsdRate); // Mount Chart.js
 
-            // Fetch Top 20 Cryptos
-            const cryptoRes = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false');
+            // Fetch Top 50 Cryptos
+            const cryptoRes = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false');
             const cryptoData = await cryptoRes.json();
             
             const listContainer = document.getElementById('dynamic-crypto-list');
@@ -233,10 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 cryptoData.forEach(coin => {
                     const priceChg = coin.price_change_percentage_24h || 0;
                     const chgClass = priceChg >= 0 ? 'trend-up' : 'trend-down';
+                    const listBg = priceChg >= 0 ? 'rgba(0, 208, 132, 0.05)' : 'rgba(255, 77, 77, 0.05)';
                     
                     const itemHtml = `
-                        <div class="crypto-item">
-                            <div class="crypto-info">
+                        <div class="crypto-item" onclick="openCryptoChart('${coin.id}', '${coin.name}', '${coin.symbol.toUpperCase()}', ${coin.current_price}, ${priceChg})" style="position: relative; overflow: hidden; cursor: pointer;">
+                            <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 30%; background: linear-gradient(90deg, transparent, ${listBg}); pointer-events: none;"></div>
+                            <div class="crypto-info" style="position: relative; z-index: 1;">
                                 <div class="crypto-icon" style="background: transparent;">
                                     <img src="${coin.image}" alt="${coin.name}" style="width: 100%; height: 100%; border-radius: 50%;">
                                 </div>
@@ -245,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div>${coin.symbol.toUpperCase()}</div>
                                 </div>
                             </div>
-                            <div class="crypto-price">
+                            <div class="crypto-price" style="position: relative; z-index: 1;">
                                 <div>$${coin.current_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 6})}</div>
                                 <div class="${chgClass}">${priceChg.toFixed(2)}%</div>
                             </div>
@@ -285,6 +302,91 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setInterval(fetchData, 300000);
 
+    // Crypto Modal Logic
+    let detailChartInstance = null;
+    window.openCryptoChart = async function(id, name, symbol, price, change) {
+        if(window.navigator.vibrate) window.navigator.vibrate(10);
+        
+        const overlay = document.getElementById('crypto-modal-overlay');
+        const modal = document.getElementById('crypto-modal');
+        const titleEl = document.getElementById('crypto-modal-title');
+        const priceEl = document.getElementById('crypto-modal-price');
+        
+        if(overlay && modal && titleEl && priceEl) {
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                modal.style.transform = 'translateY(0)';
+            }, 10);
+            
+            titleEl.innerText = `${name} (${symbol})`;
+            priceEl.innerText = `$${price.toLocaleString('en-US', {maximumFractionDigits: 6})}`;
+            priceEl.style.color = change >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+            
+            const ctx = document.getElementById('cryptoDetailCanvas');
+            if(!ctx) return;
+            
+            // Show loading state on canvas
+            if(detailChartInstance) { detailChartInstance.destroy(); }
+            
+            try {
+                const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1`);
+                const data = await res.json();
+                
+                const prices = data.prices.map(p => p[1]);
+                const labels = data.prices.map((p, i) => i);
+                
+                const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+                const isUp = change >= 0;
+                gradient.addColorStop(0, isUp ? 'rgba(0, 208, 132, 0.4)' : 'rgba(255, 77, 77, 0.4)');
+                gradient.addColorStop(1, isUp ? 'rgba(0, 208, 132, 0)' : 'rgba(255, 77, 77, 0)');
+
+                detailChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: prices,
+                            borderColor: isUp ? '#00D084' : '#FF4D4D',
+                            borderWidth: 2,
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        },
+                        layout: { padding: 0 }
+                    }
+                });
+            } catch (e) {
+                console.error('Error fetching crypto chart:', e);
+            }
+        }
+    };
+    
+    const closeCryptoModal = document.getElementById('close-crypto-modal');
+    if(closeCryptoModal) {
+        closeCryptoModal.addEventListener('click', () => {
+            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            const overlay = document.getElementById('crypto-modal-overlay');
+            const modal = document.getElementById('crypto-modal');
+            overlay.style.opacity = '0';
+            modal.style.transform = 'translateY(100%)';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                if(detailChartInstance) { detailChartInstance.destroy(); detailChartInstance = null; }
+            }, 300);
+        });
+    }
+
     document.querySelectorAll('button, .nav-item').forEach(btn => {
         btn.addEventListener('click', () => {
             if (window.navigator.vibrate) window.navigator.vibrate(10);
@@ -297,13 +399,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.navigator.vibrate) window.navigator.vibrate(15);
             
             const val = e.target.innerText;
-            if(val === 'C') {
+            if (val.trim() === 'C') {
                 calcInput = "0";
-            } else if (val === 'GENERAR RECIBO') {
-                if(!window.html2canvas) {
-                    window.showNotification("Cargando motor de recibos...");
-                    return;
-                }
+            } else if (val.includes('GENERAR RECIBO')) {
+                if(calcInput === "0" || calcInput === "") return;
                 
                 let rateName = '';
                 let activeRate = 0;
@@ -329,22 +428,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(async () => {
                     const rcptDiv = document.getElementById('receipt-template');
                     try {
-                        const canvas = await html2canvas(rcptDiv, { backgroundColor: '#161B22', scale: 2 });
-                        canvas.toBlob(blob => {
-                            const file = new File([blob], 'recibo-dolarve.png', { type: 'image/png' });
-                            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                                navigator.share({
-                                    files: [file],
-                                    title: 'Recibo DolarVE',
-                                    text: 'Recibo generado al instante'
-                                });
-                            } else {
-                                const a = document.createElement('a');
-                                a.href = URL.createObjectURL(blob);
-                                a.download = 'recibo-dolarve.png';
-                                a.click();
-                            }
-                        }, 'image/png');
+                        const canvas = await html2canvas(rcptDiv, { 
+                            backgroundColor: 'transparent',
+                            scale: 3,
+                            logging: false,
+                            windowWidth: 350,
+                            scrollX: 0,
+                            scrollY: 0,
+                            x: 0,
+                            y: 0 
+                        });
+                        
+                        const imgData = canvas.toDataURL('image/png');
+                        window.btnDataToShare = imgData;
+                        
+                        const overlay = document.getElementById('receipt-modal-overlay');
+                        const imgEl = document.getElementById('receipt-preview-img');
+                        
+                        if(overlay && imgEl) {
+                            imgEl.src = imgData;
+                            overlay.style.display = 'flex';
+                            setTimeout(() => {
+                                overlay.style.opacity = '1';
+                            }, 10);
+                        }
                     } catch(e) { 
                         console.error(e); 
                         window.showNotification('Falló generación. Intente refrescar.');
@@ -365,5 +472,45 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCalcDisplay();
         });
     });
+
+    // Receipt Modal Button Handlers
+    window.btnDataToShare = null;
+    const closeReceiptBtn = document.getElementById('close-receipt-modal');
+    if(closeReceiptBtn) {
+        closeReceiptBtn.addEventListener('click', () => {
+            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            const overlay = document.getElementById('receipt-modal-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 300);
+        });
+    }
+
+    const shareReceiptBtn = document.getElementById('share-receipt-btn');
+    if(shareReceiptBtn) {
+        shareReceiptBtn.addEventListener('click', async () => {
+            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            if(!window.btnDataToShare) return;
+
+            if (navigator.share) {
+                try {
+                    const res = await fetch(window.btnDataToShare);
+                    const blob = await res.blob();
+                    const file = new File([blob], `Recibo_DolarVE_${Date.now()}.png`, { type: 'image/png' });
+                    
+                    await navigator.share({
+                        title: 'Recibo de Conversión DolarVE',
+                        files: [file]
+                    });
+                } catch (err) {
+                    console.error('Error sharing receipt:', err);
+                }
+            } else {
+                const link = document.createElement('a');
+                link.download = `Recibo_DolarVE_${Date.now()}.png`;
+                link.href = window.btnDataToShare;
+                link.click();
+            }
+        });
+    }
 });
 

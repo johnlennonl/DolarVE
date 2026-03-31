@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
 
 :root {
-    --bg-color: #0B0E14;
+    --bg-color: #000000;
     --card-bg: #161B22;
     --card-border: rgba(255, 255, 255, 0.05);
     --text-main: #FFFFFF;
@@ -110,8 +110,13 @@ header {
     font-size: 14px;
 }
 
-.trend-up { color: var(--accent-green); }
-.trend-down { color: var(--accent-red); }
+.trend-up {
+    color: var(--accent-green);
+}
+
+.trend-down {
+    color: var(--accent-red);
+}
 
 /* Chart Placeholder */
 .chart-mini {
@@ -197,8 +202,15 @@ header {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Calculator Grid */
@@ -260,10 +272,16 @@ header {
     font-size: 16px;
 }
 
+.calc-btn.danger-btn {
+    color: var(--accent-red);
+    background: rgba(255, 77, 77, 0.1);
+}
+
 /* Rate Selector Chips */
 .rate-selector::-webkit-scrollbar {
     display: none;
 }
+
 .rate-chip {
     padding: 8px 16px;
     border-radius: 20px;
@@ -277,6 +295,7 @@ header {
     white-space: nowrap;
     transition: all 0.2s ease;
 }
+
 .rate-chip.active {
     background: rgba(0, 208, 132, 0.15);
     color: var(--accent-green);
@@ -316,12 +335,26 @@ header {
     font-size: 18px;
 }
 
-.crypto-name div:first-child { font-weight: 600; }
-.crypto-name div:last-child { font-size: 12px; color: var(--text-muted); }
+.crypto-name div:first-child {
+    font-weight: 600;
+}
 
-.crypto-price { text-align: right; }
-.crypto-price div:first-child { font-weight: 600; }
-.crypto-price div:last-child { font-size: 12px; }
+.crypto-name div:last-child {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.crypto-price {
+    text-align: right;
+}
+
+.crypto-price div:first-child {
+    font-weight: 600;
+}
+
+.crypto-price div:last-child {
+    font-size: 12px;
+}
 
 /* Market Stats Widgets */
 .stats-grid {
@@ -447,13 +480,23 @@ header {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 /* Toast Notification */
@@ -467,7 +510,7 @@ header {
     padding: 15px 25px;
     border-radius: 12px;
     border: 1px solid var(--accent-green);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -482,7 +525,7 @@ header {
 }
 
 body.light-theme .toast-notification {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Crypto Search Input */
