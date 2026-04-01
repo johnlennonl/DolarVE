@@ -458,19 +458,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Allow rendering cycle
                 setTimeout(async () => {
                     const rcptDiv = document.getElementById('receipt-template');
+                    console.log('[DolarVE DEBUG] receipt-template found:', !!rcptDiv);
+                    if(!rcptDiv) { window.showNotification('Error: Plantilla recibo no encontrada'); return; }
                     try {
+                        console.log('[DolarVE DEBUG] Starting receipt html2canvas...');
                         const canvas = await html2canvas(rcptDiv, { 
                             backgroundColor: '#0d0d0d',
-                            scale: 3,
-                            logging: false,
+                            scale: 2,
+                            logging: true,
                             useCORS: true,
                             allowTaint: true,
-                            windowWidth: 350,
+                            width: 350,
+                            height: rcptDiv.scrollHeight || 400,
                             scrollX: 0,
                             scrollY: 0,
                             x: 0,
-                            y: 0 
+                            y: 0,
+                            removeContainer: true,
+                            foreignObjectRendering: false
                         });
+                        console.log('[DolarVE DEBUG] Receipt canvas DONE:', canvas.width, 'x', canvas.height);
                         
                         const imgData = canvas.toDataURL('image/png');
                         window.btnDataToShare = imgData;
@@ -481,13 +488,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(overlay && imgEl) {
                             imgEl.src = imgData;
                             overlay.style.display = 'flex';
-                            setTimeout(() => {
-                                overlay.style.opacity = '1';
-                            }, 10);
+                            overlay.offsetHeight; // force reflow
+                            overlay.style.opacity = '1';
                         }
                     } catch(e) { 
-                        console.error(e); 
-                        window.showNotification('Falló generación. Intente refrescar.');
+                        console.error('[DolarVE DEBUG] Receipt ERROR:', e); 
+                        window.showNotification('Error: ' + e.message);
                     }
                 }, 100);
                 return;
@@ -529,19 +535,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 setTimeout(async () => {
                     const chargeDiv = document.getElementById('charge-template');
+                    console.log('[DolarVE DEBUG] charge-template found:', !!chargeDiv);
+                    if(!chargeDiv) { window.showNotification('Error: Plantilla cobro no encontrada'); return; }
                     try {
+                        console.log('[DolarVE DEBUG] Starting charge html2canvas...');
                         const canvas = await html2canvas(chargeDiv, {
                             backgroundColor: '#0d0d0d',
-                            scale: 3,
-                            logging: false,
+                            scale: 2,
+                            logging: true,
                             useCORS: true,
                             allowTaint: true,
-                            windowWidth: 350,
+                            width: 350,
+                            height: chargeDiv.scrollHeight || 500,
                             scrollX: 0,
                             scrollY: 0,
                             x: 0,
-                            y: 0 
+                            y: 0,
+                            removeContainer: true,
+                            foreignObjectRendering: false
                         });
+                        console.log('[DolarVE DEBUG] Charge canvas DONE:', canvas.width, 'x', canvas.height);
                         const imgData = canvas.toDataURL('image/png');
                         window.btnDataToShare = imgData;
                         
@@ -550,9 +563,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (overlay && imgEl) {
                             imgEl.src = imgData;
                             overlay.style.display = 'flex';
-                            setTimeout(() => { overlay.style.opacity = '1'; }, 10);
+                            overlay.offsetHeight; // force reflow
+                            overlay.style.opacity = '1';
                         }
-                    } catch(e) { window.showNotification('Error al generar Solicitud'); }
+                    } catch(e) { console.error('[DolarVE DEBUG] Charge ERROR:', e); window.showNotification('Error: ' + e.message); }
                 }, 100);
             } else {
                 if(calcInput === "0" && val !== '.') calcInput = val;
@@ -627,34 +641,44 @@ document.addEventListener('DOMContentLoaded', () => {
             
             setTimeout(async () => {
                 const templateDiv = document.getElementById('daily-rate-template');
+                console.log('[DolarVE DEBUG] daily-rate-template found:', !!templateDiv);
+                if(!templateDiv) { window.showNotification('Error: Plantilla no encontrada'); return; }
+                if(typeof html2canvas !== 'function') { window.showNotification('Error: Librería no cargada'); return; }
                 try {
+                    console.log('[DolarVE DEBUG] Starting html2canvas render...');
                     const canvas = await html2canvas(templateDiv, { 
                         backgroundColor: '#0d0d0d',
-                        scale: 3, 
+                        scale: 2, 
                         logging: false,
                         useCORS: true,
                         allowTaint: true,
-                        windowWidth: 350,
+                        width: 350,
+                        height: templateDiv.scrollHeight || 400,
                         scrollX: 0,
                         scrollY: 0,
                         x: 0,
-                        y: 0 
+                        y: 0,
+                        removeContainer: true,
+                        foreignObjectRendering: false
                     });
+                    console.log('[DolarVE DEBUG] html2canvas COMPLETED! Canvas:', canvas.width, 'x', canvas.height);
                     
                     const imgData = canvas.toDataURL('image/png');
                     window.btnDataToShare = imgData;
                     
+                    // Show preview in modal
                     const overlay = document.getElementById('receipt-modal-overlay');
                     const imgEl = document.getElementById('receipt-preview-img');
-                    
                     if(overlay && imgEl) {
                         imgEl.src = imgData;
                         overlay.style.display = 'flex';
-                        setTimeout(() => overlay.style.opacity = '1', 10);
+                        // Force reflow before opacity transition
+                        overlay.offsetHeight;
+                        overlay.style.opacity = '1';
                     }
                 } catch(e) { 
-                    console.error(e); 
-                    window.showNotification('Falló generación. Intente refrescar.');
+                    console.error('[DolarVE DEBUG] html2canvas ERROR:', e); 
+                    window.showNotification('Error: ' + e.message);
                 }
             }, 100);
         });
