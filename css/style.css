@@ -506,7 +506,7 @@ header {
 /* Toast Notification */
 .toast-notification {
     position: fixed;
-    top: 20px;
+    top: calc(env(safe-area-inset-top, 20px) + 10px);
     left: 50%;
     transform: translateX(-50%) translateY(-100px);
     background: var(--card-bg);
