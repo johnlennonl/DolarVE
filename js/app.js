@@ -312,6 +312,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.classList.add('active');
                 screens.forEach(s => s.classList.remove('active'));
                 screens[index].classList.add('active');
+                
+                // Refresh calculator if switching to it
+                if (index === 1 && typeof updateCalcDisplay === 'function') {
+                    updateCalcDisplay();
+                }
             };
             if (document.startViewTransition) {
                 document.startViewTransition(doTransition);
@@ -386,6 +391,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         saveCalcState();
     }
+
+    // Initial Calculator Refresh
+    updateCalcDisplay();
 
     // Toggle Base Currency via Chips
     document.querySelectorAll('.rate-chip').forEach(chip => {
