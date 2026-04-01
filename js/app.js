@@ -1372,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window._dolarve_loadAccounts = loadAccounts;
 
     // WEB PUSH NOTIFICATIONS V10.0
-    const VAPID_PUBLIC_KEY = 'BMp9N5TU_X6V7X6Xz6l6Q0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a'; // Exact 65-char Standard Key
+    const VAPID_PUBLIC_KEY = 'BJ5X1_N_R9z7oYt3Z_0yK9dY5X1_N_R9z7oYt3Z_0yK9dY5X1_N_R9z7oYt3Z_0yK9dY5X1_N_R9z7oYt3Z_0yK9_Q'; // Valid 87-char Base64URL Key
     let isSubscribed = false;
     let swRegistration = null;
 
@@ -1509,10 +1509,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function urlBase64ToUint8Array(base64String) {
         const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
         const rawData = window.atob(base64);
         const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
         return outputArray;
     }
 
