@@ -1,9 +1,9 @@
-const CACHE_NAME = 'dolarve-v10.6-cache';
+const CACHE_NAME = 'dolarve-v10.7-cache';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/css/style.css?v=10.6',
-  '/js/app.js?v=10.6',
+  '/css/style.css?v=10.7',
+  '/js/app.js?v=10.7',
   '/manifest.json',
   '/logo.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
