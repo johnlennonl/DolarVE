@@ -1454,13 +1454,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('[DolarVE] User is subscribed:', subscription);
             
-            // Save to Supabase
+            // Save to Supabase (Optional, don't block UI if it fails)
             if (supabase && currentUser) {
-                await supabase.from('push_subscriptions').upsert({
-                    user_id: currentUser.id,
-                    subscription: subscription,
-                    platform: 'pwa'
-                });
+                try {
+                    const { error } = await supabase.from('push_subscriptions').upsert({
+                        user_id: currentUser.id,
+                        subscription: subscription,
+                        platform: 'pwa'
+                    });
+                    if (error) console.error('[DolarVE] Supabase Push Error:', error);
+                } catch (e) {
+                    console.error('[DolarVE] Supabase Integration failed:', e);
+                }
             }
             
             isSubscribed = true;
@@ -1483,7 +1488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (err.name === 'InvalidCharacterError' || err.name === 'InvalidStateError') {
                 window.showNotification('⚠️ Error técnico (VAPID Key)');
             } else {
-                window.showNotification('⚠️ Error al activar alertas');
+                window.showNotification(`⚠️ ${err.message || 'Error al activar alertas'}`);
             }
         }
     }
