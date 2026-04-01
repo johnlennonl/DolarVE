@@ -1418,8 +1418,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (!swRegistration) {
-                window.showNotification('⚠️ Sistema de alertas no disponible');
-                return;
+                try {
+                    swRegistration = await navigator.serviceWorker.ready;
+                } catch(e) {
+                    window.showNotification('⚠️ Sistema de alertas no disponible');
+                    return;
+                }
             }
 
             if (Notification.permission === 'denied') {
@@ -1519,12 +1523,20 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\-/g, '+')
             .replace(/_/g, '/');
         const rawData = window.atob(base64);
-        // FORCE EXACTLY 65 BYTES FOR VAPID (P-256 Standard)
+        // FORCE EXACTLY 65 BYTES FOR VAPID (P-256 standard point uncompressed)
         const outputArray = new Uint8Array(65);
         for (let i = 0; i < 65; ++i) {
             outputArray[i] = rawData.charCodeAt(i);
         }
         return outputArray;
+    }
+
+    // Sync settings toggle if it exists
+    const pushToggle = document.getElementById('push-notifications-toggle');
+    if(pushToggle && pushBellBtn) {
+        pushToggle.parentElement.addEventListener('click', () => {
+            pushBellBtn.click();
+        });
     }
 
     // Initial load (deferred until auth is ready)
