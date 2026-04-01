@@ -307,27 +307,31 @@
             </div>
 
             <!-- MIS CUENTAS DE PAGO MÓVIL V9.0 (Supabase) -->
-            <div class="card" style="margin-top: 20px; border: 1px solid var(--accent-green); box-shadow: 0 4px 15px rgba(0, 208, 132, 0.05);">
-                <div class="card-title" style="color: var(--accent-green); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-money-bill-transfer"></i> Mis Cuentas de Cobro</div>
-                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Agrega varias cuentas para enviar Solicitudes de Cobro. <span id="pm-sync-status" style="color: var(--accent-green);">(Sincronizado con la nube ☁️)</span></div>
+            <div style="margin-top: 15px; padding: 0 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <div>
+                        <div style="font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-wallet" style="color: var(--accent-green);"></i> Mis Cuentas de Cobro</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Agrega cuentas para solicitudes de cobro</div>
+                    </div>
+                </div>
                 
                 <!-- Saved Accounts List -->
                 <div id="pm-accounts-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
                 
-                <!-- Add Account Form (collapsible) -->
-                <div id="pm-add-form-toggle" style="cursor: pointer; text-align: center; padding: 12px; background: rgba(0, 208, 132, 0.08); border: 1px dashed rgba(0, 208, 132, 0.3); border-radius: 12px; margin-bottom: 10px;">
-                    <i class="fa-solid fa-plus" style="color: var(--accent-green); margin-right: 5px;"></i>
-                    <span style="font-weight: 600; font-size: 13px; color: var(--accent-green);">Agregar Nueva Cuenta</span>
+                <!-- Add Account Button -->
+                <div id="pm-add-form-toggle" style="cursor: pointer; text-align: center; padding: 14px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 14px; margin-bottom: 10px; transition: all 0.2s ease;">
+                    <i class="fa-solid fa-plus" style="color: var(--accent-green); margin-right: 6px;"></i>
+                    <span style="font-weight: 600; font-size: 14px; color: var(--text-main);">Agregar Cuenta</span>
                 </div>
                 
-                <div id="pm-add-form" style="display: none; flex-direction: column; gap: 15px; padding-top: 10px; border-top: 1px solid var(--card-border);">
+                <div id="pm-add-form" style="display: none; flex-direction: column; gap: 15px; padding: 20px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 14px;">
                     <div class="input-group">
-                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Etiqueta (Ej: "Cuenta Personal")</label>
-                        <input type="text" id="pm-etiqueta" placeholder="Mi Cuenta Principal" style="width: 100%; box-sizing: border-box; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Etiqueta</label>
+                        <input type="text" id="pm-etiqueta" placeholder="Ej: Cuenta Personal" style="width: 100%; box-sizing: border-box; padding: 14px; font-size: 16px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-family: 'Outfit'; outline: none;">
                     </div>
                     <div class="input-group">
                         <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Banco Destino</label>
-                        <select id="pm-banco" style="width: 100%; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                        <select id="pm-banco" style="width: 100%; padding: 14px; font-size: 16px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-family: 'Outfit'; outline: none;">
                             <option value="" disabled selected>Selecciona tu Banco...</option>
                             <option value="0102 - BANCO DE VENEZUELA">0102 - BANCO DE VENEZUELA</option>
                             <option value="0104 - VENEZOLANO DE CRÉDITO">0104 - VENEZOLANO DE CRÉDITO</option>
@@ -354,7 +358,7 @@
                     <div class="input-group">
                         <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Identificación</label>
                         <div style="display: flex; gap: 8px;">
-                            <select id="pm-id-type" style="width: 80px; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                            <select id="pm-id-type" style="width: 80px; padding: 14px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-family: 'Outfit'; outline: none;">
                                 <option value="V-">V -</option>
                                 <option value="E-">E -</option>
                                 <option value="J-">J -</option>
@@ -362,13 +366,13 @@
                                 <option value="P-">P -</option>
                                 <option value="R-">R -</option>
                             </select>
-                            <input type="tel" id="pm-id-num" placeholder="12345678" style="flex: 1; min-width: 0; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none; box-sizing: border-box;">
+                            <input type="tel" id="pm-id-num" placeholder="12345678" style="flex: 1; min-width: 0; padding: 14px; font-size: 16px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-family: 'Outfit'; outline: none; box-sizing: border-box;">
                         </div>
                     </div>
                     <div class="input-group">
                         <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Teléfono Afiliado</label>
                         <div style="display: flex; gap: 8px;">
-                            <select id="pm-tel-prefix" style="width: 100px; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                            <select id="pm-tel-prefix" style="width: 100px; padding: 14px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-family: 'Outfit'; outline: none;">
                                 <option value="0412">0412</option>
                                 <option value="0414">0414</option>
                                 <option value="0424">0424</option>
@@ -376,10 +380,10 @@
                                 <option value="0426">0426</option>
                                 <option value="0422">0422</option>
                             </select>
-                            <input type="tel" id="pm-tel-num" placeholder="1234567" maxlength="7" style="flex: 1; min-width: 0; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none; box-sizing: border-box;">
+                            <input type="tel" id="pm-tel-num" placeholder="1234567" maxlength="7" style="flex: 1; min-width: 0; padding: 14px; font-size: 16px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-family: 'Outfit'; outline: none; box-sizing: border-box;">
                         </div>
                     </div>
-                    <button id="save-pm-btn" style="width: 100%; padding: 14px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(0, 208, 132, 0.2);">
+                    <button id="save-pm-btn" style="width: 100%; padding: 16px; font-size: 15px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <i class="fa-solid fa-cloud-arrow-up"></i> Guardar en la Nube
                     </button>
                 </div>
