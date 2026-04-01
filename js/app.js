@@ -478,51 +478,76 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        try {
-            const [usdRes, eurRes, parRes] = await Promise.all([
-                fetch('https://ve.dolarapi.com/v1/dolares/oficial'),
-                fetch('https://ve.dolarapi.com/v1/euros/oficial'),
-                fetch('https://ve.dolarapi.com/v1/dolares/paralelo')
-            ]);
-            
-            const usdData = await usdRes.json();
-            const eurData = await eurRes.json();
-            const parData = await parRes.json();
+        let fetchSuccess = false;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+                const [usdRes, eurRes, parRes] = await Promise.all([
+                    fetch('https://ve.dolarapi.com/v1/dolares/oficial'),
+                    fetch('https://ve.dolarapi.com/v1/euros/oficial'),
+                    fetch('https://ve.dolarapi.com/v1/dolares/paralelo')
+                ]);
+                
+                const usdData = await usdRes.json();
+                const eurData = await eurRes.json();
+                const parData = await parRes.json();
 
-            currentUsdRate = usdData.promedio;
-            document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
-            let updateTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('last-update-usd').innerText = `Actualizado: ${updateTime}`;
-            
-            currentEurRate = eurData.promedio;
-            if(document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
-            
-            currentParaleloRate = parData.promedio;
-            document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
-            
-            if(currentUsdRate > 0 && currentParaleloRate > 0) {
-                const brecha = ((currentParaleloRate - currentUsdRate) / currentUsdRate) * 100;
-                document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
-                const trendIcon = brecha > 0 ? '<i class="fa-solid fa-arrow-trend-up" style="font-size: 14px; color: var(--accent-red);"></i>' : '';
-                document.getElementById('brecha-value').innerHTML = `${brecha.toFixed(2)}% ${trendIcon}`;
-                document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
+                currentUsdRate = usdData.promedio;
+                document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
+                let updateTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('last-update-usd').innerText = `Actualizado: ${updateTime}`;
+                
+                currentEurRate = eurData.promedio;
+                if(document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
+                
+                currentParaleloRate = parData.promedio;
+                document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
+                
+                if(currentUsdRate > 0 && currentParaleloRate > 0) {
+                    const brecha = ((currentParaleloRate - currentUsdRate) / currentUsdRate) * 100;
+                    document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
+                    const trendIcon = brecha > 0 ? '<i class="fa-solid fa-arrow-trend-up" style="font-size: 14px; color: var(--accent-red);"></i>' : '';
+                    document.getElementById('brecha-value').innerHTML = `${brecha.toFixed(2)}% ${trendIcon}`;
+                    document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
+                }
+                
+                if(window.updateQuickReference) window.updateQuickReference();
+                
+                localStorage.setItem('dolarve_offline_data', JSON.stringify({
+                    usd: currentUsdRate,
+                    eur: currentEurRate,
+                    paralelo: currentParaleloRate
+                }));
+                
+                checkAndSendSystemNotification(currentUsdRate, currentEurRate);
+
+                updateCalcDisplay();
+                initChart(currentUsdRate);
+                fetchSuccess = true;
+                break; // Exit retry loop on success
+            } catch (e) {
+                console.error(`[DolarVE] API attempt ${attempt}/3 failed:`, e);
+                if (attempt < 3) {
+                    await new Promise(r => setTimeout(r, 3000)); // Wait 3s before retry
+                }
             }
-            
-            if(window.updateQuickReference) window.updateQuickReference();
-            
-            localStorage.setItem('dolarve_offline_data', JSON.stringify({
-                usd: currentUsdRate,
-                eur: currentEurRate,
-                paralelo: currentParaleloRate
-            }));
-            
-            checkAndSendSystemNotification(currentUsdRate, currentEurRate);
-
-            updateCalcDisplay(); // Update calc with real initial rate
-            initChart(currentUsdRate); // Mount Chart.js
-        } catch (e) {
-            console.error('Fiat fetch error:', e);
-            window.showNotification('Error al cargar datos del BCV');
+        }
+        
+        // If all retries failed, load from cache
+        if (!fetchSuccess) {
+            const offlineData = JSON.parse(localStorage.getItem('dolarve_offline_data') || '{}');
+            if (offlineData.usd) {
+                currentUsdRate = offlineData.usd;
+                currentEurRate = offlineData.eur || 0;
+                currentParaleloRate = offlineData.paralelo || 0;
+                if(currentUsdRate) document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
+                if(currentParaleloRate) document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
+                if(currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
+                updateCalcDisplay();
+                initChart(currentUsdRate);
+                window.showNotification('⚠️ Usando datos guardados (sin conexión estable)');
+            } else {
+                window.showNotification('❌ Error al cargar tasas. Verifica tu conexión.');
+            }
         }
 
         try {

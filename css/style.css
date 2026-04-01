@@ -155,15 +155,32 @@ header {
     color: var(--text-muted);
     font-size: 10px;
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, transform 0.2s ease;
+    position: relative;
+    padding: 4px 12px;
+}
+
+.nav-item:active {
+    transform: scale(0.9);
 }
 
 .nav-item.active {
-    color: var(--accent-blue);
+    color: var(--accent-green);
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    width: 5px;
+    height: 5px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-green);
 }
 
 .nav-item i {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 4px;
 }
 
