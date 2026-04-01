@@ -15,7 +15,7 @@
     <link rel="icon" type="image/png" href="logo.png">
 
     <title>DolarVE | Oficial & Cripto</title>
-    <link rel="stylesheet" href="css/style.css?v=10.7">
+    <link rel="stylesheet" href="css/style.css?v=10.8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -732,7 +732,7 @@
             }).then(cacheNames => {
                 return Promise.all(cacheNames.map(name => caches.delete(name)));
             }).then(() => {
-                navigator.serviceWorker.register('sw.js?v=10.7');
+                navigator.serviceWorker.register('sw.js?v=10.8');
                 console.log('[DolarVE] Service Worker refreshed successfully');
             });
         }

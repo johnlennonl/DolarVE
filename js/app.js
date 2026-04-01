@@ -1519,12 +1519,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\-/g, '+')
             .replace(/_/g, '/');
         const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) {
+        // FORCE EXACTLY 65 BYTES FOR VAPID (P-256 Standard)
+        const outputArray = new Uint8Array(65);
+        for (let i = 0; i < 65; ++i) {
             outputArray[i] = rawData.charCodeAt(i);
         }
-        // Force 65 bytes for VAPID if necessary
-        return outputArray.length === 66 ? outputArray.slice(0, 65) : outputArray;
+        return outputArray;
     }
 
     // Initial load (deferred until auth is ready)
