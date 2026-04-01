@@ -15,7 +15,7 @@
     <link rel="icon" type="image/png" href="logo.png">
 
     <title>DolarVE | Oficial & Cripto</title>
-    <link rel="stylesheet" href="css/style.css?v=6.0">
+    <link rel="stylesheet" href="css/style.css?v=10.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -43,26 +43,44 @@
                     <span class="header-subtitle">Oficial BCV</span>
                     <h1>Bolívar Digital Pro</h1>
                 </div>
-                <div id="user-profile-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--nav-bg); border: 2px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 2px 10px rgba(0,208,132,0.2);">
-                        <img id="user-avatar-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                        <i id="user-avatar-placeholder" class="fa-solid fa-user" style="color: var(--accent-green); font-size: 16px;"></i>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div id="push-bell-btn" style="cursor: pointer; position: relative; padding: 5px;">
+                        <i class="fa-solid fa-bell" id="push-bell-icon" style="color: var(--text-muted); font-size: 20px;"></i>
+                        <span id="push-bell-dot" style="display: none; position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: var(--accent-red); border-radius: 50%; border: 2px solid var(--bg-color);"></span>
                     </div>
-                    <span id="user-short-name" style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Ingresar</span>
+                    <div id="user-profile-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--nav-bg); border: 2px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 2px 10px rgba(0,208,132,0.2);">
+                            <img id="user-avatar-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            <i id="user-avatar-placeholder" class="fa-solid fa-user" style="color: var(--accent-green); font-size: 16px;"></i>
+                        </div>
+                        <span id="user-short-name" style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Ingresar</span>
+                    </div>
                 </div>
             </header>
 
-            <div class="card">
-                <div class="card-title">USD / VES</div>
-                <div class="card-value"><span id="usd-bcv-price">---</span> <span
-                        style="font-size: 14px; font-weight: normal; color: var(--text-muted);">VES</span></div>
-                <div class="chart-mini" style="height: 80px; margin-top: 15px; background: transparent;">
-                    <canvas id="bcvChart"></canvas>
+            <div class="card" style="position: relative; overflow: hidden; border: 1px solid var(--card-border); background: var(--card-bg);">
+                <!-- Flag Colors Glow Overlay -->
+                <div style="position: absolute; top: 0; right: 0; bottom: 0; width: 100%; background: linear-gradient(135deg, rgba(255, 204, 0, 0.03) 0%, rgba(0, 51, 160, 0.03) 50%, rgba(206, 17, 38, 0.03) 100%); pointer-events: none;"></div>
+                
+                <div style="position: relative; z-index: 1;">
+                    <div class="card-title">USD / VES (Oficial)</div>
+                    <div class="card-value"><span id="usd-bcv-price">---</span> <span
+                            style="font-size: 14px; font-weight: normal; color: var(--text-muted);">VES</span></div>
+                    <div class="chart-mini" style="height: 80px; margin-top: 15px; background: transparent;">
+                        <canvas id="bcvChart"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <span class="trend-up" id="usd-trend-indicator" style="background: rgba(0, 208, 132, 0.1); padding: 4px 8px; border-radius: 6px;"><i class="fa-solid fa-check-circle"></i>
+                            BCV</span>
+                        <span style="color: var(--text-muted)" id="last-update-usd">Actualizando...</span>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <span class="trend-up" id="usd-trend-indicator" style="background: rgba(0, 208, 132, 0.1); padding: 4px 8px; border-radius: 6px;"><i class="fa-solid fa-check-circle"></i>
-                        Oficial</span>
-                    <span style="color: var(--text-muted)" id="last-update-usd">Actualizando...</span>
+                
+                <!-- Bottom Flag Stripe -->
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 3px; display: flex;">
+                    <div style="flex: 1; background: #ffcc00; opacity: 0.6;"></div>
+                    <div style="flex: 1; background: #0033a0; opacity: 0.6;"></div>
+                    <div style="flex: 1; background: #ce1126; opacity: 0.6;"></div>
                 </div>
             </div>
 
@@ -130,6 +148,55 @@
                 </div>
             </div>
 
+            <!-- Monedas Internacionales -->
+            <div style="padding: 10px 20px 5px;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-globe" style="color: #f1c40f;"></i> Mercado Internacional (Dólar vs)
+                </div>
+                
+                <!-- Card Colombia (Main) -->
+                <div class="card" style="margin: 0 0 10px; padding: 18px; background: rgba(241, 196, 15, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1;">
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Peso Colombiano (COP)</div>
+                            <div style="font-size: 22px; font-weight: 700; color: var(--text-main);" id="home-cop-rate">--- <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="width: 42px; height: 42px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; display: flex; justify-content: center; align-items: center; color: #f1c40f; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                                <i class="fa-solid fa-flag" style="font-size: 18px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.08)); pointer-events: none;"></div>
+                </div>
+
+                <!-- Cards Brazil and Chile -->
+                <div class="grid-2" style="padding: 0; gap: 10px;">
+                    <!-- Card Brasil -->
+                    <div class="card" style="margin: 0; padding: 15px; background: rgba(0, 151, 57, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="position: relative; z-index: 1;">
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Brasil (BRL)</div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-brl-rate">--- <span style="font-size: 11px; font-weight: 400;">BRL</span></div>
+                        </div>
+                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(0, 151, 57, 0.1)); pointer-events: none;"></div>
+                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #009739; opacity: 0.3;">
+                            <i class="fa-solid fa-earth-americas"></i>
+                        </div>
+                    </div>
+                    <!-- Card Chile -->
+                    <div class="card" style="margin: 0; padding: 15px; background: rgba(213, 43, 30, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="position: relative; z-index: 1;">
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Chile (CLP)</div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-clp-rate">--- <span style="font-size: 11px; font-weight: 400;">CLP</span></div>
+                        </div>
+                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(37, 117, 252, 0.1)); pointer-events: none;"></div>
+                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #2575fc; opacity: 0.3;">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div style="padding: 20px 20px 10px;">
                 <!-- Referencia Rápida Interactiva -->
                 <div class="card" style="margin: 0; padding: 15px;">
@@ -182,10 +249,11 @@
                 </div>
             </header>
 
-            <div class="rate-selector" style="padding: 0 20px 15px; display: flex; gap: 8px; overflow-x: auto;">
+            <div class="rate-selector" style="padding: 0 20px 15px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;">
                 <button class="rate-chip active" data-rate="bcv">BCV</button>
                 <button class="rate-chip" data-rate="paralelo">Paralelo</button>
                 <button class="rate-chip" data-rate="eur">Euro</button>
+                <button class="rate-chip" data-rate="cop">Peso COP</button>
             </div>
 
             <div class="calc-container">
@@ -209,8 +277,8 @@
                         class="calc-btn danger-btn">C</button>
                     
                     <div style="grid-column: span 3; display: flex; gap: 10px;">
-                        <button class="calc-btn action" id="generate-receipt-btn" style="flex: 1; font-size: 14px; padding: 15px;"><i class="fa-solid fa-receipt"></i> RECIBO</button>
-                        <button class="calc-btn action" id="generate-charge-btn" style="flex: 1; background: rgba(0, 208, 132, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 208, 132, 0.2); font-size: 14px; padding: 15px; box-shadow: 0 4px 10px rgba(0,208,132,0.1);"><i class="fa-solid fa-file-invoice-dollar"></i> COBRAR</button>
+                        <button class="calc-btn action" id="generate-receipt-btn" style="flex: 1; font-size: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-receipt"></i> RECIBO</button>
+                        <button class="calc-btn action" id="generate-charge-btn" style="flex: 1; background: rgba(0, 208, 132, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 208, 132, 0.2); font-size: 14px; padding: 15px; box-shadow: 0 4px 10px rgba(0,208,132,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-file-invoice-dollar"></i> COBRAR</button>
                     </div>
                 </div>
             </div>
@@ -664,7 +732,7 @@
             }).then(cacheNames => {
                 return Promise.all(cacheNames.map(name => caches.delete(name)));
             }).then(() => {
-                navigator.serviceWorker.register('sw.js?v=8.7');
+                navigator.serviceWorker.register('sw.js?v=10.0');
                 console.log('[DolarVE] Service Worker refreshed successfully');
             });
         }

@@ -339,6 +339,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUsdRate = 0;
     let currentEurRate = 0;
     let currentParaleloRate = 0;
+    let currentCopRate = 0;
+    let currentBrlRate = 0;
+    let currentClpRate = 0;
     let baseCurrency = localStorage.getItem('dolarve_base') || 'bcv';
     let isForeignToVes = localStorage.getItem('dolarve_direction') ? localStorage.getItem('dolarve_direction') === 'true' : true;
     let calcInput = localStorage.getItem('dolarve_calc') || "1";
@@ -360,6 +363,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (baseCurrency === 'bcv') { activeRate = currentUsdRate; rateName = 'USD (BCV)'; }
         if (baseCurrency === 'paralelo') { activeRate = currentParaleloRate; rateName = 'USD (Paralelo)'; }
         if (baseCurrency === 'eur') { activeRate = currentEurRate; rateName = 'EUR'; }
+        if (baseCurrency === 'cop') { 
+            activeRate = currentCopRate || 3900; 
+            rateName = 'PESO COP'; 
+        }
         
         if(!fromValue) return;
         
@@ -378,11 +385,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const num = parseFloat(calcInput) || 0;
-        const result = isForeignToVes ? (num * activeRate) : (num / activeRate);
+        let result = isForeignToVes ? (num * activeRate) : (num / activeRate);
+        
+        // Final Display Formatting
         toValue.innerText = result.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
-        fromLabel.innerText = isForeignToVes ? `MONTO ${rateName.split(' ')[0]}` : "MONTO VES";
-        toLabel.innerText = isForeignToVes ? "RESULTADO VES" : `RESULTADO ${rateName.split(' ')[0]}`;
+        if (baseCurrency === 'cop') {
+            fromLabel.innerText = isForeignToVes ? "MONTO USD" : "MONTO COP";
+            toLabel.innerText = isForeignToVes ? "RESULTADO COP" : "RESULTADO USD";
+            // Hide COBRAR for COP (not valid for Pago Movil)
+            if(document.getElementById('generate-charge-btn')) document.getElementById('generate-charge-btn').style.display = 'none';
+        } else {
+            fromLabel.innerText = isForeignToVes ? `MONTO ${rateName.split(' ')[0]}` : "MONTO VES";
+            toLabel.innerText = isForeignToVes ? "RESULTADO VES" : `RESULTADO ${rateName.split(' ')[0]}`;
+            if(document.getElementById('generate-charge-btn')) document.getElementById('generate-charge-btn').style.display = 'flex';
+        }
         
         // Update chip UI
         document.querySelectorAll('.rate-chip').forEach(c => c.classList.remove('active'));
@@ -468,11 +485,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if(offlineData.usd) currentUsdRate = offlineData.usd;
             if(offlineData.eur) currentEurRate = offlineData.eur;
             if(offlineData.paralelo) currentParaleloRate = offlineData.paralelo;
+            if(offlineData.cop) currentCopRate = offlineData.cop;
+            if(offlineData.brl) currentBrlRate = offlineData.brl;
+            if(offlineData.clp) currentClpRate = offlineData.clp;
             
             if(currentUsdRate) document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
             if(currentParaleloRate) document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
             if(currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
             
+            // Home COP Rate Update
+            if (currentCopRate && document.getElementById('home-cop-rate')) {
+                document.getElementById('home-cop-rate').innerHTML = `${currentCopRate.toLocaleString('es-VE')} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span>`;
+            }
+            if (currentBrlRate && document.getElementById('home-brl-rate')) {
+                document.getElementById('home-brl-rate').innerHTML = `${currentBrlRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">BRL</span>`;
+            }
+            if (currentClpRate && document.getElementById('home-clp-rate')) {
+                document.getElementById('home-clp-rate').innerHTML = `${currentClpRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">CLP</span>`;
+            }
+
             if(currentUsdRate > 0 && currentParaleloRate > 0) {
                 const brecha = ((currentParaleloRate - currentUsdRate) / currentUsdRate) * 100;
                 document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
@@ -489,17 +520,33 @@ document.addEventListener('DOMContentLoaded', () => {
         let fetchSuccess = false;
         for (let attempt = 1; attempt <= 3; attempt++) {
             try {
-                const [usdRes, eurRes, parRes] = await Promise.all([
+                const [usdRes, eurRes, parRes, copRes] = await Promise.all([
                     fetch('https://ve.dolarapi.com/v1/dolares/oficial'),
                     fetch('https://ve.dolarapi.com/v1/euros/oficial'),
-                    fetch('https://ve.dolarapi.com/v1/dolares/paralelo')
+                    fetch('https://ve.dolarapi.com/v1/dolares/paralelo'),
+                    fetch('https://open.er-api.com/v6/latest/USD')
                 ]);
                 
                 const usdData = await usdRes.json();
                 const eurData = await eurRes.json();
                 const parData = await parRes.json();
+                const copData = await copRes.json();
 
                 currentUsdRate = usdData.promedio;
+                currentCopRate = copData.rates.COP;
+                currentBrlRate = copData.rates.BRL;
+                currentClpRate = copData.rates.CLP;
+
+                if (document.getElementById('home-cop-rate')) {
+                    document.getElementById('home-cop-rate').innerHTML = `${currentCopRate.toLocaleString('es-VE')} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span>`;
+                }
+                if (document.getElementById('home-brl-rate')) {
+                    document.getElementById('home-brl-rate').innerHTML = `${currentBrlRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">BRL</span>`;
+                }
+                if (document.getElementById('home-clp-rate')) {
+                    document.getElementById('home-clp-rate').innerHTML = `${currentClpRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">CLP</span>`;
+                }
+
                 document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
                 let updateTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('last-update-usd').innerText = `Actualizado: ${updateTime}`;
@@ -523,7 +570,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('dolarve_offline_data', JSON.stringify({
                     usd: currentUsdRate,
                     eur: currentEurRate,
-                    paralelo: currentParaleloRate
+                    paralelo: currentParaleloRate,
+                    cop: currentCopRate,
+                    brl: currentBrlRate,
+                    clp: currentClpRate
                 }));
                 
                 checkAndSendSystemNotification(currentUsdRate, currentEurRate);
@@ -1320,6 +1370,145 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Make functions globally accessible for the auth state change
     window._dolarve_loadAccounts = loadAccounts;
+
+    // WEB PUSH NOTIFICATIONS V10.0
+    const VAPID_PUBLIC_KEY = 'BOMi-X6V7X6Xz6l6Q0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0'; // Replace with a real VAPID key in production
+    let isSubscribed = false;
+    let swRegistration = null;
+
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        navigator.serviceWorker.ready.then(registration => {
+            swRegistration = registration;
+            checkPushSubscription();
+        });
+    }
+
+    async function checkPushSubscription() {
+        if (!swRegistration) return;
+        const subscription = await swRegistration.pushManager.getSubscription();
+        isSubscribed = !(subscription === null);
+        updatePushUI();
+    }
+
+    function updatePushUI() {
+        const bellIcon = document.getElementById('push-bell-icon');
+        if (!bellIcon) return;
+        if (isSubscribed) {
+            bellIcon.style.color = 'var(--accent-green)';
+            bellIcon.classList.remove('fa-bell');
+            bellIcon.classList.add('fa-bell');
+        } else {
+            bellIcon.style.color = 'var(--text-muted)';
+        }
+    }
+
+    const pushBellBtn = document.getElementById('push-bell-btn');
+    if (pushBellBtn) {
+        pushBellBtn.addEventListener('click', async () => {
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
+            
+            // Seamless wait if not yet ready
+            if (!swRegistration && 'serviceWorker' in navigator) {
+                try {
+                    swRegistration = await navigator.serviceWorker.ready;
+                } catch(e) {
+                    window.showNotification('⚠️ El navegador no soporta alertas');
+                    return;
+                }
+            }
+
+            if (!swRegistration) {
+                window.showNotification('⚠️ Sistema de alertas no disponible');
+                return;
+            }
+
+            if (Notification.permission === 'denied') {
+                window.showNotification('⚠️ Permiso denegado: Actívalo en ajustes');
+                return;
+            }
+
+            // iOS PWA Check (Push requires Add to Home Screen)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            if (isIOS && !isStandalone) {
+                window.showNotification('📲 Instala la app para recibir alertas');
+                return;
+            }
+
+            if (isSubscribed) {
+                unsubscribeUser();
+            } else {
+                subscribeUser();
+            }
+        });
+    }
+
+    async function subscribeUser() {
+        if (!swRegistration) return;
+        try {
+            const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+            const subscription = await swRegistration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: applicationServerKey
+            });
+
+            console.log('[DolarVE] User is subscribed:', subscription);
+            
+            // Save to Supabase
+            if (supabase && currentUser) {
+                await supabase.from('push_subscriptions').upsert({
+                    user_id: currentUser.id,
+                    subscription: subscription,
+                    platform: 'pwa'
+                });
+            }
+            
+            isSubscribed = true;
+            updatePushUI();
+            window.showNotification('✅ Notificaciones activadas en este dispositivo');
+            
+            // Optional: simulate a "test" notification for UX
+            setTimeout(() => {
+                if (swRegistration) {
+                    swRegistration.showNotification('DolarVE', {
+                        body: '¡Ya estás listo para recibir alertas en tiempo real! 🔔',
+                        icon: '/logo.png'
+                    });
+                }
+            }, 1000);
+        } catch (err) {
+            console.error('[DolarVE] Failed to subscribe the user: ', err);
+            window.showNotification('⚠️ Error al activar notificaciones');
+        }
+    }
+
+    async function unsubscribeUser() {
+        if (!swRegistration) return;
+        try {
+            const subscription = await swRegistration.pushManager.getSubscription();
+            if (subscription) {
+                await subscription.unsubscribe();
+                // Remove from Supabase
+                if (supabase && currentUser) {
+                    await supabase.from('push_subscriptions').delete().eq('user_id', currentUser.id);
+                }
+            }
+            isSubscribed = false;
+            updatePushUI();
+            window.showNotification('🔕 Notificaciones desactivadas');
+        } catch (err) {
+            console.error('[DolarVE] Error unsubscribing', err);
+        }
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
+        return outputArray;
+    }
 
     // Initial load (deferred until auth is ready)
     setTimeout(() => { loadAccounts(); }, 1500);
