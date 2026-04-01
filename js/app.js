@@ -2,6 +2,278 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DolarVE APP LOADED');
 
+    // --- V9.0 SUPABASE AUTH CONFIGURATION ---
+    const SUPABASE_URL = 'https://urbyglfugcvzryuvivzf.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_FpTWpApM4-NPkkt_bYNilg_etUs_wtL';
+    let supabase = null;
+    let currentUser = null;
+    let isRegisterMode = false;
+    
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('[DolarVE] Supabase V9.0 Client Init OK');
+    } else {
+        console.error('[DolarVE] Supabase library not found');
+    }
+
+    // Modal UI elements
+    const userProfileBtn = document.getElementById('user-profile-btn');
+    const authModalOverlay = document.getElementById('auth-modal-overlay');
+    const closeAuthModal = document.getElementById('close-auth-modal');
+    const authToggleBtn = document.getElementById('auth-toggle-btn');
+    const authToggleText = document.getElementById('auth-toggle-text');
+    const authRegisterFields = document.getElementById('auth-register-fields');
+    const authTitle = document.getElementById('auth-title');
+    const authSubtitle = document.getElementById('auth-subtitle');
+    const authActionBtn = document.getElementById('auth-action-btn');
+    const authForm = document.getElementById('auth-form');
+    const authLoading = document.getElementById('auth-loading');
+    const authLogoutBtn = document.getElementById('auth-logout-btn');
+    const fNameInput = document.getElementById('auth-firstname');
+    const lNameInput = document.getElementById('auth-lastname');
+    const emailInput = document.getElementById('auth-email');
+    const passInput = document.getElementById('auth-password');
+    const dobInput = document.getElementById('auth-dob');
+
+    // UI Update Logic
+    function updateUserUI(user) {
+        currentUser = user;
+        const avatarImg = document.getElementById('user-avatar-img');
+        const avatarPlaceholder = document.getElementById('user-avatar-placeholder');
+        const shortName = document.getElementById('user-short-name');
+        const loginView = document.getElementById('auth-login-view');
+        const profileView = document.getElementById('auth-profile-view');
+        
+        if (user) {
+            const fName = user.user_metadata?.first_name || '';
+            const lName = user.user_metadata?.last_name || '';
+            const avatarUrl = user.user_metadata?.avatar_url || '';
+            const dob = user.user_metadata?.dob || '';
+            
+            if(shortName) shortName.innerText = fName ? fName : 'Perfil';
+            
+            // Header avatar
+            if (avatarImg && avatarPlaceholder) {
+                if (avatarUrl) {
+                    avatarImg.src = avatarUrl;
+                    avatarImg.style.display = 'block';
+                    avatarPlaceholder.style.display = 'none';
+                } else {
+                    avatarImg.style.display = 'none';
+                    avatarPlaceholder.style.display = 'block';
+                }
+            }
+            
+            // Toggle modal views
+            if (loginView) loginView.style.display = 'none';
+            if (profileView) profileView.style.display = 'block';
+            
+            // Populate profile card
+            const profName = document.getElementById('profile-display-name');
+            const profEmail = document.getElementById('profile-display-email');
+            const profDob = document.getElementById('profile-dob');
+            const profCreated = document.getElementById('profile-created');
+            const profAvatarImg = document.getElementById('profile-avatar-img');
+            const profAvatarPlaceholder = document.getElementById('profile-avatar-placeholder');
+            
+            if (profName) profName.innerText = `${fName} ${lName}`.trim() || 'Usuario';
+            if (profEmail) profEmail.innerText = user.email;
+            if (profDob) profDob.innerText = dob ? new Date(dob).toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' }) : 'No definida';
+            if (profCreated) profCreated.innerText = new Date(user.created_at).toLocaleDateString('es-VE', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            if (profAvatarImg && profAvatarPlaceholder) {
+                if (avatarUrl) {
+                    profAvatarImg.src = avatarUrl;
+                    profAvatarImg.style.display = 'block';
+                    profAvatarPlaceholder.style.display = 'none';
+                } else {
+                    profAvatarImg.style.display = 'none';
+                    profAvatarPlaceholder.style.display = 'flex';
+                }
+            }
+        } else {
+            if(shortName) shortName.innerText = 'Ingresar';
+            if (avatarImg && avatarPlaceholder) {
+                avatarImg.style.display = 'none';
+                avatarPlaceholder.style.display = 'block';
+            }
+            
+            // Toggle modal views
+            if (loginView) loginView.style.display = 'block';
+            if (profileView) profileView.style.display = 'none';
+        }
+    }
+    
+    // Avatar Upload Logic
+    const avatarWrapper = document.getElementById('profile-avatar-wrapper');
+    const avatarFileInput = document.getElementById('avatar-file-input');
+    
+    if (avatarWrapper && avatarFileInput) {
+        avatarWrapper.addEventListener('click', () => {
+            if (!currentUser) return;
+            avatarFileInput.click();
+        });
+        
+        avatarFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !supabase || !currentUser) return;
+            
+            window.showNotification('Subiendo foto...');
+            
+            const fileExt = file.name.split('.').pop();
+            const filePath = `avatars/${currentUser.id}.${fileExt}`;
+            
+            try {
+                // Upload to Supabase Storage
+                const { data, error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(filePath, file, { upsert: true, contentType: file.type });
+                
+                if (uploadError) throw uploadError;
+                
+                // Get public URL
+                const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                const publicURL = urlData.publicUrl + '?t=' + Date.now();
+                
+                // Update user metadata
+                const { error: updateError } = await supabase.auth.updateUser({
+                    data: { avatar_url: publicURL }
+                });
+                
+                if (updateError) throw updateError;
+                
+                window.showNotification('¡Foto actualizada! 📸');
+                updateUserUI(currentUser);
+            } catch(err) {
+                console.error('[DolarVE] Avatar Upload Error:', err);
+                window.showNotification('Error: ' + err.message);
+            }
+            
+            avatarFileInput.value = '';
+        });
+    }
+
+    if (supabase) {
+        // Initial Session Check
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            updateUserUI(session?.user || null);
+        });
+
+        // Listen for login/logout events
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('[DolarVE] Auth Event:', event);
+            updateUserUI(session?.user || null);
+            // Reload accounts after auth state changes
+            setTimeout(() => { if (window._dolarve_loadAccounts) window._dolarve_loadAccounts(); }, 500);
+        });
+        
+        // Modal Controls
+        if (userProfileBtn && authModalOverlay) {
+            userProfileBtn.addEventListener('click', () => {
+                if (window.navigator.vibrate) window.navigator.vibrate(10);
+                authModalOverlay.style.display = 'flex';
+                authModalOverlay.offsetHeight;
+                authModalOverlay.style.opacity = '1';
+            });
+        }
+        
+        if (closeAuthModal) {
+            closeAuthModal.addEventListener('click', () => {
+                authModalOverlay.style.opacity = '0';
+                setTimeout(() => { authModalOverlay.style.display = 'none'; }, 300);
+            });
+        }
+        
+        if (authToggleBtn) {
+            authToggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                isRegisterMode = !isRegisterMode;
+                if (isRegisterMode) {
+                    authTitle.innerText = "Crear Cuenta";
+                    authActionBtn.innerText = "Regístrate";
+                    authToggleText.innerText = "¿Ya tienes cuenta?";
+                    authToggleBtn.innerText = "Inicia Sesión";
+                    authRegisterFields.style.display = 'flex';
+                    fNameInput.required = true;
+                    lNameInput.required = true;
+                    dobInput.required = true;
+                } else {
+                    authTitle.innerText = "Iniciar Sesión";
+                    authActionBtn.innerText = "Entrar";
+                    authToggleText.innerText = "¿No tienes cuenta?";
+                    authToggleBtn.innerText = "Regístrate";
+                    authRegisterFields.style.display = 'none';
+                    fNameInput.required = false;
+                    lNameInput.required = false;
+                    dobInput.required = false;
+                }
+            });
+        }
+
+        // Form Submit
+        if (authForm) {
+            authForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = emailInput.value.trim();
+                const password = passInput.value;
+                
+                authActionBtn.style.display = 'none';
+                authLoading.style.display = 'flex';
+                
+                try {
+                    if (isRegisterMode) {
+                        const { data, error } = await supabase.auth.signUp({
+                            email,
+                            password,
+                            options: {
+                                data: {
+                                    first_name: fNameInput.value.trim(),
+                                    last_name: lNameInput.value.trim(),
+                                    dob: dobInput.value
+                                }
+                            }
+                        });
+                        if (error) throw error;
+                        
+                        if (data.session) {
+                            window.showNotification('¡Bienvenido! Registro exitoso.');
+                            closeAuthModal.click();
+                        } else {
+                            window.showNotification('¡Registro exitoso!');
+                            if (data.user?.identities?.length === 0) {
+                                window.showNotification('El correo ya está registrado o requiere confirmación.');
+                            }
+                            authToggleBtn.click();
+                        }
+                    } else {
+                        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                        if (error) throw error;
+                        window.showNotification('¡Bienvenido!');
+                        closeAuthModal.click();
+                    }
+                } catch(err) {
+                    console.error('[DolarVE] Auth Error:', err);
+                    window.showNotification('Error: ' + err.message);
+                } finally {
+                    authActionBtn.style.display = 'block';
+                    authLoading.style.display = 'none';
+                }
+            });
+        }
+        
+        // Logout
+        if (authLogoutBtn) {
+            authLogoutBtn.addEventListener('click', async () => {
+                const { error } = await supabase.auth.signOut();
+                if (error) window.showNotification('Error al salir: ' + error.message);
+                else {
+                    window.showNotification('Sesión cerrada');
+                    closeAuthModal.click();
+                }
+            });
+        }
+    }
+
     // 1. Local Storage for Theme
     const savedTheme = localStorage.getItem('dolarve_theme');
     const themeToggle = document.getElementById('theme-toggle');
@@ -500,9 +772,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if(val.includes('COBRAR')) {
                 if(calcInput === "0" || calcInput === "") return;
                 
-                const pm = JSON.parse(localStorage.getItem('dolarve_pagomovil'));
-                if(!pm || !pm.banco || !pm.idNum || !pm.telNum) {
-                    window.showNotification('⚠️ Configura tus Datos de Cobro en Ajustes');
+                if(userAccounts.length === 0) {
+                    window.showNotification('⚠️ Agrega una Cuenta de Cobro en Ajustes');
                     setTimeout(() => {
                         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -524,50 +795,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bsAmount = isForeignToVes ? (num * activeRate) : num;
                 const formattedBs = bsAmount.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 
-                document.getElementById('charge-amount-val').innerText = formattedBs;
-                document.getElementById('charge-rate-val').innerText = rateName;
-                document.getElementById('charge-bank-val').innerText = pm.banco;
-                document.getElementById('charge-phone-val').innerText = `${pm.telPrefix}-${pm.telNum}`;
-                document.getElementById('charge-id-val').innerText = `${pm.idType}${pm.idNum}`;
-                document.getElementById('charge-date-val').innerText = `Fecha: ${new Date().toLocaleDateString('es-VE')}`;
+                // Function to generate charge with selected account
+                const generateChargeWithAccount = (pm) => {
+                    document.getElementById('charge-amount-val').innerText = formattedBs;
+                    document.getElementById('charge-rate-val').innerText = rateName;
+                    document.getElementById('charge-bank-val').innerText = pm.banco_nombre;
+                    document.getElementById('charge-phone-val').innerText = `${pm.prefijo_tel}-${pm.numero_tel}`;
+                    document.getElementById('charge-id-val').innerText = `${pm.tipo_documento}${pm.numero_documento}`;
+                    document.getElementById('charge-date-val').innerText = `Fecha: ${new Date().toLocaleDateString('es-VE')}`;
                 
-                window.showNotification('Generando Solicitud...');
+                    window.showNotification('Generando Solicitud...');
                 
-                setTimeout(async () => {
-                    const chargeDiv = document.getElementById('charge-template');
-                    console.log('[DolarVE DEBUG] charge-template found:', !!chargeDiv);
-                    if(!chargeDiv) { window.showNotification('Error: Plantilla cobro no encontrada'); return; }
-                    try {
-                        console.log('[DolarVE DEBUG] Starting charge html2canvas...');
-                        const canvas = await html2canvas(chargeDiv, {
-                            backgroundColor: '#0d0d0d',
-                            scale: 2,
-                            logging: true,
-                            useCORS: true,
-                            allowTaint: true,
-                            width: 350,
-                            height: chargeDiv.scrollHeight || 500,
-                            scrollX: 0,
-                            scrollY: 0,
-                            x: 0,
-                            y: 0,
-                            removeContainer: true,
-                            foreignObjectRendering: false
-                        });
-                        console.log('[DolarVE DEBUG] Charge canvas DONE:', canvas.width, 'x', canvas.height);
-                        const imgData = canvas.toDataURL('image/png');
-                        window.btnDataToShare = imgData;
+                    setTimeout(async () => {
+                        const chargeDiv = document.getElementById('charge-template');
+                        console.log('[DolarVE DEBUG] charge-template found:', !!chargeDiv);
+                        if(!chargeDiv) { window.showNotification('Error: Plantilla cobro no encontrada'); return; }
+                        try {
+                            console.log('[DolarVE DEBUG] Starting charge html2canvas...');
+                            const canvas = await html2canvas(chargeDiv, {
+                                backgroundColor: '#0d0d0d',
+                                scale: 2,
+                                logging: true,
+                                useCORS: true,
+                                allowTaint: true,
+                                width: 350,
+                                height: chargeDiv.scrollHeight || 500,
+                                scrollX: 0,
+                                scrollY: 0,
+                                x: 0,
+                                y: 0,
+                                removeContainer: true,
+                                foreignObjectRendering: false
+                            });
+                            console.log('[DolarVE DEBUG] Charge canvas DONE:', canvas.width, 'x', canvas.height);
+                            const imgData = canvas.toDataURL('image/png');
+                            window.btnDataToShare = imgData;
                         
-                        const overlay = document.getElementById('receipt-modal-overlay');
-                        const imgEl = document.getElementById('receipt-preview-img');
-                        if (overlay && imgEl) {
-                            imgEl.src = imgData;
-                            overlay.style.display = 'flex';
-                            overlay.offsetHeight; // force reflow
-                            overlay.style.opacity = '1';
-                        }
-                    } catch(e) { console.error('[DolarVE DEBUG] Charge ERROR:', e); window.showNotification('Error: ' + e.message); }
-                }, 100);
+                            const overlay = document.getElementById('receipt-modal-overlay');
+                            const imgEl = document.getElementById('receipt-preview-img');
+                            if (overlay && imgEl) {
+                                imgEl.src = imgData;
+                                overlay.style.display = 'flex';
+                                overlay.offsetHeight; // force reflow
+                                overlay.style.opacity = '1';
+                            }
+                        } catch(e) { console.error('[DolarVE DEBUG] Charge ERROR:', e); window.showNotification('Error: ' + e.message); }
+                    }, 100);
+                }; // end generateChargeWithAccount
+                
+                // If user has exactly 1 account, use it directly. If multiple, show picker.
+                if (userAccounts.length === 1) {
+                    generateChargeWithAccount(userAccounts[0]);
+                } else {
+                    showAccountPicker(generateChargeWithAccount);
+                }
+                return;
             } else {
                 if(calcInput === "0" && val !== '.') calcInput = val;
                 else if (val === '.' && calcInput.includes('.')) return; // Prevent double dots
@@ -825,56 +1107,188 @@ document.addEventListener('DOMContentLoaded', () => {
             window.updateQuickReference();
         });
     });
-    // --- PAGO MOVIL SETTINGS LOGIC ---
+    // --- PAGO MOVIL SETTINGS LOGIC (V9.0 Supabase Multi-Account) ---
+    let userAccounts = [];
+    
+    const pmAccountsList = document.getElementById('pm-accounts-list');
+    const pmAddFormToggle = document.getElementById('pm-add-form-toggle');
+    const pmAddForm = document.getElementById('pm-add-form');
     const pmBanco = document.getElementById('pm-banco');
     const pmIdType = document.getElementById('pm-id-type');
     const pmIdNum = document.getElementById('pm-id-num');
     const pmTelPrefix = document.getElementById('pm-tel-prefix');
     const pmTelNum = document.getElementById('pm-tel-num');
+    const pmEtiqueta = document.getElementById('pm-etiqueta');
     const savePmBtn = document.getElementById('save-pm-btn');
+    const accountPickerOverlay = document.getElementById('account-picker-overlay');
+    const accountPickerSheet = document.getElementById('account-picker-sheet');
+    const accountPickerList = document.getElementById('account-picker-list');
 
-    // Load saved data
-    const savedPm = JSON.parse(localStorage.getItem('dolarve_pagomovil')) || {};
-    if(savedPm.banco && pmBanco) pmBanco.value = savedPm.banco;
-    if(savedPm.idType && pmIdType) pmIdType.value = savedPm.idType;
-    if(savedPm.idNum && pmIdNum) pmIdNum.value = savedPm.idNum;
-    if(savedPm.telPrefix && pmTelPrefix) pmTelPrefix.value = savedPm.telPrefix;
-    if(savedPm.telNum && pmTelNum) pmTelNum.value = savedPm.telNum;
-
-    if(savePmBtn) {
-        savePmBtn.addEventListener('click', () => {
-            if(window.navigator.vibrate) window.navigator.vibrate(15);
-            
-            if(!pmBanco.value || !pmIdNum.value || !pmTelNum.value) {
-                window.showNotification("Por favor, llena todos los campos");
+    // Toggle add form
+    if (pmAddFormToggle && pmAddForm) {
+        pmAddFormToggle.addEventListener('click', () => {
+            if (!currentUser) {
+                window.showNotification('⚠️ Inicia sesión para agregar cuentas');
+                if (userProfileBtn) userProfileBtn.click();
                 return;
             }
-
-            const pmData = {
-                banco: pmBanco.value,
-                idType: pmIdType.value,
-                idNum: pmIdNum.value,
-                telPrefix: pmTelPrefix.value,
-                telNum: pmTelNum.value
-            };
-            
-            localStorage.setItem('dolarve_pagomovil', JSON.stringify(pmData));
-            
-            // Visual feedback
-            const originalText = savePmBtn.innerHTML;
-            savePmBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Guardado Exitosamente!';
-            savePmBtn.style.background = '#000';
-            savePmBtn.style.color = '#00D084';
-            savePmBtn.style.border = '1px solid #00D084';
-            setTimeout(() => {
-                savePmBtn.innerHTML = originalText;
-                savePmBtn.style.background = 'linear-gradient(90deg, #00D084, #00a669)';
-                savePmBtn.style.color = '#000';
-                savePmBtn.style.border = 'none';
-            }, 2500);
-            
-            window.showNotification("¡Datos de Pago Móvil guardados!");
+            const isOpen = pmAddForm.style.display === 'flex';
+            pmAddForm.style.display = isOpen ? 'none' : 'flex';
+            pmAddFormToggle.style.display = isOpen ? 'block' : 'none';
         });
     }
+
+    // Render accounts list
+    function renderAccountsList(accounts) {
+        userAccounts = accounts;
+        if (!pmAccountsList) return;
+        
+        if (accounts.length === 0) {
+            pmAccountsList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;"><i class="fa-solid fa-wallet" style="font-size: 24px; opacity: 0.3; display: block; margin-bottom: 8px;"></i>No tienes cuentas registradas aún.</div>';
+            return;
+        }
+        
+        pmAccountsList.innerHTML = accounts.map(acc => `
+            <div style="background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 600; font-size: 14px; color: var(--accent-green); margin-bottom: 3px;">${acc.etiqueta}</div>
+                    <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${acc.banco_nombre}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">${acc.tipo_documento}${acc.numero_documento} · ${acc.prefijo_tel}-${acc.numero_tel}</div>
+                </div>
+                <button data-id="${acc.id}" class="delete-account-btn" style="background: rgba(255,59,48,0.1); border: none; color: #ff3b30; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 14px; flex-shrink: 0; margin-left: 10px;">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        `).join('');
+        
+        // Attach delete handlers
+        pmAccountsList.querySelectorAll('.delete-account-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                if (!supabase || !currentUser) return;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                const { error } = await supabase.from('cuentas_pago_movil').delete().eq('id', id);
+                if (error) {
+                    window.showNotification('Error: ' + error.message);
+                    btn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+                } else {
+                    window.showNotification('Cuenta eliminada');
+                    loadAccounts();
+                }
+            });
+        });
+    }
+
+    // Load accounts from Supabase
+    async function loadAccounts() {
+        if (!supabase || !currentUser) {
+            // Fallback: load from localStorage for non-logged users
+            const saved = JSON.parse(localStorage.getItem('dolarve_pagomovil')) || {};
+            if (saved.banco) {
+                userAccounts = [{ id: 'local', etiqueta: 'Mi Cuenta', banco_nombre: saved.banco, tipo_documento: saved.idType, numero_documento: saved.idNum, prefijo_tel: saved.telPrefix, numero_tel: saved.telNum }];
+                renderAccountsList(userAccounts);
+            } else {
+                renderAccountsList([]);
+            }
+            return;
+        }
+        
+        const { data, error } = await supabase.from('cuentas_pago_movil').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true });
+        if (error) {
+            console.error('[DolarVE] Load Accounts Error:', error);
+            renderAccountsList([]);
+        } else {
+            renderAccountsList(data || []);
+        }
+    }
+
+    // Save new account
+    if (savePmBtn) {
+        savePmBtn.addEventListener('click', async () => {
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
+            
+            if (!pmBanco.value || !pmIdNum.value || !pmTelNum.value || !pmEtiqueta.value.trim()) {
+                window.showNotification("Por favor, llena todos los campos incluyendo la etiqueta");
+                return;
+            }
+            
+            if (!supabase || !currentUser) {
+                window.showNotification('⚠️ Inicia sesión para guardar en la nube');
+                return;
+            }
+            
+            savePmBtn.disabled = true;
+            savePmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+            
+            const { error } = await supabase.from('cuentas_pago_movil').insert({
+                user_id: currentUser.id,
+                etiqueta: pmEtiqueta.value.trim(),
+                banco_nombre: pmBanco.value,
+                tipo_documento: pmIdType.value,
+                numero_documento: pmIdNum.value,
+                prefijo_tel: pmTelPrefix.value,
+                numero_tel: pmTelNum.value
+            });
+            
+            if (error) {
+                window.showNotification('Error: ' + error.message);
+            } else {
+                window.showNotification('¡Cuenta guardada en la nube! ☁️');
+                // Reset form
+                pmEtiqueta.value = '';
+                pmBanco.selectedIndex = 0;
+                pmIdNum.value = '';
+                pmTelNum.value = '';
+                pmAddForm.style.display = 'none';
+                pmAddFormToggle.style.display = 'block';
+                loadAccounts();
+            }
+            
+            savePmBtn.disabled = false;
+            savePmBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Guardar en la Nube';
+        });
+    }
+
+    // Account Picker for COBRAR
+    function showAccountPicker(callback) {
+        if (!accountPickerOverlay || !accountPickerList) return;
+        
+        accountPickerList.innerHTML = userAccounts.map((acc, i) => `
+            <button data-idx="${i}" style="width: 100%; padding: 15px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); cursor: pointer; text-align: left; font-family: 'Outfit'; transition: all 0.2s;">
+                <div style="font-weight: 600; color: var(--accent-green); margin-bottom: 3px;">${acc.etiqueta}</div>
+                <div style="font-size: 12px; color: var(--text-muted);">${acc.banco_nombre} · ${acc.tipo_documento}${acc.numero_documento}</div>
+            </button>
+        `).join('');
+        
+        accountPickerList.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.dataset.idx);
+                hideAccountPicker();
+                callback(userAccounts[idx]);
+            });
+        });
+        
+        accountPickerOverlay.style.display = 'block';
+        accountPickerOverlay.offsetHeight;
+        accountPickerOverlay.style.opacity = '1';
+        accountPickerSheet.style.transform = 'translateX(-50%) translateY(0)';
+        
+        accountPickerOverlay.addEventListener('click', (e) => {
+            if (e.target === accountPickerOverlay) hideAccountPicker();
+        }, { once: true });
+    }
+    
+    function hideAccountPicker() {
+        if (!accountPickerOverlay || !accountPickerSheet) return;
+        accountPickerSheet.style.transform = 'translateX(-50%) translateY(100%)';
+        accountPickerOverlay.style.opacity = '0';
+        setTimeout(() => { accountPickerOverlay.style.display = 'none'; }, 300);
+    }
+    
+    // Make functions globally accessible for the auth state change
+    window._dolarve_loadAccounts = loadAccounts;
+
+    // Initial load (deferred until auth is ready)
+    setTimeout(() => { loadAccounts(); }, 1500);
 });
 

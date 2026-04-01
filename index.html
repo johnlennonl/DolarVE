@@ -38,10 +38,17 @@
     <div class="app-container">
         <!-- Pantalla de Inicio -->
         <section id="home-screen" class="screen active">
-            <header>
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <div class="header-title">
                     <span class="header-subtitle">Oficial BCV</span>
                     <h1>Bolívar Digital Pro</h1>
+                </div>
+                <div id="user-profile-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--nav-bg); border: 2px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 2px 10px rgba(0,208,132,0.2);">
+                        <img id="user-avatar-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        <i id="user-avatar-placeholder" class="fa-solid fa-user" style="color: var(--accent-green); font-size: 16px;"></i>
+                    </div>
+                    <span id="user-short-name" style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Ingresar</span>
                 </div>
             </header>
 
@@ -301,72 +308,85 @@
                 </div>
             </div>
 
-            <!-- MIS DATOS DE PAGO MÓVIL V8.0 -->
+            <!-- MIS CUENTAS DE PAGO MÓVIL V9.0 (Supabase) -->
             <div class="card" style="margin-top: 20px; border: 1px solid var(--accent-green); box-shadow: 0 4px 15px rgba(0, 208, 132, 0.05);">
-                <div class="card-title" style="color: var(--accent-green); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-money-bill-transfer"></i> Mis Datos de Cobro</div>
-                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 20px;">Configura tus datos para enviar Solicitudes de Cobro a tus clientes al instante. (Guardado 100% en tu teléfono)</div>
+                <div class="card-title" style="color: var(--accent-green); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-money-bill-transfer"></i> Mis Cuentas de Cobro</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Agrega varias cuentas para enviar Solicitudes de Cobro. <span id="pm-sync-status" style="color: var(--accent-green);">(Sincronizado con la nube ☁️)</span></div>
                 
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Banco Destino</label>
-                    <select id="pm-banco" style="width: 100%; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
-                        <option value="" disabled selected>Selecciona tu Banco...</option>
-                        <option value="0102 - BANCO DE VENEZUELA">0102 - BANCO DE VENEZUELA</option>
-                        <option value="0104 - VENEZOLANO DE CRÉDITO">0104 - VENEZOLANO DE CRÉDITO</option>
-                        <option value="0105 - BANCO MERCANTIL">0105 - BANCO MERCANTIL</option>
-                        <option value="0108 - BANCO PROVINCIAL">0108 - BANCO PROVINCIAL</option>
-                        <option value="0114 - BANCARIBE">0114 - BANCARIBE</option>
-                        <option value="0115 - BANCO EXTERIOR">0115 - BANCO EXTERIOR</option>
-                        <option value="0128 - BANCO CARONÍ">0128 - BANCO CARONÍ</option>
-                        <option value="0134 - BANESCO">0134 - BANESCO</option>
-                        <option value="0137 - BANCO SOFITASA">0137 - BANCO SOFITASA</option>
-                        <option value="0138 - BANCO PLAZA">0138 - BANCO PLAZA</option>
-                        <option value="0151 - BFC FONDO COMÚN">0151 - BFC FONDO COMÚN</option>
-                        <option value="0156 - 100% BANCO">0156 - 100% BANCO</option>
-                        <option value="0157 - DELSUR">0157 - DELSUR</option>
-                        <option value="0163 - BANCO DEL TESORO">0163 - BANCO DEL TESORO</option>
-                        <option value="0171 - BANCO ACTIVO">0171 - BANCO ACTIVO</option>
-                        <option value="0172 - BANCAMIGA">0172 - BANCAMIGA</option>
-                        <option value="0174 - BANPLUS">0174 - BANPLUS</option>
-                        <option value="0175 - BDT (Bicentenario)">0175 - BDT (Bicentenario)</option>
-                        <option value="0177 - BANFANB">0177 - BANFANB</option>
-                        <option value="0191 - BNC">0191 - BNC</option>
-                    </select>
+                <!-- Saved Accounts List -->
+                <div id="pm-accounts-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
+                
+                <!-- Add Account Form (collapsible) -->
+                <div id="pm-add-form-toggle" style="cursor: pointer; text-align: center; padding: 12px; background: rgba(0, 208, 132, 0.08); border: 1px dashed rgba(0, 208, 132, 0.3); border-radius: 12px; margin-bottom: 10px;">
+                    <i class="fa-solid fa-plus" style="color: var(--accent-green); margin-right: 5px;"></i>
+                    <span style="font-weight: 600; font-size: 13px; color: var(--accent-green);">Agregar Nueva Cuenta</span>
                 </div>
                 
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Identificación</label>
-                    <div style="display: flex; gap: 8px;">
-                        <select id="pm-id-type" style="width: 80px; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
-                            <option value="V-">V -</option>
-                            <option value="E-">E -</option>
-                            <option value="J-">J -</option>
-                            <option value="G-">G -</option>
-                            <option value="P-">P -</option>
-                            <option value="R-">R -</option>
-                        </select>
-                        <input type="tel" id="pm-id-num" placeholder="12345678" style="flex: 1; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                <div id="pm-add-form" style="display: none; flex-direction: column; gap: 15px; padding-top: 10px; border-top: 1px solid var(--card-border);">
+                    <div class="input-group">
+                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Etiqueta (Ej: "Cuenta Personal")</label>
+                        <input type="text" id="pm-etiqueta" placeholder="Mi Cuenta Principal" style="width: 100%; box-sizing: border-box; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
                     </div>
-                </div>
-                
-                <div class="input-group" style="margin-bottom: 20px;">
-                    <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Teléfono Afiliado</label>
-                    <div style="display: flex; gap: 8px;">
-                        <select id="pm-tel-prefix" style="width: 100px; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
-                            <option value="0412">0412</option>
-                            <option value="0414">0414</option>
-                            <option value="0424">0424</option>
-                            <option value="0416">0416</option>
-                            <option value="0426">0426</option>
-                            <option value="0422">0422</option>
+                    <div class="input-group">
+                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Banco Destino</label>
+                        <select id="pm-banco" style="width: 100%; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                            <option value="" disabled selected>Selecciona tu Banco...</option>
+                            <option value="0102 - BANCO DE VENEZUELA">0102 - BANCO DE VENEZUELA</option>
+                            <option value="0104 - VENEZOLANO DE CRÉDITO">0104 - VENEZOLANO DE CRÉDITO</option>
+                            <option value="0105 - BANCO MERCANTIL">0105 - BANCO MERCANTIL</option>
+                            <option value="0108 - BANCO PROVINCIAL">0108 - BANCO PROVINCIAL</option>
+                            <option value="0114 - BANCARIBE">0114 - BANCARIBE</option>
+                            <option value="0115 - BANCO EXTERIOR">0115 - BANCO EXTERIOR</option>
+                            <option value="0128 - BANCO CARONÍ">0128 - BANCO CARONÍ</option>
+                            <option value="0134 - BANESCO">0134 - BANESCO</option>
+                            <option value="0137 - BANCO SOFITASA">0137 - BANCO SOFITASA</option>
+                            <option value="0138 - BANCO PLAZA">0138 - BANCO PLAZA</option>
+                            <option value="0151 - BFC FONDO COMÚN">0151 - BFC FONDO COMÚN</option>
+                            <option value="0156 - 100% BANCO">0156 - 100% BANCO</option>
+                            <option value="0157 - DELSUR">0157 - DELSUR</option>
+                            <option value="0163 - BANCO DEL TESORO">0163 - BANCO DEL TESORO</option>
+                            <option value="0171 - BANCO ACTIVO">0171 - BANCO ACTIVO</option>
+                            <option value="0172 - BANCAMIGA">0172 - BANCAMIGA</option>
+                            <option value="0174 - BANPLUS">0174 - BANPLUS</option>
+                            <option value="0175 - BDT (Bicentenario)">0175 - BDT (Bicentenario)</option>
+                            <option value="0177 - BANFANB">0177 - BANFANB</option>
+                            <option value="0191 - BNC">0191 - BNC</option>
                         </select>
-                        <input type="tel" id="pm-tel-num" placeholder="1234567" maxlength="7" style="flex: 1; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
                     </div>
+                    <div class="input-group">
+                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Identificación</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="pm-id-type" style="width: 80px; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                                <option value="V-">V -</option>
+                                <option value="E-">E -</option>
+                                <option value="J-">J -</option>
+                                <option value="G-">G -</option>
+                                <option value="P-">P -</option>
+                                <option value="R-">R -</option>
+                            </select>
+                            <input type="tel" id="pm-id-num" placeholder="12345678" style="flex: 1; min-width: 0; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Teléfono Afiliado</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="pm-tel-prefix" style="width: 100px; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none;">
+                                <option value="0412">0412</option>
+                                <option value="0414">0414</option>
+                                <option value="0424">0424</option>
+                                <option value="0416">0416</option>
+                                <option value="0426">0426</option>
+                                <option value="0422">0422</option>
+                            </select>
+                            <input type="tel" id="pm-tel-num" placeholder="1234567" maxlength="7" style="flex: 1; min-width: 0; padding: 12px; background: var(--nav-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 10px; font-family: 'Outfit'; outline: none; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <button id="save-pm-btn" style="width: 100%; padding: 14px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(0, 208, 132, 0.2);">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Guardar en la Nube
+                    </button>
                 </div>
-                
-                <button id="save-pm-btn" style="width: 100%; padding: 14px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(0, 208, 132, 0.2);">
-                    <i class="fa-solid fa-floppy-disk"></i> Guardar Mis Datos
-                </button>
             </div>
+
 
             <div
                 style="text-align: center; padding: 40px 20px 20px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
@@ -374,6 +394,7 @@
                 <div style="font-size: 11px; opacity: 0.6;">Versión 8.0.0 (Beta)</div>
                 <div style="font-size: 11px; margin-top: 8px; opacity: 0.4;">Desarrollado por John Lennon 🇻🇪</div>
             </div>
+
         </section>
 
         <nav class="bottom-nav">
@@ -382,6 +403,16 @@
             <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Cripto</span></a>
             <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
         </nav>
+    </div>
+
+    <!-- Account Picker Bottom Sheet (for COBRAR - Global Overlay) -->
+    <div id="account-picker-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 99998; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease;">
+        <div id="account-picker-sheet" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--card-bg); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 20px)); transform: translateX(-50%) translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div style="width: 40px; height: 4px; background: var(--text-muted); border-radius: 2px; margin: 0 auto 15px; opacity: 0.4;"></div>
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 5px;">Selecciona una Cuenta</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">¿A cuál cuenta deseas que te paguen?</p>
+            <div id="account-picker-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;"></div>
+        </div>
     </div>
 
 
@@ -541,7 +572,86 @@
         </div>
     </div>
 
-    <script src="js/app.js?v=8.7&t=1775001"></script>
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 99999; backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease;">
+        <div style="width: 100%; max-width: 350px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 25px; display: flex; flex-direction: column; gap: 15px; position: relative;">
+            <div id="close-auth-modal" style="position: absolute; top: 15px; right: 15px; cursor: pointer; color: var(--text-muted); z-index: 2;"><i class="fa-solid fa-xmark" style="font-size: 20px;"></i></div>
+            
+            <!-- LOGIN / REGISTER VIEW -->
+            <div id="auth-login-view">
+                <div style="text-align: center; margin-bottom: 5px;">
+                    <h2 id="auth-title" style="font-size: 20px; color: var(--accent-green); font-weight: 700;">Iniciar Sesión</h2>
+                    <p id="auth-subtitle" style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">Accede a tu perfil de DolarVE</p>
+                </div>
+                
+                <form id="auth-form" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div id="auth-register-fields" style="display: none; flex-direction: column; gap: 15px;">
+                        <div style="display: flex; gap: 10px; width: 100%;">
+                            <input type="text" id="auth-firstname" placeholder="Nombres" style="flex: 1; min-width: 0; padding: 14px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 12px; outline: none; font-family: 'Outfit'; box-sizing: border-box;">
+                            <input type="text" id="auth-lastname" placeholder="Apellidos" style="flex: 1; min-width: 0; padding: 14px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 12px; outline: none; font-family: 'Outfit'; box-sizing: border-box;">
+                        </div>
+                        <div class="input-group">
+                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 500;">Fecha de Nacimiento</label>
+                            <input type="date" id="auth-dob" style="width: 100%; box-sizing: border-box; padding: 12px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 12px; outline: none; color-scheme: dark; font-family: 'Outfit';">
+                        </div>
+                    </div>
+                    
+                    <input type="email" id="auth-email" placeholder="Correo Electrónico" required style="width: 100%; box-sizing: border-box; padding: 14px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 12px; outline: none; font-family: 'Outfit';">
+                    <input type="password" id="auth-password" placeholder="Contraseña" required minlength="6" style="width: 100%; box-sizing: border-box; padding: 14px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 12px; outline: none; font-family: 'Outfit';">
+                    
+                    <!-- Loading Spinner for Auth -->
+                    <div id="auth-loading" style="display: none; justify-content: center; padding: 10px;">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="color: var(--accent-green); font-size: 24px;"></i>
+                    </div>
+                    
+                    <button type="submit" id="auth-action-btn" style="width: 100%; padding: 16px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 5px; font-family: 'Outfit'; box-shadow: 0 4px 15px rgba(0,208,132,0.2);">Entrar</button>
+                </form>
+                
+                <div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 5px;">
+                    <span id="auth-toggle-text">¿No tienes cuenta?</span>
+                    <a href="#" id="auth-toggle-btn" style="color: var(--accent-green); text-decoration: none; font-weight: 600; margin-left: 5px;">Regístrate</a>
+                </div>
+            </div>
+
+            <!-- PROFILE VIEW (shown when logged in) -->
+            <div id="auth-profile-view" style="display: none;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <!-- Avatar with upload -->
+                    <div id="profile-avatar-wrapper" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 15px; position: relative; cursor: pointer; border: 3px solid var(--accent-green); box-shadow: 0 0 20px rgba(0,208,132,0.15);">
+                        <img id="profile-avatar-img" src="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+                        <div id="profile-avatar-placeholder" style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, rgba(0,208,132,0.15), rgba(62,139,255,0.1)); display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-user" style="font-size: 32px; color: var(--accent-green); opacity: 0.6;"></i>
+                        </div>
+                        <div style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg);">
+                            <i class="fa-solid fa-camera" style="font-size: 12px; color: #000;"></i>
+                        </div>
+                    </div>
+                    <input type="file" id="avatar-file-input" accept="image/*" style="display: none;">
+                    
+                    <h2 id="profile-display-name" style="font-size: 20px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px;">---</h2>
+                    <p id="profile-display-email" style="font-size: 13px; color: var(--text-muted);">---</p>
+                </div>
+                
+                <!-- User Info Card -->
+                <div style="background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 15px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-calendar" style="width: 16px; margin-right: 5px;"></i>Nacimiento</span>
+                        <span id="profile-dob" style="font-size: 13px; font-weight: 600;">---</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-clock" style="width: 16px; margin-right: 5px;"></i>Miembro desde</span>
+                        <span id="profile-created" style="font-size: 13px; font-weight: 600;">---</span>
+                    </div>
+                </div>
+                
+                <button id="auth-logout-btn" style="width: 100%; padding: 14px; background: rgba(255,59,48,0.08); color: #ff3b30; border: 1px solid rgba(255,59,48,0.15); border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; font-size: 14px;"><i class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i>Cerrar Sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase SDK v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/app.js?v=9.0"></script>
     <script>
         // Force clear all old service workers and caches, then re-register
         if ('serviceWorker' in navigator) {
