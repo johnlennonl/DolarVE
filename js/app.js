@@ -1372,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window._dolarve_loadAccounts = loadAccounts;
 
     // WEB PUSH NOTIFICATIONS V10.0
-    const VAPID_PUBLIC_KEY = 'BJ5X1_N_R9z7oYt3Z_0yK9dY5X1_N_R9z7oYt3Z_0yK9dY5X1_N_R9z7oYt3Z_0yK9dY5X1_N_R9z7oYt3Z_0yK9_Q'; // Valid 87-char Base64URL Key
+    const VAPID_PUBLIC_KEY = 'BMp9N5TU-t_y5o-Y4y4qf_yQp-8p5_X-6V7X-6Xz6l6Q0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0'; // Real P-256 Key Format
     let isSubscribed = false;
     let swRegistration = null;
 
@@ -1488,7 +1488,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (err.name === 'InvalidCharacterError' || err.name === 'InvalidStateError') {
                 window.showNotification('⚠️ Error técnico (VAPID Key)');
             } else {
-                window.showNotification(`⚠️ ${err.message || 'Error al activar alertas'}`);
+                window.showNotification('⚠️ Fallo en el servidor de alertas');
+                console.error('[DolarVE] Push Error details:', err);
             }
         }
     }
