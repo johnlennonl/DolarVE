@@ -586,5 +586,45 @@ body.light-theme .toast-notification {
 @keyframes pulse-red {
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
     70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 77, 77, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
 }
+
+/* --- Legal & Cookies Components --- */
+#terms-modal div::-webkit-scrollbar {
+    width: 6px;
+}
+
+#terms-modal div::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#terms-modal div::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+body.light-theme #terms-modal div::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme #cookies-banner {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+body.light-theme #terms-modal {
+    background: var(--card-bg);
+}
+
+body.light-theme #terms-modal header {
+    background: #f8f9fa;
+}
+
+@media (max-width: 480px) {
+    #cookies-banner {
+        left: 15px;
+        right: 15px;
+        bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px) + 15px);
+    }
+}
+

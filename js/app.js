@@ -1549,6 +1549,65 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- LEGAL: Cookies & Terms Logic ---
+    const cookiesBanner = document.getElementById('cookies-banner');
+    const acceptCookiesBtn = document.getElementById('accept-cookies-btn');
+    const viewTermsCookiesBtn = document.getElementById('view-terms-cookies-btn');
+    const termsModalOverlay = document.getElementById('terms-modal-overlay');
+    const termsModal = document.getElementById('terms-modal');
+    const closeTermsModal = document.getElementById('close-terms-modal');
+    const confirmTermsBtn = document.getElementById('confirm-terms-btn');
+    const openTermsBtn = document.getElementById('open-terms-btn');
+
+    // Show banner if not accepted
+    const cookiesAccepted = localStorage.getItem('dolarve_cookies_accepted');
+    if (!cookiesAccepted && cookiesBanner) {
+        setTimeout(() => {
+            cookiesBanner.style.display = 'block';
+            setTimeout(() => {
+                cookiesBanner.style.transform = 'translateY(0)';
+            }, 100);
+        }, 3000);
+    }
+
+    if (acceptCookiesBtn) {
+        acceptCookiesBtn.addEventListener('click', () => {
+            localStorage.setItem('dolarve_cookies_accepted', 'true');
+            cookiesBanner.style.transform = 'translateY(150%)';
+            if (window.navigator.vibrate) window.navigator.vibrate(20);
+            setTimeout(() => {
+                cookiesBanner.style.display = 'none';
+            }, 600);
+            window.showNotification('¡Gracias! Tus preferencias han sido guardadas. 🍪');
+        });
+    }
+
+    const openTermsFunc = () => {
+        if (termsModalOverlay && termsModal) {
+            termsModalOverlay.style.display = 'block';
+            setTimeout(() => {
+                termsModalOverlay.style.opacity = '1';
+                termsModal.style.transform = 'scale(1)';
+            }, 10);
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
+        }
+    };
+
+    const closeTermsFunc = () => {
+        if (termsModalOverlay && termsModal) {
+            termsModalOverlay.style.opacity = '0';
+            termsModal.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                termsModalOverlay.style.display = 'none';
+            }, 300);
+        }
+    };
+
+    if (viewTermsCookiesBtn) viewTermsCookiesBtn.addEventListener('click', openTermsFunc);
+    if (openTermsBtn) openTermsBtn.addEventListener('click', openTermsFunc);
+    if (closeTermsModal) closeTermsModal.addEventListener('click', closeTermsFunc);
+    if (confirmTermsBtn) confirmTermsBtn.addEventListener('click', closeTermsFunc);
+
     // Initial load (deferred until auth is ready)
     setTimeout(() => { loadAccounts(); }, 1500);
 });
