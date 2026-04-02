@@ -628,3 +628,46 @@ body.light-theme #terms-modal header {
     }
 }
 
+/* --- Surtidor & Grid Styling --- */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.pump-type-btn.active {
+    background: var(--accent-green) !important;
+    color: #000 !important;
+}
+
+#pump-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #2D333B;
+    height: 8px;
+    border-radius: 4px;
+}
+
+#pump-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--accent-green, #00D084);
+    border: 3px solid #000;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 208, 132, 0.4);
+    margin-top: -8px; /* Centers thumb over the track */
+}
+
+#pump-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: var(--accent-green, #00D084);
+    border: 3px solid #000;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 208, 132, 0.4);
+}
+

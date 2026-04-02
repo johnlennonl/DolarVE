@@ -117,8 +117,7 @@
             </div>
 
             <!-- Brecha Cambiaria Widget -->
-            <div class="card"
-                style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between;">
+            <div class="card" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between;">
                 <div style="z-index: 1;">
                     <div class="card-title" style="margin-bottom: 5px;">Brecha Cambiaria</div>
                     <div class="card-value" id="brecha-value" style="font-size: 28px;">---%</div>
@@ -126,9 +125,7 @@
                 <div style="z-index: 1; font-size: 32px; opacity: 0.1;">
                     <i class="fa-solid fa-scale-unbalanced"></i>
                 </div>
-                <div id="brecha-bg"
-                    style="position: absolute; right: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.1)); transition: width 1s ease;">
-                </div>
+                <div id="brecha-bg" style="position: absolute; right: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.1)); transition: width 1s ease;"></div>
             </div>
 
             <div style="padding: 20px 20px 10px;">
@@ -141,38 +138,43 @@
                     <div class="sentiment-bar">
                         <div class="sentiment-fill" id="sentiment-fill-bcv" style="width: 85%;"></div>
                     </div>
-                    <div
-                        style="text-align: center; font-size: 12px; font-weight: 600; margin-top: 5px; color: var(--accent-green);">
+                    <div style="text-align: center; font-size: 12px; font-weight: 600; margin-top: 5px; color: var(--accent-green);">
                         85% Alcista
                     </div>
                 </div>
             </div>
 
             <!-- Monedas Internacionales -->
+            <!-- Mercado Internacional (USD vs) - Grid 2x2 -->
             <div style="padding: 10px 20px 5px;">
                 <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-globe" style="color: #f1c40f;"></i> Mercado Internacional (Dólar vs)
                 </div>
                 
-                <!-- Card Colombia (Main) -->
-                <div class="card" style="margin: 0 0 10px; padding: 18px; background: rgba(241, 196, 15, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1;">
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Peso Colombiano (COP)</div>
-                            <div style="font-size: 22px; font-weight: 700; color: var(--text-main);" id="home-cop-rate">--- <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span></div>
+                <div class="grid-2" style="padding: 0; gap: 10px; grid-template-rows: repeat(2, 1fr);">
+                    <!-- Colombia -->
+                    <div class="card" style="margin: 0; padding: 15px; background: rgba(241, 196, 15, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="position: relative; z-index: 1;">
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Colombia (COP)</div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-cop-rate">--- <span style="font-size: 11px; font-weight: 400;">COP</span></div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="width: 42px; height: 42px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; display: flex; justify-content: center; align-items: center; color: #f1c40f; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                                <i class="fa-solid fa-flag" style="font-size: 18px;"></i>
-                            </div>
+                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.1)); pointer-events: none;"></div>
+                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #f1c40f; opacity: 0.3;">
+                            <i class="fa-solid fa-flag"></i>
                         </div>
                     </div>
-                    <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.08)); pointer-events: none;"></div>
-                </div>
-
-                <!-- Cards Brazil and Chile -->
-                <div class="grid-2" style="padding: 0; gap: 10px;">
-                    <!-- Card Brasil -->
+                    <!-- Argentina (Blue) -->
+                    <div class="card" style="margin: 0; padding: 15px; background: rgba(116, 172, 223, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="position: relative; z-index: 1;">
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Argentina (BLUE)</div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-ars-rate">--- <span style="font-size: 11px; font-weight: 400;">ARS</span></div>
+                        </div>
+                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(116, 172, 223, 0.1)); pointer-events: none;"></div>
+                        <div style="position: absolute; right: 8px; top: 8px; font-size: 12px; font-weight: 800; color: #74ACDF; opacity: 0.5;">
+                            ARS
+                        </div>
+                    </div>
+                    <!-- Brasil -->
                     <div class="card" style="margin: 0; padding: 15px; background: rgba(0, 151, 57, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="position: relative; z-index: 1;">
                             <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Brasil (BRL)</div>
@@ -183,14 +185,14 @@
                             <i class="fa-solid fa-earth-americas"></i>
                         </div>
                     </div>
-                    <!-- Card Chile -->
+                    <!-- Chile -->
                     <div class="card" style="margin: 0; padding: 15px; background: rgba(213, 43, 30, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="position: relative; z-index: 1;">
                             <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Chile (CLP)</div>
                             <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-clp-rate">--- <span style="font-size: 11px; font-weight: 400;">CLP</span></div>
                         </div>
-                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(37, 117, 252, 0.1)); pointer-events: none;"></div>
-                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #2575fc; opacity: 0.3;">
+                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(213, 43, 30, 0.1)); pointer-events: none;"></div>
+                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #d32f2f; opacity: 0.3;">
                             <i class="fa-solid fa-star"></i>
                         </div>
                     </div>
@@ -279,6 +281,70 @@
                     <div style="grid-column: span 3; display: flex; gap: 10px;">
                         <button class="calc-btn action" id="generate-receipt-btn" style="flex: 1; font-size: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-receipt"></i> RECIBO</button>
                         <button class="calc-btn action" id="generate-charge-btn" style="flex: 1; background: rgba(0, 208, 132, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 208, 132, 0.2); font-size: 14px; padding: 15px; box-shadow: 0 4px 10px rgba(0,208,132,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-file-invoice-dollar"></i> COBRAR</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla Surtidor Inteligente -->
+        <section id="pump-screen" class="screen">
+            <header>
+                <div class="header-title">
+                    <span class="header-subtitle">Movilidad</span>
+                    <h1>Gasolina</h1>
+                </div>
+                <div class="header-icon">
+                    <i class="fa-solid fa-gas-pump" style="color: var(--accent-green); font-size: 24px;"></i>
+                </div>
+            </header>
+
+            <div style="padding: 10px 20px;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
+                    Control de Combustible v12.1
+                </div>
+                
+                <div class="card" style="margin: 0; padding: 0; background: linear-gradient(145deg, #161B22, #0d1117); border: 1px solid var(--card-border); border-radius: 28px; position: relative; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+                    <!-- Pantalla Digital Surtidor -->
+                    <div style="background: #000; padding: 35px 25px; border-bottom: 1px solid var(--card-border); position: relative;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                            <div style="text-align: left;">
+                                <div style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Litros</div>
+                                <div style="font-size: 56px; font-family: 'DM Mono', monospace; font-weight: 700; color: #fff; line-height: 1;" id="pump-liters">20.0</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Precio /L</div>
+                                <div id="pump-price-indicator" style="font-size: 24px; color: #fff; font-weight: 700; font-family: 'DM Mono', monospace;">0.50$</div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; border-top: 1px solid rgba(0, 208, 132, 0.1); padding-top: 25px;">
+                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Monto total estimado</div>
+                            <div style="font-size: 42px; font-weight: 800; color: var(--accent-green); line-height: 1; font-family: 'Outfit';" id="pump-total-ves">--- Bs</div>
+                            <div style="font-size: 18px; color: #fff; margin-top: 8px; opacity: 0.8;" id="pump-total-usd">10.00 USD</div>
+                        </div>
+                        
+                        <!-- Premium Glow -->
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 100%; background: radial-gradient(circle at center, rgba(0, 208, 132, 0.05), transparent); pointer-events: none;"></div>
+                    </div>
+
+                    <!-- Controles Surtidor -->
+                    <div style="padding: 25px;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--accent-green); text-align: center; margin-bottom: 25px; letter-spacing: 1px;">
+                            MODO: PRECIO REGULAR ($0.50)
+                        </div>
+
+                        <!-- Slider -->
+                        <div style="position: relative; padding: 20px 0;">
+                            <input type="range" id="pump-slider" min="1" max="100" value="20" style="width: 100%; height: 8px; background: #2D333B; border-radius: 10px; appearance: none; outline: none; cursor: pointer;">
+                        </div>
+                        
+                        <!-- Quick Select Buttons -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 25px;">
+                            <button onclick="updatePump(20)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">20L</button>
+                            <button onclick="updatePump(35)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">35L</button>
+                            <button onclick="updatePump(40)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">40L</button>
+                            <button onclick="updatePump(60)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">60L</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -381,14 +447,7 @@
                 </div>
             </div>
 
-            <!-- MIS CUENTAS DE PAGO MÓVIL V9.0 (Supabase) -->
-            <div style="margin-top: 15px; padding: 0 20px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <div>
-                        <div style="font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-wallet" style="color: var(--accent-green);"></i> Mis Cuentas de Cobro</div>
-                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Agrega cuentas para solicitudes de cobro</div>
-                    </div>
-                </div>
+
                 
                 <!-- Saved Accounts List -->
                 <div id="pm-accounts-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
@@ -458,12 +517,12 @@
                             <input type="tel" id="pm-tel-num" placeholder="1234567" maxlength="7" style="flex: 1; min-width: 0; padding: 14px; font-size: 16px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-family: 'Outfit'; outline: none; box-sizing: border-box;">
                         </div>
                     </div>
-                    <button id="save-pm-btn" style="width: 100%; padding: 16px; font-size: 15px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <button id="save-pm-btn" style="width: 100%; padding: 16px; font-size: 15px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
                         <i class="fa-solid fa-cloud-arrow-up"></i> Guardar en la Nube
                     </button>
-                </div>
-            </div>
-
+                    <button id="cancel-pm-btn" style="width: 100%; padding: 14px; font-size: 14px; background: transparent; color: var(--text-muted); border: 1px solid var(--card-border); border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        Cancelar
+                    </button>                </div>
 
             <div
                 style="text-align: center; padding: 40px 20px 20px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
@@ -477,6 +536,7 @@
         <nav class="bottom-nav">
             <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
             <a href="#" class="nav-item"><i class="fa-solid fa-calculator"></i><span>Calc</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-gas-pump"></i><span>Gasolina</span></a>
             <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Cripto</span></a>
             <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
         </nav>

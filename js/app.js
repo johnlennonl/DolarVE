@@ -317,6 +317,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (index === 1 && typeof updateCalcDisplay === 'function') {
                     updateCalcDisplay();
                 }
+                // Refresh pump if switching to it (V12.1)
+                if (index === 2 && typeof window.refreshPump === 'function') {
+                    window.refreshPump();
+                }
             };
             if (document.startViewTransition) {
                 document.startViewTransition(doTransition);
@@ -339,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUsdRate = 0;
     let currentEurRate = 0;
     let currentParaleloRate = 0;
+    let currentArsRate = 0;
     let currentCopRate = 0;
     let currentBrlRate = 0;
     let currentClpRate = 0;
@@ -485,6 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(offlineData.usd) currentUsdRate = offlineData.usd;
             if(offlineData.eur) currentEurRate = offlineData.eur;
             if(offlineData.paralelo) currentParaleloRate = offlineData.paralelo;
+            if(offlineData.ars) currentArsRate = offlineData.ars;
             if(offlineData.cop) currentCopRate = offlineData.cop;
             if(offlineData.brl) currentBrlRate = offlineData.brl;
             if(offlineData.clp) currentClpRate = offlineData.clp;
@@ -494,14 +500,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if(currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
             
             // Home COP Rate Update
-            if (currentCopRate && document.getElementById('home-cop-rate')) {
-                document.getElementById('home-cop-rate').innerHTML = `${currentCopRate.toLocaleString('es-VE')} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span>`;
+            if (document.getElementById('home-cop-rate')) {
+                const copVal = currentCopRate || 0;
+                document.getElementById('home-cop-rate').innerHTML = `${copVal.toLocaleString('es-VE')} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span>`;
             }
-            if (currentBrlRate && document.getElementById('home-brl-rate')) {
-                document.getElementById('home-brl-rate').innerHTML = `${currentBrlRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">BRL</span>`;
+            if (document.getElementById('home-brl-rate')) {
+                const brlVal = currentBrlRate || 0;
+                document.getElementById('home-brl-rate').innerHTML = `${brlVal.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">BRL</span>`;
             }
-            if (currentClpRate && document.getElementById('home-clp-rate')) {
-                document.getElementById('home-clp-rate').innerHTML = `${currentClpRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">CLP</span>`;
+            if (document.getElementById('home-clp-rate')) {
+                const clpVal = currentClpRate || 0;
+                document.getElementById('home-clp-rate').innerHTML = `${clpVal.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">CLP</span>`;
+            }
+            if (document.getElementById('home-ars-rate')) {
+                const arsVal = currentArsRate || 0;
+                document.getElementById('home-ars-rate').innerHTML = `${arsVal.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">ARS</span>`;
             }
 
             if(currentUsdRate > 0 && currentParaleloRate > 0) {
@@ -520,31 +533,41 @@ document.addEventListener('DOMContentLoaded', () => {
         let fetchSuccess = false;
         for (let attempt = 1; attempt <= 3; attempt++) {
             try {
-                const [usdRes, eurRes, parRes, copRes] = await Promise.all([
+                const [usdRes, eurRes, parRes, copRes, arsRes] = await Promise.all([
                     fetch('https://ve.dolarapi.com/v1/dolares/oficial'),
                     fetch('https://ve.dolarapi.com/v1/euros/oficial'),
                     fetch('https://ve.dolarapi.com/v1/dolares/paralelo'),
-                    fetch('https://open.er-api.com/v6/latest/USD')
+                    fetch('https://open.er-api.com/v6/latest/USD'),
+                    fetch('https://dolarapi.com/v1/dolares/blue')
                 ]);
                 
                 const usdData = await usdRes.json();
                 const eurData = await eurRes.json();
                 const parData = await parRes.json();
                 const copData = await copRes.json();
+                const arsData = await arsRes.json();
 
                 currentUsdRate = usdData.promedio;
+                currentArsRate = (arsData.compra + arsData.venta) / 2;
                 currentCopRate = copData.rates.COP;
                 currentBrlRate = copData.rates.BRL;
                 currentClpRate = copData.rates.CLP;
 
                 if (document.getElementById('home-cop-rate')) {
-                    document.getElementById('home-cop-rate').innerHTML = `${currentCopRate.toLocaleString('es-VE')} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span>`;
+                    const copVal = currentCopRate || 0;
+                    document.getElementById('home-cop-rate').innerHTML = `${copVal.toLocaleString('es-VE')} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">COP</span>`;
                 }
                 if (document.getElementById('home-brl-rate')) {
-                    document.getElementById('home-brl-rate').innerHTML = `${currentBrlRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">BRL</span>`;
+                    const brlVal = currentBrlRate || 0;
+                    document.getElementById('home-brl-rate').innerHTML = `${brlVal.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">BRL</span>`;
                 }
                 if (document.getElementById('home-clp-rate')) {
-                    document.getElementById('home-clp-rate').innerHTML = `${currentClpRate.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">CLP</span>`;
+                    const clpVal = currentClpRate || 0;
+                    document.getElementById('home-clp-rate').innerHTML = `${clpVal.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">CLP</span>`;
+                }
+                if (document.getElementById('home-ars-rate')) {
+                    const arsVal = currentArsRate || 0;
+                    document.getElementById('home-ars-rate').innerHTML = `${arsVal.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">ARS</span>`;
                 }
 
                 document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
@@ -566,11 +589,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 if(window.updateQuickReference) window.updateQuickReference();
+                if(window.refreshPump) window.refreshPump();
                 
                 localStorage.setItem('dolarve_offline_data', JSON.stringify({
                     usd: currentUsdRate,
                     eur: currentEurRate,
                     paralelo: currentParaleloRate,
+                    ars: currentArsRate,
                     cop: currentCopRate,
                     brl: currentBrlRate,
                     clp: currentClpRate
@@ -1262,6 +1287,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const cancelPmBtn = document.getElementById('cancel-pm-btn');
+
     // Load accounts from Supabase
     async function loadAccounts() {
         if (!supabase || !currentUser) {
@@ -1329,6 +1356,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             savePmBtn.disabled = false;
             savePmBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Guardar en la Nube';
+        });
+    }
+
+    if (cancelPmBtn) {
+        cancelPmBtn.addEventListener('click', () => {
+            pmAddForm.style.display = 'none';
+            pmAddFormToggle.style.display = 'block';
+            if (window.navigator.vibrate) window.navigator.vibrate(5);
         });
     }
 
@@ -1608,7 +1643,48 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeTermsModal) closeTermsModal.addEventListener('click', closeTermsFunc);
     if (confirmTermsBtn) confirmTermsBtn.addEventListener('click', closeTermsFunc);
 
+    // --- SURTIDOR INTELIGENTE LOGIC ---
+    let pumpLiters = 20;
+    let pumpPricePerLiter = 0.50;
+
+    const pumpLitersEl = document.getElementById('pump-liters');
+    const pumpTotalVesEl = document.getElementById('pump-total-ves');
+    const pumpTotalUsdEl = document.getElementById('pump-total-usd');
+    const pumpSlider = document.getElementById('pump-slider');
+
+    window.updatePump = function(val) {
+        pumpLiters = parseFloat(val);
+        if(pumpSlider) pumpSlider.value = pumpLiters;
+        refreshPump();
+    }
+
+    window.refreshPump = function() {
+        if(!pumpLitersEl) return;
+        
+        pumpLitersEl.innerText = pumpLiters.toFixed(1);
+        const totalUsd = pumpLiters * pumpPricePerLiter;
+        const totalVes = totalUsd * currentUsdRate;
+
+        if(pumpTotalUsdEl) pumpTotalUsdEl.innerText = `${totalUsd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} USD`;
+        if(pumpTotalVesEl) {
+            if(currentUsdRate > 0) {
+                pumpTotalVesEl.innerText = `${totalVes.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs`;
+            } else {
+                pumpTotalVesEl.innerText = "Cargando...";
+            }
+        }
+    }
+
+    if(pumpSlider) {
+        pumpSlider.addEventListener('input', (e) => {
+            pumpLiters = parseFloat(e.target.value);
+            refreshPump();
+            if(window.navigator.vibrate) window.navigator.vibrate(5);
+        });
+    }
+
+
     // Initial load (deferred until auth is ready)
-    setTimeout(() => { loadAccounts(); }, 1500);
+    setTimeout(() => { loadAccounts(); refreshPump(); }, 1500);
 });
 
