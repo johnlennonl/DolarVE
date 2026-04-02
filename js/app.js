@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let supabase = null;
     let currentUser = null;
     let isRegisterMode = false;
-    
+
     if (window.supabase) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         console.log('[DolarVE] Supabase V9.0 Client Init OK');
@@ -43,15 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const shortName = document.getElementById('user-short-name');
         const loginView = document.getElementById('auth-login-view');
         const profileView = document.getElementById('auth-profile-view');
-        
+
         if (user) {
             const fName = user.user_metadata?.first_name || '';
             const lName = user.user_metadata?.last_name || '';
             const avatarUrl = user.user_metadata?.avatar_url || '';
             const dob = user.user_metadata?.dob || '';
-            
-            if(shortName) shortName.innerText = fName ? fName : 'Perfil';
-            
+
+            if (shortName) shortName.innerText = fName ? fName : 'Perfil';
+
             // Header avatar
             if (avatarImg && avatarPlaceholder) {
                 if (avatarUrl) {
@@ -63,12 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     avatarPlaceholder.style.display = 'block';
                 }
             }
-            
+
             // Toggle modal views
-            if (loginView) loginView.style.display = 'none';
             if (profileView) profileView.style.display = 'block';
             
-            // Populate profile card
+            // Populate profile card (MOVED FROM LOGIC BELOW)
             const profName = document.getElementById('profile-display-name');
             const profEmail = document.getElementById('profile-display-email');
             const profDob = document.getElementById('profile-dob');
@@ -92,63 +91,156 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } else {
+            const shortName = document.getElementById('user-short-name');
+            const loginView = document.getElementById('auth-login-view');
+            const profileView = document.getElementById('auth-profile-view');
+            const avatarImg = document.getElementById('user-avatar-img');
+            const avatarPlaceholder = document.getElementById('user-avatar-placeholder');
+
             if(shortName) shortName.innerText = 'Ingresar';
             if (avatarImg && avatarPlaceholder) {
                 avatarImg.style.display = 'none';
                 avatarPlaceholder.style.display = 'block';
             }
-            
-            // Toggle modal views
             if (loginView) loginView.style.display = 'block';
             if (profileView) profileView.style.display = 'none';
         }
     }
+
+    // --- PWA INSTALL LOGIC (Phase 3 - Corrected Placement) ---
+    let deferredPrompt;
+    const installBtn = document.getElementById('pwa-install-btn');
+    const installText = document.getElementById('install-text');
+    const installIcon = document.getElementById('install-icon');
+    const installModalOverlay = document.getElementById('install-modal-overlay');
+    const installModal = document.getElementById('install-modal');
+    const closeInstallModal = document.getElementById('close-install-modal');
     
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    if (!isStandalone) {
+        if (installBtn) installBtn.style.display = 'flex';
+        if (isIOS) {
+            if (installText) installText.innerText = 'Cómo instalar en iPhone';
+            if (installIcon) { installIcon.className = 'fa-brands fa-apple'; installIcon.style.color = '#fff'; }
+        } else if (/Android/.test(navigator.userAgent)) {
+            if (installText) installText.innerText = 'Instalar en Android';
+            if (installIcon) installIcon.className = 'fa-brands fa-android';
+        }
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBtn) installBtn.style.display = 'flex';
+    });
+
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
+            if (isIOS) {
+                if (installModalOverlay && installModal) {
+                    installModalOverlay.style.display = 'block';
+                    setTimeout(() => {
+                        installModalOverlay.style.opacity = '1';
+                        installModal.classList.add('show');
+                    }, 10);
+                }
+            } else if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') { installBtn.style.display = 'none'; }
+                deferredPrompt = null;
+            } else {
+                window.showNotification('💡 Busca el icono de instalación en tu navegador');
+            }
+        });
+    }
+
+    if (closeInstallModal) {
+        closeInstallModal.addEventListener('click', () => {
+            if (installModalOverlay) {
+                installModalOverlay.style.opacity = '0';
+                setTimeout(() => { installModalOverlay.style.display = 'none'; }, 300);
+            }
+        });
+    }
+    
+    // ACCOUNTS MODAL LOGIC (Phase 3 - Corrected Placement)
+    const accountsModalOverlay = document.getElementById('accounts-modal-overlay');
+    const accountsModal = document.getElementById('accounts-modal');
+    const openAccountsBtn = document.getElementById('open-accounts-btn');
+    const closeAccountsModal = document.getElementById('close-accounts-modal');
+
+    if (openAccountsBtn) {
+        openAccountsBtn.addEventListener('click', () => {
+            if (accountsModalOverlay && accountsModal) {
+                accountsModalOverlay.style.display = 'block';
+                setTimeout(() => {
+                    accountsModalOverlay.style.opacity = '1';
+                    accountsModal.classList.add('show');
+                }, 10);
+                if (window.navigator.vibrate) window.navigator.vibrate(10);
+                loadAccounts();
+            }
+        });
+    }
+
+    if (closeAccountsModal) {
+        closeAccountsModal.addEventListener('click', () => {
+            if (accountsModalOverlay) {
+                accountsModalOverlay.style.opacity = '0';
+                setTimeout(() => { accountsModalOverlay.style.display = 'none'; }, 300);
+            }
+        });
+    }
+
     // Avatar Upload Logic
     const avatarWrapper = document.getElementById('profile-avatar-wrapper');
     const avatarFileInput = document.getElementById('avatar-file-input');
-    
+
     if (avatarWrapper && avatarFileInput) {
         avatarWrapper.addEventListener('click', () => {
             if (!currentUser) return;
             avatarFileInput.click();
         });
-        
+
         avatarFileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file || !supabase || !currentUser) return;
-            
+
             window.showNotification('Subiendo foto...');
-            
+
             const fileExt = file.name.split('.').pop();
             const filePath = `avatars/${currentUser.id}.${fileExt}`;
-            
+
             try {
                 // Upload to Supabase Storage
                 const { data, error: uploadError } = await supabase.storage
                     .from('avatars')
                     .upload(filePath, file, { upsert: true, contentType: file.type });
-                
+
                 if (uploadError) throw uploadError;
-                
+
                 // Get public URL
                 const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
                 const publicURL = urlData.publicUrl + '?t=' + Date.now();
-                
+
                 // Update user metadata
                 const { error: updateError } = await supabase.auth.updateUser({
                     data: { avatar_url: publicURL }
                 });
-                
+
                 if (updateError) throw updateError;
-                
+
                 window.showNotification('¡Foto actualizada! 📸');
                 updateUserUI(currentUser);
-            } catch(err) {
+            } catch (err) {
                 console.error('[DolarVE] Avatar Upload Error:', err);
                 window.showNotification('Error: ' + err.message);
             }
-            
+
             avatarFileInput.value = '';
         });
     }
@@ -166,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reload accounts after auth state changes
             setTimeout(() => { if (window._dolarve_loadAccounts) window._dolarve_loadAccounts(); }, 500);
         });
-        
+
         // Modal Controls
         if (userProfileBtn && authModalOverlay) {
             userProfileBtn.addEventListener('click', () => {
@@ -176,14 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 authModalOverlay.style.opacity = '1';
             });
         }
-        
+
         if (closeAuthModal) {
             closeAuthModal.addEventListener('click', () => {
                 authModalOverlay.style.opacity = '0';
                 setTimeout(() => { authModalOverlay.style.display = 'none'; }, 300);
             });
         }
-        
+
         if (authToggleBtn) {
             authToggleBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -216,10 +308,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const email = emailInput.value.trim();
                 const password = passInput.value;
-                
+
                 authActionBtn.style.display = 'none';
                 authLoading.style.display = 'flex';
-                
+
                 try {
                     if (isRegisterMode) {
                         const { data, error } = await supabase.auth.signUp({
@@ -234,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         });
                         if (error) throw error;
-                        
+
                         if (data.session) {
                             window.showNotification('¡Bienvenido! Registro exitoso.');
                             closeAuthModal.click();
@@ -251,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.showNotification('¡Bienvenido!');
                         closeAuthModal.click();
                     }
-                } catch(err) {
+                } catch (err) {
                     console.error('[DolarVE] Auth Error:', err);
                     window.showNotification('Error: ' + err.message);
                 } finally {
@@ -260,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        
+
         // Logout
         if (authLogoutBtn) {
             authLogoutBtn.addEventListener('click', async () => {
@@ -279,17 +371,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     if (savedTheme === 'light') {
         document.body.classList.add('light-theme');
-        if(themeToggle) themeToggle.classList.remove('on');
+        if (themeToggle) themeToggle.classList.remove('on');
     }
-    
+
     // Custom Toast Notification Logic
-    window.showNotification = function(message) {
+    window.showNotification = function (message) {
         const toast = document.getElementById('app-toast');
         const msgEl = document.getElementById('toast-message');
-        if(!toast || !msgEl) return;
+        if (!toast || !msgEl) return;
         msgEl.innerText = message;
         toast.classList.add('show');
-        if(window.navigator.vibrate) window.navigator.vibrate(50);
+        if (window.navigator.vibrate) window.navigator.vibrate(50);
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
@@ -298,12 +390,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Splash Screen Logic
     setTimeout(() => {
         const splash = document.getElementById('splash-screen');
-        if(splash) splash.classList.add('hidden');
+        if (splash) splash.classList.add('hidden');
     }, 2000);
 
     const navItems = document.querySelectorAll('.nav-item');
     const screens = document.querySelectorAll('.screen');
-    
+
     navItems.forEach((item, index) => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -312,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.classList.add('active');
                 screens.forEach(s => s.classList.remove('active'));
                 screens[index].classList.add('active');
-                
+
                 // Refresh calculator if switching to it
                 if (index === 1 && typeof updateCalcDisplay === 'function') {
                     updateCalcDisplay();
@@ -368,48 +460,48 @@ document.addEventListener('DOMContentLoaded', () => {
         if (baseCurrency === 'bcv') { activeRate = currentUsdRate; rateName = 'USD (BCV)'; }
         if (baseCurrency === 'paralelo') { activeRate = currentParaleloRate; rateName = 'USD (Paralelo)'; }
         if (baseCurrency === 'eur') { activeRate = currentEurRate; rateName = 'EUR'; }
-        if (baseCurrency === 'cop') { 
-            activeRate = currentCopRate || 3900; 
-            rateName = 'PESO COP'; 
+        if (baseCurrency === 'cop') {
+            activeRate = currentCopRate || 3900;
+            rateName = 'PESO COP';
         }
-        
-        if(!fromValue) return;
-        
+
+        if (!fromValue) return;
+
         let displayStr = calcInput;
         // Format input purely for display
-        if(displayStr.endsWith('.')) {
+        if (displayStr.endsWith('.')) {
             fromValue.innerText = displayStr;
         } else {
             const parsedInput = parseFloat(calcInput) || 0;
-            fromValue.innerText = parsedInput.toLocaleString('en-US', {maximumFractionDigits: 4});
+            fromValue.innerText = parsedInput.toLocaleString('en-US', { maximumFractionDigits: 4 });
         }
-        
-        if(activeRate === 0) {
+
+        if (activeRate === 0) {
             toValue.innerText = "0.00";
             return;
         }
-        
+
         const num = parseFloat(calcInput) || 0;
         let result = isForeignToVes ? (num * activeRate) : (num / activeRate);
-        
+
         // Final Display Formatting
-        toValue.innerText = result.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        
+        toValue.innerText = result.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
         if (baseCurrency === 'cop') {
             fromLabel.innerText = isForeignToVes ? "MONTO USD" : "MONTO COP";
             toLabel.innerText = isForeignToVes ? "RESULTADO COP" : "RESULTADO USD";
             // Hide COBRAR for COP (not valid for Pago Movil)
-            if(document.getElementById('generate-charge-btn')) document.getElementById('generate-charge-btn').style.display = 'none';
+            if (document.getElementById('generate-charge-btn')) document.getElementById('generate-charge-btn').style.display = 'none';
         } else {
             fromLabel.innerText = isForeignToVes ? `MONTO ${rateName.split(' ')[0]}` : "MONTO VES";
             toLabel.innerText = isForeignToVes ? "RESULTADO VES" : `RESULTADO ${rateName.split(' ')[0]}`;
-            if(document.getElementById('generate-charge-btn')) document.getElementById('generate-charge-btn').style.display = 'flex';
+            if (document.getElementById('generate-charge-btn')) document.getElementById('generate-charge-btn').style.display = 'flex';
         }
-        
+
         // Update chip UI
         document.querySelectorAll('.rate-chip').forEach(c => c.classList.remove('active'));
         const activeChip = document.querySelector(`.rate-chip[data-rate="${baseCurrency}"]`);
-        if(activeChip) activeChip.classList.add('active');
+        if (activeChip) activeChip.classList.add('active');
 
         saveCalcState();
     }
@@ -421,18 +513,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.rate-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
             baseCurrency = e.target.getAttribute('data-rate');
-            if(window.navigator.vibrate) window.navigator.vibrate(15);
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
             updateCalcDisplay();
         });
     });
 
     // Swap Btn
     const swapBtn = document.getElementById('swap-currency-btn');
-    if(swapBtn) {
+    if (swapBtn) {
         swapBtn.addEventListener('click', () => {
             isForeignToVes = !isForeignToVes;
             updateCalcDisplay();
-            if(window.navigator.vibrate) window.navigator.vibrate(15);
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
         });
     }
 
@@ -440,18 +532,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let bcvChartInstance = null;
     function initChart(currentPrice) {
         const ctx = document.getElementById('bcvChart');
-        if(!ctx) return;
-        
+        if (!ctx) return;
+
         const base = currentPrice;
         // Mocking a realistic 7-day ascending curve ending at current price
-        const dataPoints = [base * 0.98, base * 0.985, base * 0.99, base * 0.992, base * 0.995, base * 0.998, base]; 
-        
-        if(bcvChartInstance) {
+        const dataPoints = [base * 0.98, base * 0.985, base * 0.99, base * 0.992, base * 0.995, base * 0.998, base];
+
+        if (bcvChartInstance) {
             bcvChartInstance.data.datasets[0].data = dataPoints;
             bcvChartInstance.update();
             return;
         }
-        
+
         const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 80);
         gradient.addColorStop(0, 'rgba(0, 208, 132, 0.4)');
         gradient.addColorStop(1, 'rgba(0, 208, 132, 0)');
@@ -487,18 +579,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!navigator.onLine) {
             window.showNotification('Modo Offline: Usando tasas recientes guardadas');
             const offlineData = JSON.parse(localStorage.getItem('dolarve_offline_data') || '{}');
-            if(offlineData.usd) currentUsdRate = offlineData.usd;
-            if(offlineData.eur) currentEurRate = offlineData.eur;
-            if(offlineData.paralelo) currentParaleloRate = offlineData.paralelo;
-            if(offlineData.ars) currentArsRate = offlineData.ars;
-            if(offlineData.cop) currentCopRate = offlineData.cop;
-            if(offlineData.brl) currentBrlRate = offlineData.brl;
-            if(offlineData.clp) currentClpRate = offlineData.clp;
-            
-            if(currentUsdRate) document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
-            if(currentParaleloRate) document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
-            if(currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
-            
+            if (offlineData.usd) currentUsdRate = offlineData.usd;
+            if (offlineData.eur) currentEurRate = offlineData.eur;
+            if (offlineData.paralelo) currentParaleloRate = offlineData.paralelo;
+            if (offlineData.ars) currentArsRate = offlineData.ars;
+            if (offlineData.cop) currentCopRate = offlineData.cop;
+            if (offlineData.brl) currentBrlRate = offlineData.brl;
+            if (offlineData.clp) currentClpRate = offlineData.clp;
+
+            if (currentUsdRate) document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
+            if (currentParaleloRate) document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
+            if (currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
+
             // Home COP Rate Update
             if (document.getElementById('home-cop-rate')) {
                 const copVal = currentCopRate || 0;
@@ -517,13 +609,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('home-ars-rate').innerHTML = `${arsVal.toLocaleString('es-VE')} <span style="font-size: 11px; font-weight: 400;">ARS</span>`;
             }
 
-            if(currentUsdRate > 0 && currentParaleloRate > 0) {
+            if (currentUsdRate > 0 && currentParaleloRate > 0) {
                 const brecha = ((currentParaleloRate - currentUsdRate) / currentUsdRate) * 100;
                 document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
                 document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
             }
-            
-            if(window.updateQuickReference) window.updateQuickReference();
+
+            if (window.updateQuickReference) window.updateQuickReference();
 
             updateCalcDisplay();
             initChart(currentUsdRate);
@@ -540,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     fetch('https://open.er-api.com/v6/latest/USD'),
                     fetch('https://dolarapi.com/v1/dolares/blue')
                 ]);
-                
+
                 const usdData = await usdRes.json();
                 const eurData = await eurRes.json();
                 const parData = await parRes.json();
@@ -573,24 +665,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
                 let updateTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('last-update-usd').innerText = `Actualizado: ${updateTime}`;
-                
+
                 currentEurRate = eurData.promedio;
-                if(document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
-                
+                if (document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
+
                 currentParaleloRate = parData.promedio;
                 document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
-                
-                if(currentUsdRate > 0 && currentParaleloRate > 0) {
+
+                if (currentUsdRate > 0 && currentParaleloRate > 0) {
                     const brecha = ((currentParaleloRate - currentUsdRate) / currentUsdRate) * 100;
                     document.getElementById('brecha-value').innerText = `${brecha.toFixed(2)}%`;
                     const trendIcon = brecha > 0 ? '<i class="fa-solid fa-arrow-trend-up" style="font-size: 14px; color: var(--accent-red);"></i>' : '';
                     document.getElementById('brecha-value').innerHTML = `${brecha.toFixed(2)}% ${trendIcon}`;
                     document.getElementById('brecha-bg').style.width = `${Math.min(brecha * 2, 100)}%`;
                 }
-                
-                if(window.updateQuickReference) window.updateQuickReference();
-                if(window.refreshPump) window.refreshPump();
-                
+
+                if (window.updateQuickReference) window.updateQuickReference();
+                if (window.refreshPump) window.refreshPump();
+
                 localStorage.setItem('dolarve_offline_data', JSON.stringify({
                     usd: currentUsdRate,
                     eur: currentEurRate,
@@ -600,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     brl: currentBrlRate,
                     clp: currentClpRate
                 }));
-                
+
                 checkAndSendSystemNotification(currentUsdRate, currentEurRate);
 
                 updateCalcDisplay();
@@ -614,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        
+
         // If all retries failed, load from cache
         if (!fetchSuccess) {
             const offlineData = JSON.parse(localStorage.getItem('dolarve_offline_data') || '{}');
@@ -622,9 +714,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUsdRate = offlineData.usd;
                 currentEurRate = offlineData.eur || 0;
                 currentParaleloRate = offlineData.paralelo || 0;
-                if(currentUsdRate) document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
-                if(currentParaleloRate) document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
-                if(currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
+                if (currentUsdRate) document.getElementById('usd-bcv-price').innerText = currentUsdRate.toFixed(2);
+                if (currentParaleloRate) document.getElementById('paralelo-price').innerText = currentParaleloRate.toFixed(2);
+                if (currentEurRate && document.getElementById('euro-top-price')) document.getElementById('euro-top-price').innerText = currentEurRate.toFixed(2);
                 updateCalcDisplay();
                 initChart(currentUsdRate);
                 window.showNotification('⚠️ Usando datos guardados (sin conexión estable)');
@@ -637,15 +729,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fetch Top 50 Cryptos
             const cryptoRes = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false');
             const cryptoData = await cryptoRes.json();
-            
+
             const listContainer = document.getElementById('dynamic-crypto-list');
-            if(listContainer) {
+            if (listContainer) {
                 listContainer.innerHTML = ''; // Clear loading spinner
                 cryptoData.forEach(coin => {
                     const priceChg = coin.price_change_percentage_24h || 0;
                     const chgClass = priceChg >= 0 ? 'trend-up' : 'trend-down';
                     const listBg = priceChg >= 0 ? 'rgba(0, 208, 132, 0.05)' : 'rgba(255, 77, 77, 0.05)';
-                    
+
                     const itemHtml = `
                         <div class="crypto-item" onclick="openCryptoChart('${coin.id}', '${coin.name}', '${coin.symbol.toUpperCase()}', ${coin.current_price}, ${priceChg})" style="position: relative; overflow: hidden; cursor: pointer;">
                             <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 30%; background: linear-gradient(90deg, transparent, ${listBg}); pointer-events: none;"></div>
@@ -659,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             </div>
                             <div class="crypto-price" style="position: relative; z-index: 1;">
-                                <div>$${coin.current_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 6})}</div>
+                                <div>$${coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
                                 <div class="${chgClass}">${priceChg.toFixed(2)}%</div>
                             </div>
                         </div>
@@ -679,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.warn('Crypto fetch error:', e);
             const listContainer = document.getElementById('dynamic-crypto-list');
-            if(listContainer) {
+            if (listContainer) {
                 listContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);"><i class="fa-solid fa-server" style="margin-bottom:10px; font-size: 20px;"></i><br>Servidor Cripto ocupado.<br>Intenta refrescar en un rato.</div>';
             }
         }
@@ -688,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchData();
     // Crypto Search Logic
     const searchInput = document.getElementById('crypto-search');
-    if(searchInput) {
+    if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const items = document.querySelectorAll('.crypto-item');
@@ -703,45 +795,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Crypto Modal Logic
     let detailChartInstance = null;
-    window.openCryptoChart = async function(id, name, symbol, price, change) {
-        if(window.navigator.vibrate) window.navigator.vibrate(10);
-        
+    window.openCryptoChart = async function (id, name, symbol, price, change) {
+        if (window.navigator.vibrate) window.navigator.vibrate(10);
+
         const overlay = document.getElementById('crypto-modal-overlay');
         const modal = document.getElementById('crypto-modal');
         const titleEl = document.getElementById('crypto-modal-title');
         const priceEl = document.getElementById('crypto-modal-price');
-        
-        if(overlay && modal && titleEl && priceEl) {
+
+        if (overlay && modal && titleEl && priceEl) {
             overlay.style.display = 'flex';
             setTimeout(() => {
                 overlay.style.opacity = '1';
                 modal.style.transform = 'translateY(0)';
             }, 10);
-            
+
             titleEl.innerText = `${name} (${symbol})`;
-            priceEl.innerText = `$${price.toLocaleString('en-US', {maximumFractionDigits: 6})}`;
+            priceEl.innerText = `$${price.toLocaleString('en-US', { maximumFractionDigits: 6 })}`;
             priceEl.style.color = change >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-            
+
             const ctx = document.getElementById('cryptoDetailCanvas');
             const errorOverlay = document.getElementById('crypto-chart-error');
-            if(!ctx) return;
-            
+            if (!ctx) return;
+
             // Show loading state
-            if(detailChartInstance) { detailChartInstance.destroy(); }
-            if(errorOverlay) errorOverlay.style.display = 'none';
+            if (detailChartInstance) { detailChartInstance.destroy(); }
+            if (errorOverlay) errorOverlay.style.display = 'none';
             ctx.style.display = 'block';
-            
+
             try {
                 const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1`);
                 const data = await res.json();
-                
+
                 if (!res.ok || !data.prices || data.prices.length === 0) {
                     throw new Error("No chart data available");
                 }
-                
+
                 const prices = data.prices.map(p => p[1]);
                 const labels = data.prices.map((p, i) => i);
-                
+
                 const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
                 const isUp = change >= 0;
                 gradient.addColorStop(0, isUp ? 'rgba(0, 208, 132, 0.4)' : 'rgba(255, 77, 77, 0.4)');
@@ -775,22 +867,22 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {
                 console.error('Error fetching crypto chart:', e);
                 ctx.style.display = 'none';
-                if(errorOverlay) errorOverlay.style.display = 'flex';
+                if (errorOverlay) errorOverlay.style.display = 'flex';
             }
         }
     };
-    
+
     const closeCryptoModal = document.getElementById('close-crypto-modal');
-    if(closeCryptoModal) {
+    if (closeCryptoModal) {
         closeCryptoModal.addEventListener('click', () => {
-            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
             const overlay = document.getElementById('crypto-modal-overlay');
             const modal = document.getElementById('crypto-modal');
             overlay.style.opacity = '0';
             modal.style.transform = 'translateY(100%)';
             setTimeout(() => {
                 overlay.style.display = 'none';
-                if(detailChartInstance) { detailChartInstance.destroy(); detailChartInstance = null; }
+                if (detailChartInstance) { detailChartInstance.destroy(); detailChartInstance = null; }
             }, 300);
         });
     }
@@ -805,44 +897,44 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.calc-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             if (window.navigator.vibrate) window.navigator.vibrate(15);
-            
+
             const targetBtn = e.target.closest('.calc-btn');
-            if(!targetBtn) return;
-            
+            if (!targetBtn) return;
+
             const val = targetBtn.innerText.trim();
             if (val === 'C') {
                 calcInput = "0";
             } else if (val.includes('RECIBO')) {
-                if(calcInput === "0" || calcInput === "") return;
-                
+                if (calcInput === "0" || calcInput === "") return;
+
                 let rateName = '';
                 let activeRate = 0;
                 if (baseCurrency === 'bcv') { activeRate = currentUsdRate; rateName = 'BCV Oficial'; }
                 if (baseCurrency === 'paralelo') { activeRate = currentParaleloRate; rateName = 'Paralelo'; }
                 if (baseCurrency === 'eur') { activeRate = currentEurRate; rateName = 'Euro'; }
-                
+
                 const num = parseFloat(calcInput) || 0;
                 const result = isForeignToVes ? (num * activeRate) : (num / activeRate);
-                
-                const fromTicker = isForeignToVes ? (baseCurrency==='eur'?'€':'$') : 'Bs.';
-                const toTicker = isForeignToVes ? 'Bs.' : (baseCurrency==='eur'?'€':'$');
-                
-                document.getElementById('rec-from').innerText = `${num.toLocaleString('en-US', {maximumFractionDigits: 4})} ${fromTicker}`;
-                document.getElementById('rec-to').innerText = `${result.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} ${toTicker}`;
+
+                const fromTicker = isForeignToVes ? (baseCurrency === 'eur' ? '€' : '$') : 'Bs.';
+                const toTicker = isForeignToVes ? 'Bs.' : (baseCurrency === 'eur' ? '€' : '$');
+
+                document.getElementById('rec-from').innerText = `${num.toLocaleString('en-US', { maximumFractionDigits: 4 })} ${fromTicker}`;
+                document.getElementById('rec-to').innerText = `${result.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${toTicker}`;
                 document.getElementById('rec-rate-name').innerText = rateName;
-                document.getElementById('rec-rate-val').innerText = `${activeRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs`;
+                document.getElementById('rec-rate-val').innerText = `${activeRate.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
                 document.getElementById('rec-date').innerText = new Date().toLocaleString('es-VE');
-                
+
                 window.showNotification("Generando recibo...");
-                
+
                 // Allow rendering cycle
                 setTimeout(async () => {
                     const rcptDiv = document.getElementById('receipt-template');
                     console.log('[DolarVE DEBUG] receipt-template found:', !!rcptDiv);
-                    if(!rcptDiv) { window.showNotification('Error: Plantilla recibo no encontrada'); return; }
+                    if (!rcptDiv) { window.showNotification('Error: Plantilla recibo no encontrada'); return; }
                     try {
                         console.log('[DolarVE DEBUG] Starting receipt html2canvas...');
-                        const canvas = await html2canvas(rcptDiv, { 
+                        const canvas = await html2canvas(rcptDiv, {
                             backgroundColor: '#0d0d0d',
                             scale: 2,
                             logging: true,
@@ -858,29 +950,29 @@ document.addEventListener('DOMContentLoaded', () => {
                             foreignObjectRendering: false
                         });
                         console.log('[DolarVE DEBUG] Receipt canvas DONE:', canvas.width, 'x', canvas.height);
-                        
+
                         const imgData = canvas.toDataURL('image/png');
                         window.btnDataToShare = imgData;
-                        
+
                         const overlay = document.getElementById('receipt-modal-overlay');
                         const imgEl = document.getElementById('receipt-preview-img');
-                        
-                        if(overlay && imgEl) {
+
+                        if (overlay && imgEl) {
                             imgEl.src = imgData;
                             overlay.style.display = 'flex';
                             overlay.offsetHeight; // force reflow
                             overlay.style.opacity = '1';
                         }
-                    } catch(e) { 
-                        console.error('[DolarVE DEBUG] Receipt ERROR:', e); 
+                    } catch (e) {
+                        console.error('[DolarVE DEBUG] Receipt ERROR:', e);
                         window.showNotification('Error: ' + e.message);
                     }
                 }, 100);
                 return;
-            } else if(val.includes('COBRAR')) {
-                if(calcInput === "0" || calcInput === "") return;
-                
-                if(userAccounts.length === 0) {
+            } else if (val.includes('COBRAR')) {
+                if (calcInput === "0" || calcInput === "") return;
+
+                if (userAccounts.length === 0) {
                     window.showNotification('⚠️ Agrega una Cuenta de Cobro en Ajustes');
                     setTimeout(() => {
                         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -890,19 +982,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1500);
                     return;
                 }
-                
+
                 let rateName = '';
                 let activeRate = 0;
                 if (baseCurrency === 'bcv') { activeRate = currentUsdRate; rateName = 'Oficial BCV'; }
                 if (baseCurrency === 'paralelo') { activeRate = currentParaleloRate; rateName = 'Dólar Paralelo'; }
                 if (baseCurrency === 'eur') { activeRate = currentEurRate; rateName = 'Euro Oficial'; }
-                
+
                 const num = parseFloat(calcInput) || 0;
-                if(num === 0 || activeRate === 0) return;
-                
+                if (num === 0 || activeRate === 0) return;
+
                 const bsAmount = isForeignToVes ? (num * activeRate) : num;
-                const formattedBs = bsAmount.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                
+                const formattedBs = bsAmount.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
                 // Function to generate charge with selected account
                 const generateChargeWithAccount = (pm) => {
                     document.getElementById('charge-amount-val').innerText = formattedBs;
@@ -911,13 +1003,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('charge-phone-val').innerText = `${pm.prefijo_tel}-${pm.numero_tel}`;
                     document.getElementById('charge-id-val').innerText = `${pm.tipo_documento}${pm.numero_documento}`;
                     document.getElementById('charge-date-val').innerText = `Fecha: ${new Date().toLocaleDateString('es-VE')}`;
-                
+
                     window.showNotification('Generando Solicitud...');
-                
+
                     setTimeout(async () => {
                         const chargeDiv = document.getElementById('charge-template');
                         console.log('[DolarVE DEBUG] charge-template found:', !!chargeDiv);
-                        if(!chargeDiv) { window.showNotification('Error: Plantilla cobro no encontrada'); return; }
+                        if (!chargeDiv) { window.showNotification('Error: Plantilla cobro no encontrada'); return; }
                         try {
                             console.log('[DolarVE DEBUG] Starting charge html2canvas...');
                             const canvas = await html2canvas(chargeDiv, {
@@ -938,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             console.log('[DolarVE DEBUG] Charge canvas DONE:', canvas.width, 'x', canvas.height);
                             const imgData = canvas.toDataURL('image/png');
                             window.btnDataToShare = imgData;
-                        
+
                             const overlay = document.getElementById('receipt-modal-overlay');
                             const imgEl = document.getElementById('receipt-preview-img');
                             if (overlay && imgEl) {
@@ -947,10 +1039,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 overlay.offsetHeight; // force reflow
                                 overlay.style.opacity = '1';
                             }
-                        } catch(e) { console.error('[DolarVE DEBUG] Charge ERROR:', e); window.showNotification('Error: ' + e.message); }
+                        } catch (e) { console.error('[DolarVE DEBUG] Charge ERROR:', e); window.showNotification('Error: ' + e.message); }
                     }, 100);
                 }; // end generateChargeWithAccount
-                
+
                 // If user has exactly 1 account, use it directly. If multiple, show picker.
                 if (userAccounts.length === 1) {
                     generateChargeWithAccount(userAccounts[0]);
@@ -959,12 +1051,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return;
             } else {
-                if(calcInput === "0" && val !== '.') calcInput = val;
+                if (calcInput === "0" && val !== '.') calcInput = val;
                 else if (val === '.' && calcInput.includes('.')) return; // Prevent double dots
                 else calcInput += val;
-                
+
                 // Max length prevention
-                if(calcInput.length > 12) {
+                if (calcInput.length > 12) {
                     calcInput = calcInput.substring(0, 12);
                     window.showNotification('Límite de dígitos alcanzado');
                 }
@@ -976,9 +1068,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Receipt Modal Button Handlers
     window.btnDataToShare = null;
     const closeReceiptBtn = document.getElementById('close-receipt-modal');
-    if(closeReceiptBtn) {
+    if (closeReceiptBtn) {
         closeReceiptBtn.addEventListener('click', () => {
-            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
             const overlay = document.getElementById('receipt-modal-overlay');
             overlay.style.opacity = '0';
             setTimeout(() => overlay.style.display = 'none', 300);
@@ -986,17 +1078,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const shareReceiptBtn = document.getElementById('share-receipt-btn');
-    if(shareReceiptBtn) {
+    if (shareReceiptBtn) {
         shareReceiptBtn.addEventListener('click', async () => {
-            if(window.navigator.vibrate) window.navigator.vibrate(10);
-            if(!window.btnDataToShare) return;
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
+            if (!window.btnDataToShare) return;
 
             if (navigator.share) {
                 try {
                     const res = await fetch(window.btnDataToShare);
                     const blob = await res.blob();
                     const file = new File([blob], `Recibo_DolarVE_${Date.now()}.png`, { type: 'image/png' });
-                    
+
                     await navigator.share({
                         title: 'Recibo de Conversión DolarVE',
                         files: [file]
@@ -1015,30 +1107,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SHARE DAILY RATE LOGIC ---
     const shareDailyBtn = document.getElementById('share-daily-rate-btn');
-    if(shareDailyBtn) {
+    if (shareDailyBtn) {
         shareDailyBtn.addEventListener('click', () => {
-            if(window.navigator.vibrate) window.navigator.vibrate(15);
-            
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
+
             // Populate template
-            const bcvVal = currentUsdRate ? currentUsdRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2}) : '---';
-            const eurVal = currentEurRate ? `${currentEurRate.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs` : '--- Bs';
-            
+            const bcvVal = currentUsdRate ? currentUsdRate.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '---';
+            const eurVal = currentEurRate ? `${currentEurRate.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs` : '--- Bs';
+
             document.getElementById('share-bcv-val').innerText = bcvVal;
             document.getElementById('share-eur-val').innerText = eurVal;
-            document.getElementById('share-date-val').innerText = `Actualizado: Hoy, ${new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'})}`;
-            
+            document.getElementById('share-date-val').innerText = `Actualizado: Hoy, ${new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })}`;
+
             window.showNotification("Generando imagen para compartir...");
-            
+
             setTimeout(async () => {
                 const templateDiv = document.getElementById('daily-rate-template');
                 console.log('[DolarVE DEBUG] daily-rate-template found:', !!templateDiv);
-                if(!templateDiv) { window.showNotification('Error: Plantilla no encontrada'); return; }
-                if(typeof html2canvas !== 'function') { window.showNotification('Error: Librería no cargada'); return; }
+                if (!templateDiv) { window.showNotification('Error: Plantilla no encontrada'); return; }
+                if (typeof html2canvas !== 'function') { window.showNotification('Error: Librería no cargada'); return; }
                 try {
                     console.log('[DolarVE DEBUG] Starting html2canvas render...');
-                    const canvas = await html2canvas(templateDiv, { 
+                    const canvas = await html2canvas(templateDiv, {
                         backgroundColor: '#0d0d0d',
-                        scale: 2, 
+                        scale: 2,
                         logging: false,
                         useCORS: true,
                         allowTaint: true,
@@ -1052,22 +1144,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         foreignObjectRendering: false
                     });
                     console.log('[DolarVE DEBUG] html2canvas COMPLETED! Canvas:', canvas.width, 'x', canvas.height);
-                    
+
                     const imgData = canvas.toDataURL('image/png');
                     window.btnDataToShare = imgData;
-                    
+
                     // Show preview in modal
                     const overlay = document.getElementById('receipt-modal-overlay');
                     const imgEl = document.getElementById('receipt-preview-img');
-                    if(overlay && imgEl) {
+                    if (overlay && imgEl) {
                         imgEl.src = imgData;
                         overlay.style.display = 'flex';
                         // Force reflow before opacity transition
                         overlay.offsetHeight;
                         overlay.style.opacity = '1';
                     }
-                } catch(e) { 
-                    console.error('[DolarVE DEBUG] html2canvas ERROR:', e); 
+                } catch (e) {
+                    console.error('[DolarVE DEBUG] html2canvas ERROR:', e);
                     window.showNotification('Error: ' + e.message);
                 }
             }, 100);
@@ -1076,10 +1168,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SYSTEM NOTIFICATIONS LOGIC (BCV & EURO ONLY) ---
     const toggleAnimationsBtn = document.getElementById('toggle-animations-btn');
-    if(toggleAnimationsBtn) {
+    if (toggleAnimationsBtn) {
         toggleAnimationsBtn.addEventListener('click', () => {
             toggleAnimationsBtn.classList.toggle('on');
-            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
         });
     }
 
@@ -1095,8 +1187,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         toggleNotifications.addEventListener('click', async () => {
             const isTurningOn = !toggleNotifications.classList.contains('on');
-            if(window.navigator.vibrate) window.navigator.vibrate(10);
-            
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
+
             if (isTurningOn) {
                 if (!('Notification' in window)) {
                     window.showNotification("Tu navegador no soporta Notificaciones.");
@@ -1119,7 +1211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.checkAndSendSystemNotification = function(newBcv, newEur, isWelcome = false) {
+    window.checkAndSendSystemNotification = function (newBcv, newEur, isWelcome = false) {
         if (localStorage.getItem('dolarve_notifs_enabled') !== 'true' || Notification.permission !== 'granted') return;
 
         if (isWelcome && newBcv && newEur) {
@@ -1174,21 +1266,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.showNotification("Debes Activar y Permitir las Notificaciones Arriba Primero ☝️");
                 return;
             }
-            if(window.navigator.vibrate) window.navigator.vibrate(20);
-            
+            if (window.navigator.vibrate) window.navigator.vibrate(20);
+
             testNotifBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Bloquea tu celular ahora... (20s)';
             testNotifBtn.style.color = "var(--text-muted)";
             testNotifBtn.style.borderColor = "var(--card-border)";
-            
+
             setTimeout(() => {
                 const bcv = currentUsdRate ? currentUsdRate.toLocaleString('es-VE') : '---';
                 const eur = currentEurRate ? currentEurRate.toLocaleString('es-VE') : '---';
                 sendPush("¡DolarVE Cambio Oficial!", `BCV a ${bcv} Bs | Euro a ${eur} Bs`);
-                
+
                 testNotifBtn.innerHTML = '<i class="fa-solid fa-check"></i> Prueba Enviada';
                 testNotifBtn.style.color = "var(--accent-green)";
                 testNotifBtn.style.borderColor = "var(--accent-green)";
-                
+
                 setTimeout(() => {
                     testNotifBtn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Emitir Señal de Prueba (20s)';
                 }, 4000);
@@ -1198,17 +1290,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- QUICK REFERENCE LOGIC ---
     let currentReferenceAmount = 100;
-    
-    window.updateQuickReference = function() {
+
+    window.updateQuickReference = function () {
         const bcvEl = document.getElementById('quick-ref-bcv');
         const eurEl = document.getElementById('quick-ref-eur');
-        if(bcvEl && currentUsdRate) bcvEl.innerText = (currentUsdRate * currentReferenceAmount).toLocaleString('es-VE') + ' Bs';
-        if(eurEl && currentEurRate) eurEl.innerText = (currentEurRate * currentReferenceAmount).toLocaleString('es-VE') + ' Bs';
+        if (bcvEl && currentUsdRate) bcvEl.innerText = (currentUsdRate * currentReferenceAmount).toLocaleString('es-VE') + ' Bs';
+        if (eurEl && currentEurRate) eurEl.innerText = (currentEurRate * currentReferenceAmount).toLocaleString('es-VE') + ' Bs';
     };
 
     document.querySelectorAll('.quick-amt-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if(window.navigator.vibrate) window.navigator.vibrate(10);
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
             document.querySelectorAll('.quick-amt-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
             currentReferenceAmount = parseInt(e.target.getAttribute('data-amt'));
@@ -1217,7 +1309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // --- PAGO MOVIL SETTINGS LOGIC (V9.0 Supabase Multi-Account) ---
     let userAccounts = [];
-    
+
     const pmAccountsList = document.getElementById('pm-accounts-list');
     const pmAddFormToggle = document.getElementById('pm-add-form-toggle');
     const pmAddForm = document.getElementById('pm-add-form');
@@ -1252,23 +1344,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!pmAccountsList) return;
         
         if (accounts.length === 0) {
-            pmAccountsList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;"><i class="fa-solid fa-wallet" style="font-size: 24px; opacity: 0.3; display: block; margin-bottom: 8px;"></i>No tienes cuentas registradas aún.</div>';
+            pmAccountsList.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;"><i class="fa-solid fa-wallet" style="font-size: 32px; opacity: 0.2; display: block; margin-bottom: 12px;"></i>No tienes cuentas registradas aún.<br>Agrega una para generar recibos de cobro.</div>';
             return;
         }
         
         pmAccountsList.innerHTML = accounts.map(acc => `
-            <div style="background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="account-card">
                 <div style="flex: 1; min-width: 0;">
-                    <div style="font-weight: 600; font-size: 14px; color: var(--accent-green); margin-bottom: 3px;">${acc.etiqueta}</div>
-                    <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${acc.banco_nombre}</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">${acc.tipo_documento}${acc.numero_documento} · ${acc.prefijo_tel}-${acc.numero_tel}</div>
+                    <div style="font-weight: 700; font-size: 15px; color: var(--accent-green); margin-bottom: 2px;">${acc.etiqueta}</div>
+                    <div style="font-size: 12px; color: var(--text-main); font-weight: 600; opacity: 0.9;">${acc.banco_nombre}</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">${acc.tipo_documento}${acc.numero_documento} • ${acc.prefijo_tel}-${acc.numero_tel}</div>
                 </div>
-                <button data-id="${acc.id}" class="delete-account-btn" style="background: rgba(255,59,48,0.1); border: none; color: #ff3b30; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 14px; flex-shrink: 0; margin-left: 10px;">
-                    <i class="fa-solid fa-trash"></i>
+                <button data-id="${acc.id}" class="delete-account-btn" title="Eliminar">
+                    <i class="fa-solid fa-trash-can"></i>
                 </button>
             </div>
         `).join('');
-        
+
         // Attach delete handlers
         pmAccountsList.querySelectorAll('.delete-account-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
@@ -1302,7 +1394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        
+
         const { data, error } = await supabase.from('cuentas_pago_movil').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true });
         if (error) {
             console.error('[DolarVE] Load Accounts Error:', error);
@@ -1316,20 +1408,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savePmBtn) {
         savePmBtn.addEventListener('click', async () => {
             if (window.navigator.vibrate) window.navigator.vibrate(15);
-            
+
             if (!pmBanco.value || !pmIdNum.value || !pmTelNum.value || !pmEtiqueta.value.trim()) {
                 window.showNotification("Por favor, llena todos los campos incluyendo la etiqueta");
                 return;
             }
-            
+
             if (!supabase || !currentUser) {
                 window.showNotification('⚠️ Inicia sesión para guardar en la nube');
                 return;
             }
-            
+
             savePmBtn.disabled = true;
             savePmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
-            
+
             const { error } = await supabase.from('cuentas_pago_movil').insert({
                 user_id: currentUser.id,
                 etiqueta: pmEtiqueta.value.trim(),
@@ -1339,7 +1431,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 prefijo_tel: pmTelPrefix.value,
                 numero_tel: pmTelNum.value
             });
-            
+
             if (error) {
                 window.showNotification('Error: ' + error.message);
             } else {
@@ -1353,7 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pmAddFormToggle.style.display = 'block';
                 loadAccounts();
             }
-            
+
             savePmBtn.disabled = false;
             savePmBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Guardar en la Nube';
         });
@@ -1370,14 +1462,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Account Picker for COBRAR
     function showAccountPicker(callback) {
         if (!accountPickerOverlay || !accountPickerList) return;
-        
+
         accountPickerList.innerHTML = userAccounts.map((acc, i) => `
             <button data-idx="${i}" style="width: 100%; padding: 15px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); cursor: pointer; text-align: left; font-family: 'Outfit'; transition: all 0.2s;">
                 <div style="font-weight: 600; color: var(--accent-green); margin-bottom: 3px;">${acc.etiqueta}</div>
                 <div style="font-size: 12px; color: var(--text-muted);">${acc.banco_nombre} · ${acc.tipo_documento}${acc.numero_documento}</div>
             </button>
         `).join('');
-        
+
         accountPickerList.querySelectorAll('button').forEach(btn => {
             btn.addEventListener('click', () => {
                 const idx = parseInt(btn.dataset.idx);
@@ -1385,24 +1477,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 callback(userAccounts[idx]);
             });
         });
-        
+
         accountPickerOverlay.style.display = 'block';
         accountPickerOverlay.offsetHeight;
         accountPickerOverlay.style.opacity = '1';
         accountPickerSheet.style.transform = 'translateX(-50%) translateY(0)';
-        
+
         accountPickerOverlay.addEventListener('click', (e) => {
             if (e.target === accountPickerOverlay) hideAccountPicker();
         }, { once: true });
     }
-    
+
     function hideAccountPicker() {
         if (!accountPickerOverlay || !accountPickerSheet) return;
         accountPickerSheet.style.transform = 'translateX(-50%) translateY(100%)';
         accountPickerOverlay.style.opacity = '0';
         setTimeout(() => { accountPickerOverlay.style.display = 'none'; }, 300);
     }
-    
+
     // Make functions globally accessible for the auth state change
     window._dolarve_loadAccounts = loadAccounts;
 
@@ -1430,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const bellDot = document.getElementById('push-bell-dot');
         const pushToggle = document.getElementById('push-notifications-toggle');
         if (!bellIcon) return;
-        
+
         if (isSubscribed) {
             bellIcon.style.color = 'var(--accent-green)';
             if (bellDot) {
@@ -1452,12 +1544,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pushBellBtn) {
         pushBellBtn.addEventListener('click', async () => {
             if (window.navigator.vibrate) window.navigator.vibrate(15);
-            
+
             // Seamless wait if not yet ready
             if (!swRegistration && 'serviceWorker' in navigator) {
                 try {
                     swRegistration = await navigator.serviceWorker.ready;
-                } catch(e) {
+                } catch (e) {
                     window.showNotification('⚠️ El navegador no soporta alertas');
                     return;
                 }
@@ -1466,7 +1558,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!swRegistration) {
                 try {
                     swRegistration = await navigator.serviceWorker.ready;
-                } catch(e) {
+                } catch (e) {
                     window.showNotification('⚠️ Sistema de alertas no disponible');
                     return;
                 }
@@ -1503,7 +1595,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             console.log('[DolarVE] User is subscribed:', subscription);
-            
+
             // Save to Supabase (Optional, don't block UI if it fails)
             if (supabase && currentUser) {
                 try {
@@ -1517,11 +1609,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('[DolarVE] Supabase Integration failed:', e);
                 }
             }
-            
+
             isSubscribed = true;
             updatePushUI();
             window.showNotification('✅ Notificaciones activadas en este dispositivo');
-            
+
             // Optional: simulate a "test" notification for UX
             setTimeout(() => {
                 if (swRegistration) {
@@ -1578,7 +1670,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sync settings toggle if it exists
     const pushToggle = document.getElementById('push-notifications-toggle');
-    if(pushToggle && pushBellBtn) {
+    if (pushToggle && pushBellBtn) {
         pushToggle.parentElement.addEventListener('click', () => {
             pushBellBtn.click();
         });
@@ -1643,7 +1735,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeTermsModal) closeTermsModal.addEventListener('click', closeTermsFunc);
     if (confirmTermsBtn) confirmTermsBtn.addEventListener('click', closeTermsFunc);
 
-    // --- SURTIDOR INTELIGENTE LOGIC ---
+    // --- SURTIDOR INTELIGENTE LOGICA ---
     let pumpLiters = 20;
     let pumpPricePerLiter = 0.50;
 
@@ -1652,34 +1744,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const pumpTotalUsdEl = document.getElementById('pump-total-usd');
     const pumpSlider = document.getElementById('pump-slider');
 
-    window.updatePump = function(val) {
+    window.updatePump = function (val) {
         pumpLiters = parseFloat(val);
-        if(pumpSlider) pumpSlider.value = pumpLiters;
+        if (pumpSlider) pumpSlider.value = pumpLiters;
         refreshPump();
     }
 
-    window.refreshPump = function() {
-        if(!pumpLitersEl) return;
-        
+    window.refreshPump = function () {
+        if (!pumpLitersEl) return;
+
         pumpLitersEl.innerText = pumpLiters.toFixed(1);
         const totalUsd = pumpLiters * pumpPricePerLiter;
         const totalVes = totalUsd * currentUsdRate;
 
-        if(pumpTotalUsdEl) pumpTotalUsdEl.innerText = `${totalUsd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} USD`;
-        if(pumpTotalVesEl) {
-            if(currentUsdRate > 0) {
-                pumpTotalVesEl.innerText = `${totalVes.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})} Bs`;
+        if (pumpTotalUsdEl) pumpTotalUsdEl.innerText = `${totalUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+        if (pumpTotalVesEl) {
+            if (currentUsdRate > 0) {
+                pumpTotalVesEl.innerText = `${totalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
             } else {
                 pumpTotalVesEl.innerText = "Cargando...";
             }
         }
     }
 
-    if(pumpSlider) {
+    if (pumpSlider) {
         pumpSlider.addEventListener('input', (e) => {
             pumpLiters = parseFloat(e.target.value);
             refreshPump();
-            if(window.navigator.vibrate) window.navigator.vibrate(5);
+            if (window.navigator.vibrate) window.navigator.vibrate(5);
         });
     }
 

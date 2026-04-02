@@ -671,3 +671,57 @@ body.light-theme #terms-modal header {
     box-shadow: 0 0 15px rgba(0, 208, 132, 0.4);
 }
 
+/* --- New Modals & Account Management --- */
+#accounts-modal div::-webkit-scrollbar {
+    width: 6px;
+}
+
+#accounts-modal div::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.account-card {
+    background: var(--nav-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s ease;
+    margin-bottom: 12px;
+}
+
+.account-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-green);
+}
+
+.delete-account-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 77, 77, 0.1);
+    color: var(--accent-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid rgba(255, 77, 77, 0.2);
+}
+
+/* --- iOS Step Animations --- */
+#install-modal strong {
+    color: var(--accent-green);
+}
+
+@keyframes modalFadeScale {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+#accounts-modal.show, #install-modal.show {
+    animation: modalFadeScale 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
