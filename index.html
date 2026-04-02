@@ -45,23 +45,33 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div id="push-bell-btn" style="cursor: pointer; position: relative; padding: 5px;">
-                        <i class="fa-solid fa-bell" id="push-bell-icon" style="color: var(--text-muted); font-size: 20px;"></i>
-                        <span id="push-bell-dot" style="display: none; position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: var(--accent-red); border-radius: 50%; border: 2px solid var(--bg-color);"></span>
+                        <i class="fa-solid fa-bell" id="push-bell-icon"
+                            style="color: var(--text-muted); font-size: 20px;"></i>
+                        <span id="push-bell-dot"
+                            style="display: none; position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: var(--accent-red); border-radius: 50%; border: 2px solid var(--bg-color);"></span>
                     </div>
-                    <div id="user-profile-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--nav-bg); border: 2px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 2px 10px rgba(0,208,132,0.2);">
-                            <img id="user-avatar-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                            <i id="user-avatar-placeholder" class="fa-solid fa-user" style="color: var(--accent-green); font-size: 16px;"></i>
+                    <div id="user-profile-btn"
+                        style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <div
+                            style="width: 36px; height: 36px; border-radius: 50%; background: var(--nav-bg); border: 2px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 2px 10px rgba(0,208,132,0.2);">
+                            <img id="user-avatar-img" src=""
+                                style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            <i id="user-avatar-placeholder" class="fa-solid fa-user"
+                                style="color: var(--accent-green); font-size: 16px;"></i>
                         </div>
-                        <span id="user-short-name" style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Ingresar</span>
+                        <span id="user-short-name"
+                            style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Ingresar</span>
                     </div>
                 </div>
             </header>
 
-            <div class="card" style="position: relative; overflow: hidden; border: 1px solid var(--card-border); background: var(--card-bg);">
+            <div class="card"
+                style="position: relative; overflow: hidden; border: 1px solid var(--card-border); background: var(--card-bg);">
                 <!-- Flag Colors Glow Overlay -->
-                <div style="position: absolute; top: 0; right: 0; bottom: 0; width: 100%; background: linear-gradient(135deg, rgba(255, 204, 0, 0.03) 0%, rgba(0, 51, 160, 0.03) 50%, rgba(206, 17, 38, 0.03) 100%); pointer-events: none;"></div>
-                
+                <div
+                    style="position: absolute; top: 0; right: 0; bottom: 0; width: 100%; background: linear-gradient(135deg, rgba(255, 204, 0, 0.03) 0%, rgba(0, 51, 160, 0.03) 50%, rgba(206, 17, 38, 0.03) 100%); pointer-events: none;">
+                </div>
+
                 <div style="position: relative; z-index: 1;">
                     <div class="card-title">USD / VES (Oficial)</div>
                     <div class="card-value"><span id="usd-bcv-price">---</span> <span
@@ -70,12 +80,14 @@
                         <canvas id="bcvChart"></canvas>
                     </div>
                     <div class="card-footer">
-                        <span class="trend-up" id="usd-trend-indicator" style="background: rgba(0, 208, 132, 0.1); padding: 4px 8px; border-radius: 6px;"><i class="fa-solid fa-check-circle"></i>
+                        <span class="trend-up" id="usd-trend-indicator"
+                            style="background: rgba(0, 208, 132, 0.1); padding: 4px 8px; border-radius: 6px;"><i
+                                class="fa-solid fa-check-circle"></i>
                             BCV</span>
                         <span style="color: var(--text-muted)" id="last-update-usd">Actualizando...</span>
                     </div>
                 </div>
-                
+
                 <!-- Bottom Flag Stripe -->
                 <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 3px; display: flex;">
                     <div style="flex: 1; background: #ffcc00; opacity: 0.6;"></div>
@@ -117,7 +129,8 @@
             </div>
 
             <!-- Brecha Cambiaria Widget -->
-            <div class="card" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between;">
+            <div class="card"
+                style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between;">
                 <div style="z-index: 1;">
                     <div class="card-title" style="margin-bottom: 5px;">Brecha Cambiaria</div>
                     <div class="card-value" id="brecha-value" style="font-size: 28px;">---%</div>
@@ -125,7 +138,9 @@
                 <div style="z-index: 1; font-size: 32px; opacity: 0.1;">
                     <i class="fa-solid fa-scale-unbalanced"></i>
                 </div>
-                <div id="brecha-bg" style="position: absolute; right: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.1)); transition: width 1s ease;"></div>
+                <div id="brecha-bg"
+                    style="position: absolute; right: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.1)); transition: width 1s ease;">
+                </div>
             </div>
 
             <div style="padding: 20px 20px 10px;">
@@ -138,7 +153,8 @@
                     <div class="sentiment-bar">
                         <div class="sentiment-fill" id="sentiment-fill-bcv" style="width: 85%;"></div>
                     </div>
-                    <div style="text-align: center; font-size: 12px; font-weight: 600; margin-top: 5px; color: var(--accent-green);">
+                    <div
+                        style="text-align: center; font-size: 12px; font-weight: 600; margin-top: 5px; color: var(--accent-green);">
                         85% Alcista
                     </div>
                 </div>
@@ -147,52 +163,77 @@
             <!-- Monedas Internacionales -->
             <!-- Mercado Internacional (USD vs) - Grid 2x2 -->
             <div style="padding: 10px 20px 5px;">
-                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <div
+                    style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-globe" style="color: #f1c40f;"></i> Mercado Internacional (Dólar vs)
                 </div>
-                
+
                 <div class="grid-2" style="padding: 0; gap: 10px; grid-template-rows: repeat(2, 1fr);">
                     <!-- Colombia -->
-                    <div class="card" style="margin: 0; padding: 15px; background: rgba(241, 196, 15, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="card"
+                        style="margin: 0; padding: 15px; background: rgba(241, 196, 15, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Colombia (COP)</div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-cop-rate">--- <span style="font-size: 11px; font-weight: 400;">COP</span></div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Colombia (COP)
+                            </div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-cop-rate">
+                                --- <span style="font-size: 11px; font-weight: 400;">COP</span></div>
                         </div>
-                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.1)); pointer-events: none;"></div>
-                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #f1c40f; opacity: 0.3;">
+                        <div
+                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.1)); pointer-events: none;">
+                        </div>
+                        <div
+                            style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #f1c40f; opacity: 0.3;">
                             <i class="fa-solid fa-flag"></i>
                         </div>
                     </div>
                     <!-- Argentina (Blue) -->
-                    <div class="card" style="margin: 0; padding: 15px; background: rgba(116, 172, 223, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="card"
+                        style="margin: 0; padding: 15px; background: rgba(116, 172, 223, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Argentina (BLUE)</div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-ars-rate">--- <span style="font-size: 11px; font-weight: 400;">ARS</span></div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Argentina (BLUE)
+                            </div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-ars-rate">
+                                --- <span style="font-size: 11px; font-weight: 400;">ARS</span></div>
                         </div>
-                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(116, 172, 223, 0.1)); pointer-events: none;"></div>
-                        <div style="position: absolute; right: 8px; top: 8px; font-size: 12px; font-weight: 800; color: #74ACDF; opacity: 0.5;">
+                        <div
+                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(116, 172, 223, 0.1)); pointer-events: none;">
+                        </div>
+                        <div
+                            style="position: absolute; right: 8px; top: 8px; font-size: 12px; font-weight: 800; color: #74ACDF; opacity: 0.5;">
                             ARS
                         </div>
                     </div>
                     <!-- Brasil -->
-                    <div class="card" style="margin: 0; padding: 15px; background: rgba(0, 151, 57, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="card"
+                        style="margin: 0; padding: 15px; background: rgba(0, 151, 57, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Brasil (BRL)</div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-brl-rate">--- <span style="font-size: 11px; font-weight: 400;">BRL</span></div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Brasil (BRL)
+                            </div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-brl-rate">
+                                --- <span style="font-size: 11px; font-weight: 400;">BRL</span></div>
                         </div>
-                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(0, 151, 57, 0.1)); pointer-events: none;"></div>
-                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #009739; opacity: 0.3;">
+                        <div
+                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(0, 151, 57, 0.1)); pointer-events: none;">
+                        </div>
+                        <div
+                            style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #009739; opacity: 0.3;">
                             <i class="fa-solid fa-earth-americas"></i>
                         </div>
                     </div>
                     <!-- Chile -->
-                    <div class="card" style="margin: 0; padding: 15px; background: rgba(213, 43, 30, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="card"
+                        style="margin: 0; padding: 15px; background: rgba(213, 43, 30, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Chile (CLP)</div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-clp-rate">--- <span style="font-size: 11px; font-weight: 400;">CLP</span></div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Chile (CLP)
+                            </div>
+                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-clp-rate">
+                                --- <span style="font-size: 11px; font-weight: 400;">CLP</span></div>
                         </div>
-                        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(213, 43, 30, 0.1)); pointer-events: none;"></div>
-                        <div style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #d32f2f; opacity: 0.3;">
+                        <div
+                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(213, 43, 30, 0.1)); pointer-events: none;">
+                        </div>
+                        <div
+                            style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #d32f2f; opacity: 0.3;">
                             <i class="fa-solid fa-star"></i>
                         </div>
                     </div>
@@ -231,7 +272,8 @@
                     </div>
                 </div>
 
-                <button id="share-daily-rate-btn" class="btn-primary" style="margin-top: 20px; width: 100%; padding: 16px; font-weight: 700; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border-radius: 16px; border: none; font-size: 15px; box-shadow: 0 10px 25px rgba(0, 208, 132, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <button id="share-daily-rate-btn" class="btn-primary"
+                    style="margin-top: 20px; width: 100%; padding: 16px; font-weight: 700; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border-radius: 16px; border: none; font-size: 15px; box-shadow: 0 10px 25px rgba(0, 208, 132, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <i class="fa-solid fa-share-from-square"></i> Compartir Imagen de Tasas
                 </button>
             </div>
@@ -251,7 +293,8 @@
                 </div>
             </header>
 
-            <div class="rate-selector" style="padding: 0 20px 15px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;">
+            <div class="rate-selector"
+                style="padding: 0 20px 15px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;">
                 <button class="rate-chip active" data-rate="bcv">BCV</button>
                 <button class="rate-chip" data-rate="paralelo">Paralelo</button>
                 <button class="rate-chip" data-rate="eur">Euro</button>
@@ -277,10 +320,14 @@
                         class="calc-btn">9</button>
                     <button class="calc-btn">.</button><button class="calc-btn">0</button><button
                         class="calc-btn danger-btn">C</button>
-                    
+
                     <div style="grid-column: span 3; display: flex; gap: 10px;">
-                        <button class="calc-btn action" id="generate-receipt-btn" style="flex: 1; font-size: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-receipt"></i> RECIBO</button>
-                        <button class="calc-btn action" id="generate-charge-btn" style="flex: 1; background: rgba(0, 208, 132, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 208, 132, 0.2); font-size: 14px; padding: 15px; box-shadow: 0 4px 10px rgba(0,208,132,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-file-invoice-dollar"></i> COBRAR</button>
+                        <button class="calc-btn action" id="generate-receipt-btn"
+                            style="flex: 1; font-size: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i
+                                class="fa-solid fa-receipt"></i> RECIBO</button>
+                        <button class="calc-btn action" id="generate-charge-btn"
+                            style="flex: 1; background: rgba(0, 208, 132, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 208, 132, 0.2); font-size: 14px; padding: 15px; box-shadow: 0 4px 10px rgba(0,208,132,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;"><i
+                                class="fa-solid fa-file-invoice-dollar"></i> COBRAR</button>
                     </div>
                 </div>
             </div>
@@ -299,51 +346,74 @@
             </header>
 
             <div style="padding: 10px 20px;">
-                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
+                <div
+                    style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
                     Control de Combustible v12.1
                 </div>
-                
-                <div class="card" style="margin: 0; padding: 0; background: linear-gradient(145deg, #161B22, #0d1117); border: 1px solid var(--card-border); border-radius: 28px; position: relative; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+
+                <div class="card"
+                    style="margin: 0; padding: 0; background: linear-gradient(145deg, #161B22, #0d1117); border: 1px solid var(--card-border); border-radius: 28px; position: relative; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
                     <!-- Pantalla Digital Surtidor -->
-                    <div style="background: #000; padding: 35px 25px; border-bottom: 1px solid var(--card-border); position: relative;">
+                    <div
+                        style="background: #000; padding: 35px 25px; border-bottom: 1px solid var(--card-border); position: relative;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
                             <div style="text-align: left;">
-                                <div style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Litros</div>
-                                <div style="font-size: 56px; font-family: 'DM Mono', monospace; font-weight: 700; color: #fff; line-height: 1;" id="pump-liters">20.0</div>
+                                <div
+                                    style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+                                    Litros</div>
+                                <div style="font-size: 56px; font-family: 'DM Mono', monospace; font-weight: 700; color: #fff; line-height: 1;"
+                                    id="pump-liters">20.0</div>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Precio /L</div>
-                                <div id="pump-price-indicator" style="font-size: 24px; color: #fff; font-weight: 700; font-family: 'DM Mono', monospace;">0.50$</div>
+                                <div
+                                    style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+                                    Precio /L</div>
+                                <div id="pump-price-indicator"
+                                    style="font-size: 24px; color: #fff; font-weight: 700; font-family: 'DM Mono', monospace;">
+                                    0.50$</div>
                             </div>
                         </div>
-                        
-                        <div style="text-align: center; border-top: 1px solid rgba(0, 208, 132, 0.1); padding-top: 25px;">
-                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Monto total estimado</div>
-                            <div style="font-size: 42px; font-weight: 800; color: var(--accent-green); line-height: 1; font-family: 'Outfit';" id="pump-total-ves">--- Bs</div>
-                            <div style="font-size: 18px; color: #fff; margin-top: 8px; opacity: 0.8;" id="pump-total-usd">10.00 USD</div>
+
+                        <div
+                            style="text-align: center; border-top: 1px solid rgba(0, 208, 132, 0.1); padding-top: 25px;">
+                            <div
+                                style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+                                Monto total estimado</div>
+                            <div style="font-size: 42px; font-weight: 800; color: var(--accent-green); line-height: 1; font-family: 'Outfit';"
+                                id="pump-total-ves">--- Bs</div>
+                            <div style="font-size: 18px; color: #fff; margin-top: 8px; opacity: 0.8;"
+                                id="pump-total-usd">10.00 USD</div>
                         </div>
-                        
+
                         <!-- Premium Glow -->
-                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 100%; background: radial-gradient(circle at center, rgba(0, 208, 132, 0.05), transparent); pointer-events: none;"></div>
+                        <div
+                            style="position: absolute; top: 0; left: 0; right: 0; height: 100%; background: radial-gradient(circle at center, rgba(0, 208, 132, 0.05), transparent); pointer-events: none;">
+                        </div>
                     </div>
 
                     <!-- Controles Surtidor -->
                     <div style="padding: 25px;">
-                        <div style="font-size: 13px; font-weight: 700; color: var(--accent-green); text-align: center; margin-bottom: 25px; letter-spacing: 1px;">
+                        <div
+                            style="font-size: 13px; font-weight: 700; color: var(--accent-green); text-align: center; margin-bottom: 25px; letter-spacing: 1px;">
                             MODO: PRECIO REGULAR ($0.50)
                         </div>
 
                         <!-- Slider -->
                         <div style="position: relative; padding: 20px 0;">
-                            <input type="range" id="pump-slider" min="1" max="100" value="20" style="width: 100%; height: 8px; background: #2D333B; border-radius: 10px; appearance: none; outline: none; cursor: pointer;">
+                            <input type="range" id="pump-slider" min="1" max="100" value="20"
+                                style="width: 100%; height: 8px; background: #2D333B; border-radius: 10px; appearance: none; outline: none; cursor: pointer;">
                         </div>
-                        
+
                         <!-- Quick Select Buttons -->
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 25px;">
-                            <button onclick="updatePump(20)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">20L</button>
-                            <button onclick="updatePump(35)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">35L</button>
-                            <button onclick="updatePump(40)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">40L</button>
-                            <button onclick="updatePump(60)" style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">60L</button>
+                            <button onclick="updatePump(20)"
+                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">20L</button>
+                            <button onclick="updatePump(35)"
+                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">35L</button>
+                            <button onclick="updatePump(40)"
+                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">40L</button>
+                            <button onclick="updatePump(60)"
+                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">60L</button>
                         </div>
                     </div>
                 </div>
@@ -409,7 +479,8 @@
                     <div>
                         <div style="font-weight: 600;"><i class="fa-solid fa-bell"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Alertas en Tiempo Real</div>
-                        <div style="font-size: 11px; color: var(--text-muted);">Recibe cambios de precio al instante</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">Recibe cambios de precio al instante
+                        </div>
                     </div>
                     <div class="toggle-switch" id="push-notifications-toggle">
                         <div class="toggle-circle"></div>
@@ -420,7 +491,8 @@
 
                 <div class="settings-item">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-moon" style="color: var(--accent-green); margin-right: 5px;"></i> Modo Oscuro</div>
+                        <div style="font-weight: 600;"><i class="fa-solid fa-moon"
+                                style="color: var(--accent-green); margin-right: 5px;"></i> Modo Oscuro</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Cambiar tema visual</div>
                     </div>
                     <div class="toggle-switch on" id="theme-toggle">
@@ -429,7 +501,8 @@
                 </div>
                 <div class="settings-item">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-globe" style="color: var(--accent-green); margin-right: 5px;"></i> Idioma</div>
+                        <div style="font-weight: 600;"><i class="fa-solid fa-globe"
+                                style="color: var(--accent-green); margin-right: 5px;"></i> Idioma</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Seleccionar lenguaje</div>
                     </div>
                     <select id="lang-select"
@@ -440,21 +513,25 @@
                 </div>
                 <div class="settings-item" id="open-accounts-btn" style="cursor: pointer;">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-building-columns" style="color: var(--accent-green); margin-right: 5px;"></i> Gestión de Cuentas</div>
+                        <div style="font-weight: 600;"><i class="fa-solid fa-building-columns"
+                                style="color: var(--accent-green); margin-right: 5px;"></i> Gestión de Cuentas</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Administra tus datos de Pago Móvil</div>
                     </div>
                     <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 14px;"></i>
                 </div>
                 <div class="settings-item" id="pwa-install-btn" style="cursor: pointer; display: none;">
                     <div>
-                        <div style="font-weight: 600;"><i id="install-icon" class="fa-solid fa-download" style="color: var(--accent-green); margin-right: 5px;"></i> <span id="install-text">Instalar DolarVE</span></div>
+                        <div style="font-weight: 600;"><i id="install-icon" class="fa-solid fa-download"
+                                style="color: var(--accent-green); margin-right: 5px;"></i> <span
+                                id="install-text">Instalar DolarVE</span></div>
                         <div style="font-size: 11px; color: var(--text-muted);">Ten las tasas siempre a la mano</div>
                     </div>
                     <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 14px;"></i>
                 </div>
                 <div class="settings-item" id="open-terms-btn" style="cursor: pointer;">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-file-contract" style="color: var(--accent-green); margin-right: 5px;"></i> Términos y Privacidad</div>
+                        <div style="font-weight: 600;"><i class="fa-solid fa-file-contract"
+                                style="color: var(--accent-green); margin-right: 5px;"></i> Términos y Privacidad</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Información legal y de uso</div>
                     </div>
                     <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 14px;"></i>
@@ -481,12 +558,18 @@
     </div>
 
     <!-- Account Picker Bottom Sheet (for COBRAR - Global Overlay) -->
-    <div id="account-picker-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 99998; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease;">
-        <div id="account-picker-sheet" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--card-bg); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 20px)); transform: translateX(-50%) translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-            <div style="width: 40px; height: 4px; background: var(--text-muted); border-radius: 2px; margin: 0 auto 15px; opacity: 0.4;"></div>
+    <div id="account-picker-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 99998; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease;">
+        <div id="account-picker-sheet"
+            style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--card-bg); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 20px)); transform: translateX(-50%) translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div
+                style="width: 40px; height: 4px; background: var(--text-muted); border-radius: 2px; margin: 0 auto 15px; opacity: 0.4;">
+            </div>
             <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 5px;">Selecciona una Cuenta</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">¿A cuál cuenta deseas que te paguen?</p>
-            <div id="account-picker-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;"></div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">¿A cuál cuenta deseas que te
+                paguen?</p>
+            <div id="account-picker-list"
+                style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;"></div>
         </div>
     </div>
 
@@ -507,7 +590,8 @@
                 </div>
                 <div id="close-crypto-modal"
                     style="cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 50%; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center;">
-                    <i class="fa-solid fa-xmark"></i></div>
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
             </header>
             <div style="padding: 0 20px 20px; height: 250px; display: flex; flex-direction: column;">
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; text-align: center;">
@@ -546,25 +630,37 @@
     <div style="position: absolute; left: -9999px; top: -9999px;">
         <div id="daily-rate-template"
             style="background: #0d0d0d; color: #fff; width: 350px; padding: 40px 30px; border-radius: 20px; font-family: 'Outfit', sans-serif; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;"></div>
-            <div style="position: absolute; bottom: -50px; left: -50px; width: 150px; height: 150px; background: rgba(37, 117, 252, 0.15); filter: blur(40px); border-radius: 50%;"></div>
-            
+            <div
+                style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;">
+            </div>
+            <div
+                style="position: absolute; bottom: -50px; left: -50px; width: 150px; height: 150px; background: rgba(37, 117, 252, 0.15); filter: blur(40px); border-radius: 50%;">
+            </div>
+
             <div style="position: relative; z-index: 1;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 35px;">
+                <div
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 35px;">
                     <img src="logo.png" style="width: 24px; height: 24px;" alt="Logo">
                     <span style="font-weight: 700; font-size: 18px; letter-spacing: 1px;">DOLARVE</span>
                 </div>
-                
-                <h2 style="font-size: 13px; text-transform: uppercase; color: #00D084; margin-bottom: 5px; letter-spacing: 1px; text-align: center;">Tasa Oficial Del Día</h2>
-                <div style="font-size: 42px; font-weight: 700; margin-bottom: 30px; text-align: center;"><span id="share-bcv-val">---</span> <span style="font-size: 16px; color: rgba(255,255,255,0.4);">Bs</span></div>
-                
-                <div style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 30px;">
+
+                <h2
+                    style="font-size: 13px; text-transform: uppercase; color: #00D084; margin-bottom: 5px; letter-spacing: 1px; text-align: center;">
+                    Tasa Oficial Del Día</h2>
+                <div style="font-size: 42px; font-weight: 700; margin-bottom: 30px; text-align: center;"><span
+                        id="share-bcv-val">---</span> <span
+                        style="font-size: 16px; color: rgba(255,255,255,0.4);">Bs</span></div>
+
+                <div
+                    style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 30px;">
                     <span style="font-size: 14px; color: rgba(255,255,255,0.6);">Euro Oficial</span>
                     <strong style="font-size: 16px; color: #fff;" id="share-eur-val">--- Bs</strong>
                 </div>
-                
-                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;" id="share-date-val">Actualizado: Hoy</p>
-                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Descarga DolarVE y ten las tasas al instante.</p>
+
+                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;"
+                    id="share-date-val">Actualizado: Hoy</p>
+                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Descarga
+                    DolarVE y ten las tasas al instante.</p>
             </div>
         </div>
     </div>
@@ -573,33 +669,44 @@
     <div style="position: absolute; left: -9999px; top: -9999px;">
         <div id="receipt-template"
             style="background: #0d0d0d; color: #fff; width: 350px; padding: 40px 30px; border-radius: 20px; font-family: 'Outfit', sans-serif; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;"></div>
-            
+            <div
+                style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;">
+            </div>
+
             <div style="position: relative; z-index: 1;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px;">
+                <div
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px;">
                     <img src="logo.png" style="width: 24px; height: 24px;" alt="Logo">
                     <span style="font-weight: 700; font-size: 18px; letter-spacing: 1px;">DOLARVE</span>
                 </div>
-                
-                <h2 style="font-size: 13px; text-transform: uppercase; color: #00D084; margin-bottom: 25px; letter-spacing: 1px; text-align: center;">Recibo de Conversión</h2>
-                
-                <div style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px;">
+
+                <h2
+                    style="font-size: 13px; text-transform: uppercase; color: #00D084; margin-bottom: 25px; letter-spacing: 1px; text-align: center;">
+                    Recibo de Conversión</h2>
+
+                <div
+                    style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px;">
                     <span style="font-size: 14px; color: rgba(255,255,255,0.6);">Monto Origen</span>
                     <strong style="font-size: 16px; color: #fff;" id="rec-from">---</strong>
                 </div>
-                
-                <div style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px;">
-                    <span style="font-size: 14px; color: rgba(255,255,255,0.6);">Tasa (<span id="rec-rate-name">BCV</span>)</span>
+
+                <div
+                    style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px;">
+                    <span style="font-size: 14px; color: rgba(255,255,255,0.6);">Tasa (<span
+                            id="rec-rate-name">BCV</span>)</span>
                     <strong style="font-size: 16px; color: #fff;" id="rec-rate-val">---</strong>
                 </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); padding: 20px; border-radius: 12px; margin-bottom: 30px; margin-top: 25px;">
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); padding: 20px; border-radius: 12px; margin-bottom: 30px; margin-top: 25px;">
                     <span style="font-size: 15px; font-weight: 600; color: #00D084;">Total a Pagar</span>
                     <strong style="font-size: 24px; font-weight: 700; color: #00D084;" id="rec-to">---</strong>
                 </div>
-                
-                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;" id="rec-date">Fecha</p>
-                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Descarga DolarVE y ten las tasas al instante.</p>
+
+                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;"
+                    id="rec-date">Fecha</p>
+                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Descarga
+                    DolarVE y ten las tasas al instante.</p>
             </div>
         </div>
     </div>
@@ -608,83 +715,118 @@
     <div style="position: absolute; left: -9999px; top: -9999px;">
         <div id="charge-template"
             style="background: #0d0d0d; color: #fff; width: 350px; padding: 40px 30px; border-radius: 20px; font-family: 'Outfit', sans-serif; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;"></div>
-            
+            <div
+                style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;">
+            </div>
+
             <div style="position: relative; z-index: 1;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px;">
+                <div
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px;">
                     <img src="logo.png" style="width: 24px; height: 24px;" alt="Logo">
                     <span style="font-weight: 700; font-size: 18px; letter-spacing: 1px;">DOLARVE</span>
                 </div>
-                
-                <h2 style="font-size: 14px; text-transform: uppercase; color: #00D084; margin-bottom: 15px; letter-spacing: 1px; text-align: center;">Solicitud de Pago</h2>
-                
+
+                <h2
+                    style="font-size: 14px; text-transform: uppercase; color: #00D084; margin-bottom: 15px; letter-spacing: 1px; text-align: center;">
+                    Solicitud de Pago</h2>
+
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 5px;">Monto Total a Pagar</div>
-                    <div style="font-size: 42px; font-weight: 700; color: #00D084; line-height: 1;"><span id="charge-amount-val">---</span> <span style="font-size: 16px; color: rgba(255,255,255,0.4);">Bs</span></div>
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px;">Referencia: <span id="charge-rate-val">---</span></div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 5px;">Monto Total a Pagar
+                    </div>
+                    <div style="font-size: 42px; font-weight: 700; color: #00D084; line-height: 1;"><span
+                            id="charge-amount-val">---</span> <span
+                            style="font-size: 16px; color: rgba(255,255,255,0.4);">Bs</span></div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px;">Referencia: <span
+                            id="charge-rate-val">---</span></div>
                 </div>
-                
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 14px; margin-bottom: 25px;">
-                    <div style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; letter-spacing: 1px;">Datos del Beneficiario</div>
-                    
+
+                <div
+                    style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 14px; margin-bottom: 25px;">
+                    <div
+                        style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; letter-spacing: 1px;">
+                        Datos del Beneficiario</div>
+
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-building-columns" style="width: 16px;"></i> Banco</span>
-                        <strong style="font-size: 13px; color: #fff;" id="charge-bank-val" style="text-align: right; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">---</strong>
+                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i
+                                class="fa-solid fa-building-columns" style="width: 16px;"></i> Banco</span>
+                        <strong style="font-size: 13px; color: #fff;" id="charge-bank-val"
+                            style="text-align: right; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">---</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-mobile-screen" style="width: 16px;"></i> Teléfono</span>
+                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i
+                                class="fa-solid fa-mobile-screen" style="width: 16px;"></i> Teléfono</span>
                         <strong style="font-size: 13px; color: #fff;" id="charge-phone-val">---</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-id-card" style="width: 16px;"></i> Identificación</span>
+                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-id-card"
+                                style="width: 16px;"></i> Identificación</span>
                         <strong style="font-size: 13px; color: #fff;" id="charge-id-val">---</strong>
                     </div>
                 </div>
-                
-                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;" id="charge-date-val">Fecha</p>
-                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Generado con DolarVE</p>
+
+                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;"
+                    id="charge-date-val">Fecha</p>
+                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Generado
+                    con DolarVE</p>
             </div>
         </div>
     </div>
 
     <!-- Auth Modal -->
-    <div class="modal-overlay" id="auth-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 99999; backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease;">
-        <div style="width: 100%; max-width: 420px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 30px; display: flex; flex-direction: column; gap: 15px; position: relative;">
-            <div id="close-auth-modal" style="position: absolute; top: 18px; right: 18px; cursor: pointer; color: var(--text-muted); z-index: 2;"><i class="fa-solid fa-xmark" style="font-size: 22px;"></i></div>
-            
+    <div class="modal-overlay" id="auth-modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 99999; backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease;">
+        <div
+            style="width: 100%; max-width: 420px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 30px; display: flex; flex-direction: column; gap: 15px; position: relative;">
+            <div id="close-auth-modal"
+                style="position: absolute; top: 18px; right: 18px; cursor: pointer; color: var(--text-muted); z-index: 2;">
+                <i class="fa-solid fa-xmark" style="font-size: 22px;"></i>
+            </div>
+
             <!-- LOGIN / REGISTER VIEW -->
             <div id="auth-login-view">
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <h2 id="auth-title" style="font-size: 24px; color: var(--accent-green); font-weight: 700;">Iniciar Sesión</h2>
-                    <p id="auth-subtitle" style="font-size: 14px; color: var(--text-muted); margin-top: 8px;">Accede a tu perfil de DolarVE</p>
+                    <h2 id="auth-title" style="font-size: 24px; color: var(--accent-green); font-weight: 700;">Iniciar
+                        Sesión</h2>
+                    <p id="auth-subtitle" style="font-size: 14px; color: var(--text-muted); margin-top: 8px;">Accede a
+                        tu perfil de DolarVE</p>
                 </div>
-                
+
                 <form id="auth-form" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 15px;">
                     <div id="auth-register-fields" style="display: none; flex-direction: column; gap: 15px;">
                         <div style="display: flex; gap: 10px; width: 100%;">
-                            <input type="text" id="auth-firstname" placeholder="Nombres" style="flex: 1; min-width: 0; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit'; box-sizing: border-box;">
-                            <input type="text" id="auth-lastname" placeholder="Apellidos" style="flex: 1; min-width: 0; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit'; box-sizing: border-box;">
+                            <input type="text" id="auth-firstname" placeholder="Nombres"
+                                style="flex: 1; min-width: 0; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit'; box-sizing: border-box;">
+                            <input type="text" id="auth-lastname" placeholder="Apellidos"
+                                style="flex: 1; min-width: 0; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit'; box-sizing: border-box;">
                         </div>
                         <div class="input-group">
-                            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 500;">Fecha de Nacimiento</label>
-                            <input type="date" id="auth-dob" style="width: 100%; box-sizing: border-box; padding: 14px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; color-scheme: dark; font-family: 'Outfit';">
+                            <label
+                                style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 500;">Fecha
+                                de Nacimiento</label>
+                            <input type="date" id="auth-dob"
+                                style="width: 100%; box-sizing: border-box; padding: 14px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; color-scheme: dark; font-family: 'Outfit';">
                         </div>
                     </div>
-                    
-                    <input type="email" id="auth-email" placeholder="Correo Electrónico" required style="width: 100%; box-sizing: border-box; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
-                    <input type="password" id="auth-password" placeholder="Contraseña" required minlength="6" style="width: 100%; box-sizing: border-box; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
-                    
+
+                    <input type="email" id="auth-email" placeholder="Correo Electrónico" required
+                        style="width: 100%; box-sizing: border-box; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+                    <input type="password" id="auth-password" placeholder="Contraseña" required minlength="6"
+                        style="width: 100%; box-sizing: border-box; padding: 16px; font-size: 16px; background: var(--nav-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+
                     <!-- Loading Spinner for Auth -->
                     <div id="auth-loading" style="display: none; justify-content: center; padding: 10px;">
-                        <i class="fa-solid fa-circle-notch fa-spin" style="color: var(--accent-green); font-size: 28px;"></i>
+                        <i class="fa-solid fa-circle-notch fa-spin"
+                            style="color: var(--accent-green); font-size: 28px;"></i>
                     </div>
-                    
-                    <button type="submit" id="auth-action-btn" style="width: 100%; padding: 18px; font-size: 16px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 5px; font-family: 'Outfit'; box-shadow: 0 4px 15px rgba(0,208,132,0.2);">Entrar</button>
+
+                    <button type="submit" id="auth-action-btn"
+                        style="width: 100%; padding: 18px; font-size: 16px; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 5px; font-family: 'Outfit'; box-shadow: 0 4px 15px rgba(0,208,132,0.2);">Entrar</button>
                 </form>
-                
+
                 <div style="text-align: center; font-size: 14px; color: var(--text-muted); margin-top: 10px;">
                     <span id="auth-toggle-text">¿No tienes cuenta?</span>
-                    <a href="#" id="auth-toggle-btn" style="color: var(--accent-green); text-decoration: none; font-weight: 600; margin-left: 5px;">Regístrate</a>
+                    <a href="#" id="auth-toggle-btn"
+                        style="color: var(--accent-green); text-decoration: none; font-weight: 600; margin-left: 5px;">Regístrate</a>
                 </div>
             </div>
 
@@ -692,116 +834,188 @@
             <div id="auth-profile-view" style="display: none;">
                 <div style="text-align: center; margin-bottom: 10px;">
                     <!-- Avatar with upload -->
-                    <div id="profile-avatar-wrapper" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 15px; position: relative; cursor: pointer; border: 3px solid var(--accent-green); box-shadow: 0 0 20px rgba(0,208,132,0.15);">
-                        <img id="profile-avatar-img" src="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
-                        <div id="profile-avatar-placeholder" style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, rgba(0,208,132,0.15), rgba(62,139,255,0.1)); display: flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-user" style="font-size: 32px; color: var(--accent-green); opacity: 0.6;"></i>
+                    <div id="profile-avatar-wrapper"
+                        style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 15px; position: relative; cursor: pointer; border: 3px solid var(--accent-green); box-shadow: 0 0 20px rgba(0,208,132,0.15);">
+                        <img id="profile-avatar-img" src=""
+                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+                        <div id="profile-avatar-placeholder"
+                            style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, rgba(0,208,132,0.15), rgba(62,139,255,0.1)); display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-user"
+                                style="font-size: 32px; color: var(--accent-green); opacity: 0.6;"></i>
                         </div>
-                        <div style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg);">
+                        <div
+                            style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg);">
                             <i class="fa-solid fa-camera" style="font-size: 12px; color: #000;"></i>
                         </div>
                     </div>
                     <input type="file" id="avatar-file-input" accept="image/*" style="display: none;">
-                    
-                    <h2 id="profile-display-name" style="font-size: 20px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px;">---</h2>
+
+                    <h2 id="profile-display-name"
+                        style="font-size: 20px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px;">---
+                    </h2>
                     <p id="profile-display-email" style="font-size: 13px; color: var(--text-muted);">---</p>
                 </div>
-                
+
                 <!-- User Info Card -->
-                <div style="background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 15px; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-calendar" style="width: 16px; margin-right: 5px;"></i>Nacimiento</span>
+                <div
+                    style="background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 15px; margin-bottom: 15px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-calendar"
+                                style="width: 16px; margin-right: 5px;"></i>Nacimiento</span>
                         <span id="profile-dob" style="font-size: 13px; font-weight: 600;">---</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-clock" style="width: 16px; margin-right: 5px;"></i>Miembro desde</span>
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-clock"
+                                style="width: 16px; margin-right: 5px;"></i>Miembro desde</span>
                         <span id="profile-created" style="font-size: 13px; font-weight: 600;">---</span>
                     </div>
                 </div>
-                
-                <button id="auth-logout-btn" style="width: 100%; padding: 14px; background: rgba(255,59,48,0.08); color: #ff3b30; border: 1px solid rgba(255,59,48,0.15); border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; font-size: 14px;"><i class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i>Cerrar Sesión</button>
+
+                <button id="auth-logout-btn"
+                    style="width: 100%; padding: 14px; background: rgba(255,59,48,0.08); color: #ff3b30; border: 1px solid rgba(255,59,48,0.15); border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; font-size: 14px;"><i
+                        class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i>Cerrar Sesión</button>
             </div>
         </div>
     </div>
 
     <!-- Cookies Consent Banner -->
-    <div id="cookies-banner" style="display: none; position: fixed; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px) + 20px); left: 20px; right: 20px; background: rgba(22, 27, 34, 0.95); backdrop-filter: blur(15px); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateY(150%); transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);">
+    <div id="cookies-banner"
+        style="display: none; position: fixed; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px) + 20px); left: 20px; right: 20px; background: rgba(22, 27, 34, 0.95); backdrop-filter: blur(15px); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateY(150%); transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);">
         <div style="display: flex; flex-direction: column; gap: 12px;">
             <div style="display: flex; align-items: start; gap: 12px;">
-                <div style="width: 40px; height: 40px; background: rgba(0, 208, 132, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <div
+                    style="width: 40px; height: 40px; background: rgba(0, 208, 132, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                     <i class="fa-solid fa-cookie-bite" style="color: var(--accent-green); font-size: 20px;"></i>
                 </div>
                 <div>
                     <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main);">¿Aceptas una galleta?</h4>
-                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 2px;">Usamos cookies para mejorar tu experiencia y guardar tus preferencias de tema y cuentas.</p>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 2px;">Usamos
+                        cookies para mejorar tu experiencia y guardar tus preferencias de tema y cuentas.</p>
                 </div>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 5px;">
-                <button id="accept-cookies-btn" style="flex: 2; padding: 12px; background: var(--accent-green); color: #000; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;">Aceptar todo</button>
-                <button id="view-terms-cookies-btn" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer;">Términos</button>
+                <button id="accept-cookies-btn"
+                    style="flex: 2; padding: 12px; background: var(--accent-green); color: #000; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;">Aceptar
+                    todo</button>
+                <button id="view-terms-cookies-btn"
+                    style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer;">Términos</button>
             </div>
         </div>
     </div>
 
     <!-- Accounts Modal Overlay -->
-    <div id="accounts-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; backdrop-filter: blur(8px); padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); opacity: 0; transition: opacity 0.3s ease;">
-        <div id="accounts-modal" style="width: 100%; max-width: 480px; height: 85vh; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 28px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-            <header style="padding: 20px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; background: var(--nav-bg);">
+    <div id="accounts-modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; backdrop-filter: blur(8px); padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); opacity: 0; transition: opacity 0.3s ease;">
+        <div id="accounts-modal"
+            style="width: 100%; max-width: 480px; height: 85vh; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 28px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <header
+                style="padding: 20px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; background: var(--nav-bg);">
                 <h3 style="font-size: 17px; font-weight: 700;">Gestión de Cuentas</h3>
-                <div id="close-accounts-modal" style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></div>
+                <div id="close-accounts-modal"
+                    style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
             </header>
             <div style="flex: 1; overflow-y: auto; padding: 20px;">
                 <!-- Saved Accounts List -->
-                <div id="pm-accounts-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"></div>
-                
+                <div id="pm-accounts-list"
+                    style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"></div>
+
                 <!-- Add Account UI -->
-                <div id="pm-add-form-toggle" style="cursor: pointer; text-align: center; padding: 16px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 20px;">
+                <div id="pm-add-form-toggle"
+                    style="cursor: pointer; text-align: center; padding: 16px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 20px;">
                     <i class="fa-solid fa-plus" style="color: var(--accent-green); margin-right: 8px;"></i>
                     <span style="font-weight: 600; font-size: 14px;">Agregar Nueva Cuenta</span>
                 </div>
-                
-                <div id="pm-add-form" style="display: none; flex-direction: column; gap: 20px; padding: 25px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 20px; margin-bottom: 20px;">
+
+                <div id="pm-add-form"
+                    style="display: none; flex-direction: column; gap: 20px; padding: 25px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 20px; margin-bottom: 20px;">
                     <div class="input-group">
-                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Etiqueta (Ej: Banco de Pedro)</label>
-                        <input type="text" id="pm-etiqueta" placeholder="Cuenta Personal" style="width: 100%; box-sizing: border-box; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+                        <label
+                            style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Etiqueta
+                            (Ej: Banco de Pedro)</label>
+                        <input type="text" id="pm-etiqueta" placeholder="Cuenta Personal"
+                            style="width: 100%; box-sizing: border-box; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
                     </div>
                     <div class="input-group">
-                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Banco Recreceptor</label>
-                        <select id="pm-banco" style="width: 100%; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+                        <label
+                            style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Banco
+                            Recreceptor</label>
+                        <select id="pm-banco"
+                            style="width: 100%; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
                             <option value="" disabled selected>Selecciona un banco...</option>
                             <option value="0102 - BANCO DE VENEZUELA">0102 - BANCO DE VENEZUELA</option>
-                            <option value="0134 - BANESCO">0134 - BANESCO</option>
+                            <option value="0104 - VENEZOLANO DE CRÉDITO">0104 - VENEZOLANO DE CRÉDITO</option>
                             <option value="0105 - BANCO MERCANTIL">0105 - BANCO MERCANTIL</option>
                             <option value="0108 - BANCO PROVINCIAL">0108 - BANCO PROVINCIAL</option>
-                            <option value="0172 - BANCAMIGA">0172 - BANCAMIGA</option>
-                            <option value="0191 - BNC">0191 - BNC</option>
+                            <option value="0114 - BANCARIBE">0114 - BANCARIBE</option>
+                            <option value="0115 - BANCO EXTERIOR">0115 - BANCO EXTERIOR</option>
+                            <option value="0128 - BANCO CARONÍ">0128 - BANCO CARONÍ</option>
+                            <option value="0134 - BANESCO">0134 - BANESCO</option>
+                            <option value="0137 - BANCO SOFITASA">0137 - BANCO SOFITASA</option>
+                            <option value="0138 - BANCO PLAZA">0138 - BANCO PLAZA</option>
+                            <option value="0151 - BFC FONDO COMÚN">0151 - BFC FONDO COMÚN</option>
+                            <option value="0156 - 100% BANCO">0156 - 100% BANCO</option>
+                            <option value="0157 - DELSUR">0157 - DELSUR</option>
                             <option value="0163 - BANCO DEL TESORO">0163 - BANCO DEL TESORO</option>
+                            <option value="0166 - BANCO AGRÍCOLA">0166 - BANCO AGRÍCOLA</option>
+                            <option value="0168 - BANCRECER">0168 - BANCRECER</option>
+                            <option value="0169 - MI BANCO">0169 - MI BANCO</option>
+                            <option value="0171 - BANCO ACTIVO">0171 - BANCO ACTIVO</option>
+                            <option value="0172 - BANCAMIGA">0172 - BANCAMIGA</option>
+                            <option value="0174 - BANPLUS">0174 - BANPLUS</option>
+                            <option value="0175 - BDT (Bicentenario)">0175 - BDT (Bicentenario)</option>
+                            <option value="0177 - BANFANB">0177 - BANFANB</option>
+                            <option value="0191 - BNC">0191 - BNC</option>
                         </select>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <div style="width: 80px;">
-                            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">ID</label>
-                            <select id="pm-id-type" style="width: 100%; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
-                                <option value="V-">V</option><option value="E-">E</option><option value="J-">J</option>
+                            <label
+                                style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">ID</label>
+                            <select id="pm-id-type"
+                                style="width: 100%; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+                                <option value="V-">V</option>
+                                <option value="E-">E</option>
+                                <option value="J-">J</option>
+                                <option value="G-">G</option>
+                                <option value="P-">P</option>
                             </select>
                         </div>
                         <div style="flex: 1;">
-                            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Cédula / RIF</label>
-                            <input type="tel" id="pm-id-num" placeholder="12345678" style="width: 100%; box-sizing: border-box; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+                            <label
+                                style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Cédula
+                                / RIF</label>
+                            <input type="tel" id="pm-id-num" placeholder="12345678"
+                                style="width: 100%; box-sizing: border-box; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
                         </div>
                     </div>
                     <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Teléfono del Pago Móvil</label>
+                        <label
+                            style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Teléfono
+                            del Pago Móvil</label>
                         <div style="display: flex; gap: 10px;">
-                            <select id="pm-tel-prefix" style="width: 100px; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
-                                <option value="0412">0412</option><option value="0414">0414</option><option value="0424">0424</option><option value="0416">0416</option><option value="0426">0426</option>
+                            <select id="pm-tel-prefix"
+                                style="width: 100px; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+                                <option value="0412">0412</option>
+                                <option value="0422">0422</option>
+                                <option value="0414">0414</option>
+                                <option value="0424">0424</option>
+                                <option value="0416">0416</option>
+                                <option value="0426">0426</option>
+
                             </select>
-                            <input type="tel" id="pm-tel-num" placeholder="1234567" maxlength="7" style="flex: 1; box-sizing: border-box; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
+                            <input type="tel" id="pm-tel-num" placeholder="1234567" maxlength="7"
+                                style="flex: 1; box-sizing: border-box; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button id="cancel-pm-btn" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; font-weight: 600; cursor: pointer;">Cancelar</button>
-                        <button id="save-pm-btn" style="flex: 2; padding: 15px; background: var(--accent-green); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer;">Guardar Cuenta</button>
+                        <button id="cancel-pm-btn"
+                            style="flex: 1; padding: 15px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                        <button id="save-pm-btn"
+                            style="flex: 2; padding: 15px; background: var(--accent-green); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer;">Guardar
+                            Cuenta</button>
                     </div>
                 </div>
             </div>
@@ -809,43 +1023,67 @@
     </div>
 
     <!-- PWA Install Guide Modal (iOS) -->
-    <div id="install-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10001; backdrop-filter: blur(10px); padding: 25px; padding-top: calc(40px + env(safe-area-inset-top)); opacity: 0; transition: opacity 0.3s ease;">
-        <div id="install-modal" style="width: 100%; max-width: 480px; margin: 0 auto; color: #fff; text-align: center; transform: translateY(20px); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
-            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #00D084, #00a669); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(0,208,132,0.3);">
+    <div id="install-modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10001; backdrop-filter: blur(10px); padding: 25px; padding-top: calc(40px + env(safe-area-inset-top)); opacity: 0; transition: opacity 0.3s ease;">
+        <div id="install-modal"
+            style="width: 100%; max-width: 480px; margin: 0 auto; color: #fff; text-align: center; transform: translateY(20px); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
+            <div
+                style="width: 80px; height: 80px; background: linear-gradient(135deg, #00D084, #00a669); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(0,208,132,0.3);">
                 <i class="fa-solid fa-cloud-arrow-down" style="font-size: 35px; color: #000;"></i>
             </div>
             <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 10px;">Instalar DolarVE</h2>
-            <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.5;">Agrega la aplicación a tu pantalla de inicio para un acceso instantáneo a las tasas.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 20px; text-align: left; background: rgba(255,255,255,0.03); padding: 25px; border-radius: 24px; border: 1px solid var(--card-border);">
+            <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.5;">Agrega la
+                aplicación a tu pantalla de inicio para un acceso instantáneo a las tasas.</p>
+
+            <div
+                style="display: flex; flex-direction: column; gap: 20px; text-align: left; background: rgba(255,255,255,0.03); padding: 25px; border-radius: 24px; border: 1px solid var(--card-border);">
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="width: 32px; height: 32px; background: var(--accent-green); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">1</div>
-                    <div style="font-size: 15px;">Toca el botón <strong>Compartir</strong> <i class="fa-solid fa-share-from-square" style="color: var(--accent-green); margin-left: 5px;"></i> en la barra inferior.</div>
+                    <div
+                        style="width: 32px; height: 32px; background: var(--accent-green); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">
+                        1</div>
+                    <div style="font-size: 15px;">Toca el botón <strong>Compartir</strong> <i
+                            class="fa-solid fa-share-from-square"
+                            style="color: var(--accent-green); margin-left: 5px;"></i> en la barra inferior.</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="width: 32px; height: 32px; background: var(--accent-green); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">2</div>
-                    <div style="font-size: 15px;">Desliza hacia abajo y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.</div>
+                    <div
+                        style="width: 32px; height: 32px; background: var(--accent-green); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">
+                        2</div>
+                    <div style="font-size: 15px;">Desliza hacia abajo y selecciona <strong>"Añadir a la pantalla de
+                            inicio"</strong>.</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="width: 32px; height: 32px; background: var(--accent-green); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">3</div>
-                    <div style="font-size: 15px;">Confirma tocando <strong>"Añadir"</strong> en la esquina superior derecha.</div>
+                    <div
+                        style="width: 32px; height: 32px; background: var(--accent-green); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">
+                        3</div>
+                    <div style="font-size: 15px;">Confirma tocando <strong>"Añadir"</strong> en la esquina superior
+                        derecha.</div>
                 </div>
             </div>
-            
-            <button id="close-install-modal" style="margin-top: 40px; width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer;">Entendido</button>
+
+            <button id="close-install-modal"
+                style="margin-top: 40px; width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer;">Entendido</button>
         </div>
     </div>
 
     <!-- Terms and Conditions Modal Overlay -->
-    <div id="terms-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; backdrop-filter: blur(8px); padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); opacity: 0; transition: opacity 0.3s ease;">
-        <div id="terms-modal" style="width: 100%; max-width: 480px; height: 80vh; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 28px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-            <header style="padding: 20px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; background: var(--nav-bg);">
+    <div id="terms-modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; backdrop-filter: blur(8px); padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); opacity: 0; transition: opacity 0.3s ease;">
+        <div id="terms-modal"
+            style="width: 100%; max-width: 480px; height: 80vh; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 28px; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <header
+                style="padding: 20px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; background: var(--nav-bg);">
                 <h3 style="font-size: 17px; font-weight: 700;">Términos y Privacidad</h3>
-                <div id="close-terms-modal" style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></div>
+                <div id="close-terms-modal"
+                    style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
             </header>
-            <div style="flex: 1; overflow-y: auto; padding: 25px; line-height: 1.6; font-size: 14px; color: var(--text-muted);">
+            <div
+                style="flex: 1; overflow-y: auto; padding: 25px; line-height: 1.6; font-size: 14px; color: var(--text-muted);">
                 <div style="text-align: center; margin-bottom: 25px;">
-                    <div style="width: 60px; height: 60px; background: rgba(0,208,132,0.1); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <div
+                        style="width: 60px; height: 60px; background: rgba(0,208,132,0.1); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
                         <i class="fa-solid fa-shield-halved" style="color: var(--accent-green); font-size: 28px;"></i>
                     </div>
                     <h2 style="color: var(--text-main); font-size: 18px; margin-bottom: 5px;">Compromiso DolarVE</h2>
@@ -853,23 +1091,34 @@
                 </div>
 
                 <h4 style="color: var(--text-main); margin-bottom: 8px;">1. Información de Tasas</h4>
-                <p style="margin-bottom: 20px;">DolarVE es una herramienta de carácter informativo. Las tasas (BCV, Paralelo, Euro) son obtenidas de fuentes públicas externas como el Banco Central de Venezuela y DolarApi. No somos responsables de discrepancias o variaciones en el mercado real.</p>
+                <p style="margin-bottom: 20px;">DolarVE es una herramienta de carácter informativo. Las tasas (BCV,
+                    Paralelo, Euro) son obtenidas de fuentes públicas externas como el Banco Central de Venezuela y
+                    DolarApi. No somos responsables de discrepancias o variaciones en el mercado real.</p>
 
                 <h4 style="color: var(--text-main); margin-bottom: 8px;">2. Privacidad y Datos</h4>
-                <p style="margin-bottom: 20px;">Tus datos de "Mis Cuentas de Cobro" se almacenan de forma segura en Supabase si has iniciado sesión. DolarVE no comparte tu información con terceros ni almacena datos sensibles de pago fuera de lo necesario para generar los recibos que tú decidas compartir.</p>
+                <p style="margin-bottom: 20px;">Tus datos de "Mis Cuentas de Cobro" se almacenan de forma segura en
+                    Supabase si has iniciado sesión. DolarVE no comparte tu información con terceros ni almacena datos
+                    sensibles de pago fuera de lo necesario para generar los recibos que tú decidas compartir.</p>
 
                 <h4 style="color: var(--text-main); margin-bottom: 8px;">3. Uso de la Aplicación</h4>
-                <p style="margin-bottom: 20px;">El usuario es responsable de verificar los montos antes de compartir recibos o solicitudes de pago. DolarVE no procesa pagos directamente; es una herramienta de cálculo y gestión visual.</p>
+                <p style="margin-bottom: 20px;">El usuario es responsable de verificar los montos antes de compartir
+                    recibos o solicitudes de pago. DolarVE no procesa pagos directamente; es una herramienta de cálculo
+                    y gestión visual.</p>
 
                 <h4 style="color: var(--text-main); margin-bottom: 8px;">4. Cookies y Preferencias</h4>
-                <p style="margin-bottom: 25px;">Utilizamos el almacenamiento local del navegador para guardar tus preferencias de tema (oscuro/claro) y el estado de tu sesión, asegurando que tu experiencia sea fluida.</p>
+                <p style="margin-bottom: 25px;">Utilizamos el almacenamiento local del navegador para guardar tus
+                    preferencias de tema (oscuro/claro) y el estado de tu sesión, asegurando que tu experiencia sea
+                    fluida.</p>
 
-                <div style="background: rgba(0,208,132,0.05); border: 1px solid rgba(0,208,132,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
-                    <p style="font-size: 12px; color: var(--accent-green); text-align: center; font-weight: 600;">Al usar esta aplicación, aceptas estos términos diseñados para tu seguridad.</p>
+                <div
+                    style="background: rgba(0,208,132,0.05); border: 1px solid rgba(0,208,132,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
+                    <p style="font-size: 12px; color: var(--accent-green); text-align: center; font-weight: 600;">Al
+                        usar esta aplicación, aceptas estos términos diseñados para tu seguridad.</p>
                 </div>
             </div>
             <div style="padding: 20px; background: var(--nav-bg); border-top: 1px solid var(--card-border);">
-                <button id="confirm-terms-btn" style="width: 100%; padding: 15px; background: var(--accent-green); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer;">Entendido</button>
+                <button id="confirm-terms-btn"
+                    style="width: 100%; padding: 15px; background: var(--accent-green); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer;">Entendido</button>
             </div>
         </div>
     </div>

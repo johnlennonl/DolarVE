@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Toggle modal views
+            if (loginView) loginView.style.display = 'none';
             if (profileView) profileView.style.display = 'block';
             
             // Populate profile card (MOVED FROM LOGIC BELOW)
