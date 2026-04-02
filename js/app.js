@@ -1372,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window._dolarve_loadAccounts = loadAccounts;
 
     // WEB PUSH NOTIFICATIONS V10.0
-    const VAPID_PUBLIC_KEY = 'BJ5X1-N-R9z7oYt3Z-0yK9dY5X1-N-R9z7oYt3Z-0yK9dY5X1-N-R9z7oYt3Z-0yK9dY5X1-N-R9z7oYt3Z-0yK9-Q'; // Correct 87-char VAPID Key
+    const VAPID_PUBLIC_KEY = 'BHSKdlZDseu4vvh53xG6BucMXIQ3YFqAu3Y46-we5r3rEIpBoRyeEQYzwwPffAzBZ2VZ2yAgHIQwBCKBntU78iE';
     let isSubscribed = false;
     let swRegistration = null;
 
@@ -1523,9 +1523,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/\-/g, '+')
             .replace(/_/g, '/');
         const rawData = window.atob(base64);
-        // FORCE EXACTLY 65 BYTES FOR VAPID (P-256 standard point uncompressed)
-        const outputArray = new Uint8Array(65);
-        for (let i = 0; i < 65; ++i) {
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
             outputArray[i] = rawData.charCodeAt(i);
         }
         return outputArray;
