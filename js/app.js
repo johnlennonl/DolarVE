@@ -1392,13 +1392,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updatePushUI() {
         const bellIcon = document.getElementById('push-bell-icon');
+        const bellDot = document.getElementById('push-bell-dot');
+        const pushToggle = document.getElementById('push-notifications-toggle');
         if (!bellIcon) return;
+        
         if (isSubscribed) {
             bellIcon.style.color = 'var(--accent-green)';
-            bellIcon.classList.remove('fa-bell');
-            bellIcon.classList.add('fa-bell');
+            if (bellDot) {
+                bellDot.style.display = 'none';
+                bellDot.classList.remove('pulse-dot');
+            }
+            if (pushToggle) pushToggle.classList.add('on');
         } else {
             bellIcon.style.color = 'var(--text-muted)';
+            if (bellDot) {
+                bellDot.style.display = 'block';
+                bellDot.classList.add('pulse-dot');
+            }
+            if (pushToggle) pushToggle.classList.remove('on');
         }
     }
 
