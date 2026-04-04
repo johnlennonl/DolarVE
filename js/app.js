@@ -356,26 +356,71 @@ const Principal = {
         }
     },
 
-    // Lógica para que la app sea instalable (PWA)
+    // Lógica para que la app sea instalable (PWA Pro)
     inicializarPWA() {
         let deferredPrompt;
         const installBtn = document.getElementById('pwa-install-btn');
+        const installText = document.getElementById('install-text');
+        const installIcon = document.getElementById('install-icon');
+        const installModalOverlay = document.getElementById('install-modal-overlay');
+        const installModal = document.getElementById('install-modal');
+        const closeInstallModal = document.getElementById('close-install-modal');
         
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        // Ocultar si ya está instalada, si no, configurar según SO
+        if (!isStandalone) {
+            if (installBtn) installBtn.style.display = 'flex';
+            if (isIOS) {
+                if (installText) installText.innerText = 'Cómo instalar en iPhone';
+                if (installIcon) { 
+                    installIcon.className = 'ph-duotone ph-apple-logo'; 
+                    installIcon.style.color = '#fff'; 
+                }
+            } else if (/Android/i.test(navigator.userAgent)) {
+                if (installText) installText.innerText = 'Instalar en Android';
+                if (installIcon) installIcon.className = 'ph-duotone ph-android-logo';
+            }
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (installBtn) installBtn.style.display = 'flex';
+            if (installBtn && !isStandalone) installBtn.style.display = 'flex';
         });
 
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
+                if (window.navigator.vibrate) window.navigator.vibrate(15);
+                
+                if (isIOS) {
+                    // Mostrar guía para iPhone
+                    if (installModalOverlay && installModal) {
+                        installModalOverlay.style.display = 'block';
+                        setTimeout(() => {
+                            installModalOverlay.style.opacity = '1';
+                            installModal.style.transform = 'translateY(0)';
+                        }, 10);
+                    }
+                } else if (deferredPrompt) {
+                    // Flujo nativo Android/Chrome
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') installBtn.style.display = 'none';
                     deferredPrompt = null;
                 } else {
                     Interfaz.mostrarNotificacion('💡 Busca el ícono de instalar en tu menú');
+                }
+            });
+        }
+
+        if (closeInstallModal) {
+            closeInstallModal.addEventListener('click', () => {
+                if (installModalOverlay) {
+                    installModalOverlay.style.opacity = '0';
+                    if (installModal) installModal.style.transform = 'translateY(100%)';
+                    setTimeout(() => { installModalOverlay.style.display = 'none'; }, 300);
                 }
             });
         }
