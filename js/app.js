@@ -86,6 +86,23 @@ const Principal = {
         const themeBtn = document.getElementById('theme-toggle');
         if (themeBtn) themeBtn.addEventListener('click', () => Interfaz.alternarModoOscuro());
 
+        // --- NOTIFICACIONES ---
+        const bellBtn = document.getElementById('push-bell-btn');
+        if (bellBtn) bellBtn.addEventListener('click', () => {
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
+            Interfaz.alternarSuscripcion();
+        });
+
+        const pushToggle = document.getElementById('push-notifications-toggle');
+        if (pushToggle) {
+            // El toggle está dentro de un contenedor, mejor escuchar ahí o en el switch
+            pushToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (window.navigator.vibrate) window.navigator.vibrate(15);
+                Interfaz.alternarSuscripcion();
+            });
+        }
+
         // Botones de la calculadora (Numpad)
         document.querySelectorAll('.calc-btn:not(.action)').forEach(btn => {
             btn.addEventListener('click', () => {

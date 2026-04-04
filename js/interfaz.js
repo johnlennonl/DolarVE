@@ -94,13 +94,133 @@ const Interfaz = {
     },
 
     // --- Notificaciones del Sistema (Push) ---
+    VAPID_PUBLIC_KEY: 'BHSKdlZDseu4vvh53xG6BucMXIQ3YFqAu3Y46-we5r3rEIpBoRyeEQYzwwPffAzBZ2VZ2yAgHIQwBCKBntU78iE',
+
     async inicializarPush() {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            console.warn('[DolarVE] El navegador no soporta Push Notifications');
+            return;
+        }
         
-        const registro = await navigator.serviceWorker.ready;
-        const suscripcion = await registro.pushManager.getSubscription();
-        window.DolarVE.suscritoPush = !!suscripcion;
-        this.actualizarIconoCampana();
+        try {
+            const registro = await navigator.serviceWorker.ready;
+            window.DolarVE.swRegistration = registro;
+            const suscripcion = await registro.pushManager.getSubscription();
+            window.DolarVE.suscritoPush = !!suscripcion;
+            this.actualizarIconoCampana();
+        } catch (e) {
+            console.error('[DolarVE] Error al inicializar Push:', e);
+        }
+    },
+
+    async alternarSuscripcion() {
+        if (!window.DolarVE.swRegistration) {
+            await this.inicializarPush();
+        }
+
+        if (Notification.permission === 'denied') {
+            this.mostrarNotificacion('⚠️ Permiso denegado: Actívalo en los ajustes de tu navegador');
+            return;
+        }
+
+        // En iOS PWA, las notificaciones requieren que la app esté instalada
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (isIOS && !isStandalone) {
+            this.mostrarNotificacion('📲 Instala DolarVE en tu pantalla de inicio para recibir alertas');
+            return;
+        }
+
+        if (window.DolarVE.suscritoPush) {
+            await this.desuscribirUsuario();
+        } else {
+            await this.suscribirUsuario();
+        }
+    },
+
+    async suscribirUsuario() {
+        const registro = window.DolarVE.swRegistration;
+        if (!registro) return;
+
+        try {
+            const applicationServerKey = this.urlBase64ToUint8Array(this.VAPID_PUBLIC_KEY);
+            const suscripcion = await registro.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: applicationServerKey
+            });
+
+            console.log('[DolarVE] Usuario suscrito:', suscripcion);
+
+            // Guardar en Supabase si el usuario está logueado
+            if (window.DolarVE.supabase && window.DolarVE.user) {
+                try {
+                    await window.DolarVE.supabase.from('push_subscriptions').upsert({
+                        user_id: window.DolarVE.user.id,
+                        subscription: suscripcion,
+                        platform: 'pwa'
+                    });
+                } catch (e) { console.error('Error guardando suscripción:', e); }
+            }
+
+            window.DolarVE.suscritoPush = true;
+            this.actualizarIconoCampana();
+            this.mostrarNotificacion('✅ ¡Listo! Recibirás alertas de precios en este equipo');
+
+            // Simular notificación de bienvenida
+            setTimeout(() => {
+                registro.showNotification('DolarVE 🔔', {
+                    body: '¡Ya estás listo para recibir alertas en tiempo real!',
+                    icon: 'img/icons/icon-192x192.png',
+                    badge: 'img/icons/badge-96x96.png'
+                });
+            }, 1000);
+
+        } catch (err) {
+            console.error('[DolarVE] Error al suscribir:', err);
+            if (err.name === 'NotAllowedError') {
+                this.mostrarNotificacion('⚠️ Permiso denegado por el navegador');
+            } else {
+                this.mostrarNotificacion('⚠️ Error al activar alertas');
+            }
+        }
+    },
+
+    async desuscribirUsuario() {
+        const registro = window.DolarVE.swRegistration;
+        if (!registro) return;
+
+        try {
+            const suscripcion = await registro.pushManager.getSubscription();
+            if (suscripcion) {
+                await suscripcion.unsubscribe();
+                
+                // Borrar de Supabase si aplica
+                if (window.DolarVE.supabase && window.DolarVE.user) {
+                    await window.DolarVE.supabase.from('push_subscriptions')
+                        .delete()
+                        .eq('user_id', window.DolarVE.user.id);
+                }
+            }
+            
+            window.DolarVE.suscritoPush = false;
+            this.actualizarIconoCampana();
+            this.mostrarNotificacion('🔕 Notificaciones desactivadas');
+        } catch (err) {
+            console.error('[DolarVE] Error al desuscribir:', err);
+        }
+    },
+
+    urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
     },
 
     actualizarIconoCampana() {
