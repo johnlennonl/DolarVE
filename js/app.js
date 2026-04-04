@@ -16,7 +16,7 @@ const Principal = {
             Interfaz.ocultarSplashScreen();
         }, 2000);
 
-        // 3. Activamos la navegación y botones principales
+        // 3. Activamos la navegación y botones principales (Refactorizado con Master Hub)
         Interfaz.inicializarNavegacion();
         this.configurarBotonesInterfaz();
 
@@ -27,11 +27,13 @@ const Principal = {
         }
 
         // 5. ¡A buscar los reales! Traemos las tasas de una vez
+        Tasas.cargarDatosCache(); 
         await Tasas.obtenerDatosTasas();
         
         // 6. Iniciamos el Surtidor y la Referencia rápida
         Tasas.refrescarSurtidor();
         Tasas.actualizarReferenciaRapida();
+        this.generarAnalisisMercado(); 
 
         // 7. Ponemos a valer las notificaciones y cookies
         Interfaz.inicializarPush();
@@ -43,7 +45,6 @@ const Principal = {
 
         // 9. Noticias y Análisis (DolarVE Insights)
         this.obtenerNoticiasEconomicas();
-        this.generarAnalisisMercado();
         
         // 9. Actualización Automática (Tiempo Real) - Cada 5 minutos
         setInterval(() => {
@@ -53,20 +54,6 @@ const Principal = {
         
         // 10. Cableado de eventos legales
         this.configurarEventosLegales();
-        const btnCerrarCripto = document.getElementById('close-crypto-modal');
-        const overlayCripto = document.getElementById('crypto-modal-overlay');
-        if (btnCerrarCripto && overlayCripto) {
-            const cerrar = () => {
-                overlayCripto.style.opacity = '0';
-                const modal = document.getElementById('crypto-modal');
-                if (modal) modal.style.transform = 'translateY(100%)';
-                setTimeout(() => { overlayCripto.style.display = 'none'; }, 300);
-            };
-            btnCerrarCripto.addEventListener('click', cerrar);
-            overlayCripto.addEventListener('click', (e) => {
-                if (e.target === overlayCripto) cerrar();
-            });
-        }
     },
 
     // Configura lo relacionado a Cookies y Términos
@@ -74,7 +61,6 @@ const Principal = {
         const btnAceptar = document.getElementById('accept-cookies-btn');
         if (btnAceptar) btnAceptar.addEventListener('click', () => Interfaz.aceptarCookies());
 
-        // Botón de Términos (desde ajustes o cookies)
         const btnVerTerminos = document.getElementById('open-terms-btn') || document.getElementById('view-terms-cookies-btn');
         if (btnVerTerminos) btnVerTerminos.addEventListener('click', () => Interfaz.abrirTerminos());
 
@@ -100,7 +86,6 @@ const Principal = {
 
         const pushToggle = document.getElementById('push-notifications-toggle');
         if (pushToggle) {
-            // El toggle está dentro de un contenedor, mejor escuchar ahí o en el switch
             pushToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (window.navigator.vibrate) window.navigator.vibrate(15);
@@ -124,7 +109,6 @@ const Principal = {
         const btnCobrar = document.getElementById('generate-charge-btn');
         if (btnCobrar) {
             btnCobrar.addEventListener('click', () => {
-                // Si el usuario no tiene cuentas, le avisamos
                 const cuentas = window.DolarVE.cuentas || [];
                 if (cuentas.length === 0) {
                     Interfaz.mostrarNotificacion('⚠️ Agrega una cuenta en Ajustes > Gestión de Cuentas');
@@ -135,6 +119,23 @@ const Principal = {
                 });
             });
         }
+
+        // 10. Botones de Navegación Maestro (NUEVO)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const screenId = item.getAttribute('data-screen');
+                if (screenId) {
+                    this.navegar(screenId);
+                }
+            });
+        });
+
+        const hubBtn = document.getElementById('master-hub-btn');
+        if (hubBtn) hubBtn.addEventListener('click', () => this.abrirHub());
+
+        const closeHubBtn = document.getElementById('close-hub-btn');
+        if (closeHubBtn) closeHubBtn.addEventListener('click', () => this.cerrarHub());
 
         // Botón de Swap (Cambiar dirección)
         const swapBtn = document.getElementById('swap-currency-btn');
@@ -160,7 +161,6 @@ const Principal = {
                     Calculadora.cambiarBase(moneda);
                 } else if (fee) {
                     window.DolarVE.config.feeType = fee;
-                    // Actualizar UI del chip activo en comisiones
                     document.querySelectorAll('#commission-selector .rate-chip').forEach(c => c.classList.remove('active'));
                     target.classList.add('active');
                     Calculadora.actualizarPantalla();
@@ -192,7 +192,6 @@ const Principal = {
             });
         }
 
-        // Botón para salir (Logout)
         const logoutBtn = document.getElementById('auth-logout-btn');
         if (logoutBtn) logoutBtn.addEventListener('click', () => Autenticacion.cerrarSesion());
 
@@ -224,7 +223,6 @@ const Principal = {
             });
         }
 
-        // Formulario de Auth (Submit)
         const formAuth = document.getElementById('auth-form');
         if (formAuth) {
             formAuth.addEventListener('submit', (e) => {
@@ -235,8 +233,10 @@ const Principal = {
                     nombre: document.getElementById('auth-firstname')?.value,
                     apellido: document.getElementById('auth-lastname')?.value,
                     fechaNacimiento: document.getElementById('auth-dob')?.value,
-                    esRegistro: esRegistro
+                    esRegistro: esRegistro // Capturado por closure
                 };
+                
+                // Llamamos a la función maestra unificada
                 Autenticacion.procesarFormulario(datos);
             });
         }
@@ -252,43 +252,40 @@ const Principal = {
             });
         }
 
-        // Gestión de Cuentas (Abrir/Cerrar/Agregar)
+        // Gestión de Cuentas
         const btnCuentas = document.getElementById('open-accounts-btn');
         const overlayCuentas = document.getElementById('accounts-modal-overlay');
         const modalCuentas = document.getElementById('accounts-modal');
-        if (btnCuentas) {
+        if (btnCuentas && overlayCuentas) {
             btnCuentas.addEventListener('click', () => {
                 overlayCuentas.style.display = 'block';
                 setTimeout(() => {
                     overlayCuentas.style.opacity = '1';
-                    modalCuentas.classList.add('show');
+                    if (modalCuentas) modalCuentas.classList.add('show');
                 }, 10);
                 Cuentas.cargarCuentas();
             });
         }
 
         const btnCerrarCuentas = document.getElementById('close-accounts-modal');
-        if (btnCerrarCuentas) {
+        if (btnCerrarCuentas && overlayCuentas) {
             btnCerrarCuentas.addEventListener('click', () => {
                 overlayCuentas.style.opacity = '0';
+                if (modalCuentas) modalCuentas.classList.remove('show');
                 setTimeout(() => { overlayCuentas.style.display = 'none'; }, 300);
             });
         }
 
         const btnToggleFormCuentas = document.getElementById('add-account-btn');
-        const formNuevaCuenta = document.getElementById('pm-add-form');
         const btnCancelarCuenta = document.getElementById('cancel-pm-btn');
-
+        const formNuevaCuenta = document.getElementById('pm-add-form');
+        
         if (btnToggleFormCuentas && formNuevaCuenta) {
-            btnToggleFormCuentas.addEventListener('click', () => {
-                formNuevaCuenta.classList.toggle('show');
-            });
+            btnToggleFormCuentas.addEventListener('click', () => formNuevaCuenta.classList.toggle('show'));
         }
-
+        
         if (btnCancelarCuenta && formNuevaCuenta) {
-            btnCancelarCuenta.addEventListener('click', () => {
-                formNuevaCuenta.classList.remove('show');
-            });
+            btnCancelarCuenta.addEventListener('click', () => formNuevaCuenta.classList.remove('show'));
         }
 
         const btnGuardarCuenta = document.getElementById('save-pm-btn');
@@ -303,7 +300,7 @@ const Principal = {
                     etiqueta: document.getElementById('pm-etiqueta').value
                 };
                 const exito = await Cuentas.guardarCuenta(datos);
-                if (exito) formNuevaCuenta.style.display = 'none';
+                if (exito && formNuevaCuenta) formNuevaCuenta.classList.remove('show');
             });
         }
 
@@ -312,73 +309,68 @@ const Principal = {
         if (closeAuth) {
             closeAuth.addEventListener('click', () => {
                 const modal = document.getElementById('auth-modal-overlay');
-                modal.style.opacity = '0';
-                setTimeout(() => { modal.style.display = 'none'; }, 300);
-            });
-        }
-
-        // Cerrar Modal Cripto (X)
-        const closeCrypto = document.getElementById('close-crypto-modal');
-        if (closeCrypto) {
-            closeCrypto.addEventListener('click', () => {
-                const overlay = document.getElementById('crypto-modal-overlay');
-                const modal = document.getElementById('crypto-modal');
-                if (overlay && modal) {
-                    overlay.style.opacity = '0';
-                    modal.style.transform = 'translateY(100%)';
-                    setTimeout(() => { overlay.style.display = 'none'; }, 300);
+                if (modal) {
+                    modal.style.opacity = '0';
+                    setTimeout(() => { modal.style.display = 'none'; }, 300);
                 }
             });
         }
 
         // Botón de Compartir Tasa Diaria
         const btnCompartirDia = document.getElementById('share-daily-rate-btn');
-        if (btnCompartirDia) {
-            btnCompartirDia.addEventListener('click', () => {
-                Calculadora.generarImagenCompartir();
+        if (btnCompartirDia) btnCompartirDia.addEventListener('click', () => Calculadora.generarImagenCompartir());
+
+        // --- BOTONES DEL MODAL DE RECIBO / COMPARTIR ---
+        const btnCerrarRecibo = document.getElementById('close-receipt-modal');
+        const btnCompartirRecibo = document.getElementById('share-receipt-btn');
+        const overlayRecibo = document.getElementById('receipt-modal-overlay');
+
+        if (btnCerrarRecibo && overlayRecibo) {
+            btnCerrarRecibo.addEventListener('click', () => {
+                overlayRecibo.style.opacity = '0';
+                setTimeout(() => { overlayRecibo.style.display = 'none'; }, 300);
             });
+        }
+
+        if (btnCompartirRecibo) {
+            btnCompartirRecibo.addEventListener('click', () => Principal.compartirImagenGenerada());
         }
         
-        // Botones de compartir de los modales de imagen
-        const btnShareReceipt = document.getElementById('share-receipt-btn');
-        if (btnShareReceipt) {
-            btnShareReceipt.addEventListener('click', async () => {
-                const imgData = window.DolarVE.ultimoRecibo;
-                if (!imgData) return;
-                
-                try {
-                    const blob = await (await fetch(imgData)).blob();
-                    const file = new File([blob], 'dolarve_recibo.png', { type: 'image/png' });
-                    if (navigator.share) {
-                        navigator.share({ files: [file], title: 'DolarVE Recibo' });
-                    } else {
-                        const link = document.createElement('a');
-                        link.href = imgData;
-                        link.download = 'dolarve_recibo.png';
-                        link.click();
-                    }
-                } catch (e) { console.error(e); }
-            });
-        }
-
-        const closeReceipt = document.getElementById('close-receipt-modal');
-        if (closeReceipt) {
-            closeReceipt.addEventListener('click', () => {
-                const overlay = document.getElementById('receipt-modal-overlay');
-                if (overlay) {
-                    overlay.style.opacity = '0';
-                    setTimeout(() => { overlay.style.display = 'none'; }, 300);
-                }
-            });
-        }
-
         // Surtidor de Gasolina
         const sliderGasofa = document.getElementById('pump-slider');
-        if (sliderGasofa) {
-            sliderGasofa.addEventListener('input', () => {
-                Tasas.refrescarSurtidor();
-            });
+        if (sliderGasofa) sliderGasofa.addEventListener('input', () => Tasas.refrescarSurtidor());
+    },
+
+    // --- Navegación Especial y Hub ---
+    abrirHub() {
+        const hub = document.getElementById('hub-overlay');
+        if (hub) {
+            hub.style.display = 'flex';
+            setTimeout(() => {
+                hub.classList.add('show');
+                if (window.navigator.vibrate) window.navigator.vibrate(20);
+            }, 10);
         }
+    },
+
+    cerrarHub() {
+        const hub = document.getElementById('hub-overlay');
+        if (hub) {
+            hub.classList.remove('show');
+            setTimeout(() => {
+                if (!hub.classList.contains('show')) hub.style.display = 'none';
+            }, 400);
+        }
+    },
+    
+    navegar(pantalla) {
+        this.cerrarHub();
+        Interfaz.cambiarPantalla(pantalla);
+    },
+
+    actualizarUISeleccion(activeItem) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if (activeItem) activeItem.classList.add('active');
     },
 
     // Lógica para que la app sea instalable (PWA Pro)
@@ -394,7 +386,6 @@ const Principal = {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-        // Ocultar si ya está instalada, si no, configurar según SO
         if (!isStandalone) {
             if (installBtn) installBtn.style.display = 'flex';
             if (isIOS) {
@@ -418,9 +409,7 @@ const Principal = {
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
                 if (window.navigator.vibrate) window.navigator.vibrate(15);
-                
                 if (isIOS) {
-                    // Mostrar guía para iPhone
                     if (installModalOverlay && installModal) {
                         installModalOverlay.style.display = 'block';
                         setTimeout(() => {
@@ -429,7 +418,6 @@ const Principal = {
                         }, 10);
                     }
                 } else if (deferredPrompt) {
-                    // Flujo nativo Android/Chrome
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') installBtn.style.display = 'none';
@@ -456,47 +444,72 @@ const Principal = {
         const feedContainer = document.getElementById('news-feed');
         if (!feedContainer) return;
 
+        console.log('[DolarVE] Buscando noticias frescas...');
+        
         const fuentes = [
-            'https://www.bancaynegocios.com/feed/',
-            'https://www.descifrado.com/feed/',
-            'https://finanzasdigital.com/feed/'
+            { url: 'https://www.bancaynegocios.com/feed/', name: 'Banca y Negocios' },
+            { url: 'https://www.descifrado.com/feed/', name: 'Descifrado' },
+            { url: 'https://finanzasdigital.com/feed/', name: 'Finanzas Digital' }
         ];
 
-        for (const url of fuentes) {
+        let todasLasNoticias = [];
+
+        for (const fuente of fuentes) {
             try {
-                const rssUrl = encodeURIComponent(url);
+                const rssUrl = encodeURIComponent(fuente.url);
+                // Usamos un cache-buster t=Date.now()
                 const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&t=${Date.now()}`);
                 const data = await response.json();
-
+                
                 if (data.status === 'ok' && data.items.length > 0) {
-                    this.poblarNewsFeed(data.items, url.includes('bancaynegocios') ? 'Banca y Negocios' : 'Economía');
-                    this.iniciarAutoScrollNoticias();
-                    return; // Si funciona una, paramos
+                    // Mapeamos para incluir el nombre de la fuente
+                    const itemsConFuente = data.items.slice(0, 4).map(item => ({
+                        ...item,
+                        fuenteApp: fuente.name
+                    }));
+                    todasLasNoticias = [...todasLasNoticias, ...itemsConFuente];
                 }
-            } catch (e) {
-                console.warn(`[DolarVE] Error con fuente ${url}:`, e);
+            } catch (e) { 
+                console.warn(`[DolarVE] Falló fuente ${fuente.name}:`, e); 
             }
         }
 
-        feedContainer.innerHTML = '<p style="font-size:12px; color:var(--text-muted); padding:10px;">Contenido temporalmente no disponible. Intenta más tarde.</p>';
+        if (todasLasNoticias.length > 0) {
+            // Ordenar por fecha (más reciente primero)
+            todasLasNoticias.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+            this.poblarNewsFeed(todasLasNoticias);
+            this.iniciarAutoScrollNoticias();
+        } else {
+            feedContainer.innerHTML = `
+                <div style="padding: 40px 20px; text-align: center; color: var(--text-muted);">
+                    <i class="ph-duotone ph-rss-slash" style="font-size: 32px; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <p style="font-size: 13px;">No pudimos conectar con las fuentes de noticias. Reintenta más tarde.</p>
+                </div>
+            `;
+        }
     },
 
-    poblarNewsFeed(noticias, fuenteNombre) {
+    poblarNewsFeed(noticias) {
         const feedContainer = document.getElementById('news-feed');
         if (!feedContainer || !noticias.length) return;
 
-        feedContainer.innerHTML = noticias.slice(0, 6).map(news => {
+        feedContainer.innerHTML = noticias.slice(0, 8).map(news => {
             const fecha = new Date(news.pubDate).toLocaleDateString('es-VE', { day: 'numeric', month: 'short' });
-            // Limpiar el título de caracteres raros HTML si vienen
-            const tituloLimpio = news.title.replace(/&quot;/g, '"').replace(/&#8230;/g, '...');
+            // Limpiar títulos de entidades HTML comunes
+            const tituloLimpio = news.title
+                .replace(/&quot;/g, '"')
+                .replace(/&#8230;/g, '...')
+                .replace(/&amp;/g, '&');
+
+            const categoria = news.categories && news.categories.length > 0 ? news.categories[0] : 'VENEZUELA';
             
             return `
                 <div class="news-item" onclick="window.open('${news.link}', '_blank')">
-                    <div class="news-tag">${news.categories[0] || 'Economía'}</div>
+                    <div class="news-tag">${categoria.toUpperCase()}</div>
                     <div class="news-title">${tituloLimpio}</div>
                     <div class="news-meta">
                         <span><i class="ph ph-clock"></i> ${fecha}</span>
-                        <span>${fuenteNombre}</span>
+                        <span>${news.fuenteApp}</span>
                     </div>
                 </div>
             `;
@@ -505,111 +518,98 @@ const Principal = {
 
     iniciarAutoScrollNoticias() {
         const feed = document.getElementById('news-feed');
-        if (!feed) return;
-
-        let interval;
-        let isPaused = false;
-
-        const startScrolling = () => {
-            interval = setInterval(() => {
-                if (isPaused) return;
-
-                const cardWidth = 280 + 15; // Ancho noticia + gap
-                const currentScroll = feed.scrollLeft;
-                const maxScroll = feed.scrollWidth - feed.clientWidth;
-
-                if (currentScroll >= maxScroll - 5) {
-                    feed.scrollTo({ left: 0, behavior: 'smooth' });
-                } else {
-                    feed.scrollBy({ left: cardWidth, behavior: 'smooth' });
-                }
-            }, 5000); // 5 segundos
-        };
-
-        feed.addEventListener('mouseenter', () => isPaused = true);
-        feed.addEventListener('mouseleave', () => isPaused = false);
-        feed.addEventListener('touchstart', () => isPaused = true);
-        feed.addEventListener('touchend', () => {
-            setTimeout(() => isPaused = false, 2000);
-        });
-
-        startScrolling();
+        if (!feed || feed.dataset.scrolling === 'true') return;
+        
+        feed.dataset.scrolling = 'true';
+        let scrollDir = 1;
+        
+        setInterval(() => {
+            if (!document.getElementById('insights-section').classList.contains('active')) return;
+            
+            const currentScroll = feed.scrollLeft;
+            const maxScroll = feed.scrollWidth - feed.clientWidth;
+            
+            if (currentScroll >= maxScroll - 2) {
+                feed.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                feed.scrollBy({ left: 300, behavior: 'smooth' });
+            }
+        }, 6000);
     },
 
     generarAnalisisMercado() {
         const titleEl = document.getElementById('insight-title');
         const bodyEl = document.getElementById('insight-body');
         if (!titleEl || !bodyEl) return;
-
-        setTimeout(() => {
-            const bcv = window.DolarVE.tasas.bcv || 0;
-            const paralelo = window.DolarVE.tasas.paralelo || 0;
-
-            if (bcv <= 0) {
-                bodyEl.innerText = "Esperando actualización de tasas oficiales...";
-                return;
-            }
-
-            const brecha = ((paralelo - bcv) / bcv) * 100;
-
-            let analisis = "";
-            let titulo = "Análisis de Mercado";
-
-            if (brecha > 15) {
-                titulo = "⚠️ Brecha Elevada";
-                analisis = `La diferencia entre el oficial y el paralelo supera el ${brecha.toFixed(1)}%. Se recomienda cautela en fijación de precios en Bs.`;
-            } else if (brecha > 5) {
-                titulo = "📊 Mercado Activo";
-                analisis = `La brecha se mantiene estable en ${brecha.toFixed(1)}%. Los comercios están ajustando inventarios según la tasa promedio.`;
-            } else {
-                titulo = "✅ Mercado Estable";
-                analisis = "Las tasas oficial y paralela están muy cerca una de la otra. Es un buen momento para transacciones bancarias nacionales.";
-            }
-
-            titleEl.innerText = titulo;
-            bodyEl.innerText = analisis;
-
-            // Actualizamos los nuevos indicadores de Riesgo y Fuerza
-            this.actualizarIndicadoresMercado(brecha);
-        }, 3000); // Esperamos a que las tasas carguen
+        const bcv = window.DolarVE.tasas.usd || 0;
+        const paralelo = window.DolarVE.tasas.paralelo || 0;
+        if (bcv <= 0) return;
+        const brecha = ((paralelo - bcv) / bcv) * 100;
+        let analisis = "";
+        let titulo = "Análisis de Mercado";
+        if (brecha > 15) {
+            titulo = "⚠️ Brecha Elevada";
+            analisis = `La diferencia es del ${brecha.toFixed(2)}%. Se recomienda cautela.`;
+        } else if (brecha > 5) {
+            titulo = "📊 Mercado Activo";
+            analisis = `La brecha se mantiene estable en el ${brecha.toFixed(2)}%.`;
+        } else {
+            titulo = "✅ Mercado Estable";
+            analisis = "Las tasas oficial y paralela están muy cerca.";
+        }
+        titleEl.innerText = titulo;
+        bodyEl.innerText = analisis;
+        this.actualizarIndicadoresMercado(brecha);
     },
 
     actualizarIndicadoresMercado(brecha) {
         const volatilityTag = document.getElementById('market-volatility-tag');
         const strengthVal = document.getElementById('market-strength-val');
         const strengthFill = document.getElementById('market-strength-fill');
-
         if (!volatilityTag || !strengthVal || !strengthFill) return;
-
-        let riesgo = "ESTABLE";
-        let colorRiesgo = "var(--accent-green)";
-        let iconRiesgo = "ph-shield-check";
-
-        if (brecha > 12) {
-            riesgo = "ALERTA";
-            colorRiesgo = "var(--accent-red)";
-            iconRiesgo = "ph-warning-octagon";
-        } else if (brecha > 6) {
-            riesgo = "CALIENTE";
-            colorRiesgo = "var(--accent-orange)";
-            iconRiesgo = "ph-flame";
-        }
-
-        volatilityTag.innerHTML = `<i class="ph-duotone ${iconRiesgo}"></i> ${riesgo}`;
-        volatilityTag.style.color = colorRiesgo;
-
-        // Fuerza del Bolívar (Inversa a la brecha, simulando confianza)
+        let riesgo = brecha > 12 ? "ALERTA" : (brecha > 6 ? "CALIENTE" : "ESTABLE");
+        volatilityTag.innerHTML = `<i class="ph-duotone ph-shield-check"></i> ${riesgo}`;
         const fuerza = Math.max(100 - (brecha * 2.5), 10);
         strengthVal.innerText = `${fuerza.toFixed(0)}%`;
-        strengthVal.style.color = fuerza > 70 ? 'var(--accent-green)' : (fuerza > 40 ? 'var(--accent-orange)' : 'var(--accent-red)');
         strengthFill.style.width = `${fuerza}%`;
-        strengthFill.style.backgroundColor = strengthVal.style.color;
+    },
+
+    // Función Maestra para compartir la imagen actual generada
+    async compartirImagenGenerada() {
+        if (!window.DolarVE.ultimoRecibo) {
+            Interfaz.mostrarNotificacion('⚠️ No hay imagen generada para compartir');
+            return;
+        }
+
+        try {
+            // Convertimos el base64 a un archivo real (Blob)
+            const response = await fetch(window.DolarVE.ultimoRecibo);
+            const blob = await response.blob();
+            const archivo = new File([blob], 'DolarVE-Recibo.png', { type: 'image/png' });
+
+            // Verificar si el equipo soporta compartir archivos (Mobile Pro)
+            if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+                await navigator.share({
+                    files: [archivo],
+                    title: 'DolarVE - Finanzas al Instante',
+                    text: 'Compartido desde DolarVE 🚀'
+                });
+            } else {
+                // Fallback: Descarga directa para escritorio o navegadores viejos
+                const link = document.createElement('a');
+                link.href = window.DolarVE.ultimoRecibo;
+                link.download = `DolarVE_${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                Interfaz.mostrarNotificacion('📸 Imagen descargada con éxito');
+            }
+        } catch (e) {
+            console.error('[DolarVE] Error al compartir:', e);
+            Interfaz.mostrarNotificacion('❌ Error al intentar compartir');
+        }
     }
 };
 
-// Evento que dispara todo el brollo
-document.addEventListener('DOMContentLoaded', () => {
-    Principal.inicializar();
-});
-
+document.addEventListener('DOMContentLoaded', () => Principal.inicializar());
 window.Principal = Principal;

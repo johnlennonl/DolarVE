@@ -29,28 +29,40 @@ const Interfaz = {
         if (splash) splash.classList.add('hidden');
     },
 
-    // Lógica para cambiar entre Inicio, Calculadora, Gasolina, etc.
-    cambiarPantalla(index) {
+    // Lógica para cambiar entre Inicio, Calculadora, Gasolina, etc. (Usando IDs)
+    cambiarPantalla(screenId) {
         const navItems = document.querySelectorAll('.nav-item');
         const screens = document.querySelectorAll('.screen');
+        const targetScreen = document.getElementById(screenId);
+
+        if (!targetScreen) {
+            console.error(`[DolarVE] Pantalla no encontrada: ${screenId}`);
+            return;
+        }
         
         const hacerTransicion = () => {
+            // Desactivar todo
             navItems.forEach(i => i.classList.remove('active'));
-            navItems[index].classList.add('active');
             screens.forEach(s => s.classList.remove('active'));
-            screens[index].classList.add('active');
 
-            // Si vamos a la calculadora, refrescamos los números
-            if (index === 1 && typeof Calculadora !== 'undefined') {
+            // Activar pantalla
+            targetScreen.classList.add('active');
+
+            // Iluminar el icono correcto en el nav
+            const activeNavItem = document.querySelector(`.nav-item[data-screen="${screenId}"]`);
+            if (activeNavItem) activeNavItem.classList.add('active');
+
+            // Refrescos específicos
+            if (screenId === 'calc-screen' && typeof Calculadora !== 'undefined') {
                 Calculadora.actualizarPantalla();
             }
-            // Si vamos a gasolina, refrescamos el surtidor
-            if (index === 2 && typeof window.refreshPump === 'function') {
+            if (screenId === 'pump-screen' && typeof window.refreshPump === 'function') {
                 window.refreshPump();
             }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // Animación suave si el navegador lo permite
         if (document.startViewTransition) {
             document.startViewTransition(hacerTransicion);
         } else {
@@ -85,10 +97,13 @@ const Interfaz = {
     // Inicializar los clicks de la navegación inferior
     inicializarNavegacion() {
         const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach((item, index) => {
+        navItems.forEach((item) => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.cambiarPantalla(index);
+                const screenId = item.getAttribute('data-screen');
+                if (screenId) {
+                    this.cambiarPantalla(screenId);
+                }
             });
         });
     },

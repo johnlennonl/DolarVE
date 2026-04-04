@@ -91,9 +91,10 @@
                         <span style="font-size: 16px; font-weight: normal; color: var(--text-muted);">VES</span>
                     </div>
                     <div class="chart-mini" style="height: 140px; margin-top: 15px; background: transparent; position: relative;">
-                        <!-- Overlay Informativo Táctil -->
-                        <div id="chart-hint" style="position: absolute; top: 10px; right: 10px; font-size: 9px; color: var(--accent-green); opacity: 0.6;">
-                            <i class="ph-duotone ph-hand-tap"></i> Desliza para comparar
+                        <!-- Overlay Informativo Táctil Premium -->
+                        <div id="chart-hint" style="position: absolute; top: 5px; right: 5px; font-size: 9px; color: var(--accent-green); background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 20px; backdrop-filter: blur(4px); z-index: 10; border: 1px solid rgba(0, 208, 132, 0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); pointer-events: none; display: flex; align-items: center; gap: 4px;">
+                            <i class="ph-duotone ph-hand-tap" style="font-size: 11px;"></i> 
+                            <span style="font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Desliza para comparar</span>
                         </div>
                         <canvas id="bcvChart"></canvas>
                     </div>
@@ -158,49 +159,7 @@
                 </div>
             </div>
 
-            <!-- DolarVE Insights: Noticias y Análisis -->
-            <div class="insights-screen-section" style="padding: 0 20px 24px;">
-                <div style="font-size: 11px; color: var(--accent-green); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    <i class="ph-duotone ph-newspaper" style="font-size: 16px;"></i> DolarVE Insights
-                </div>
-                
-                <!-- Card de Análisis Diario -->
-                <div class="insight-card" id="daily-insight">
-                    <div class="insight-icon"><i class="ph-duotone ph-lightbulb"></i></div>
-                    <div class="insight-text">
-                        <h4 id="insight-title">Análisis de Hoy</h4>
-                        <p id="insight-body">Cargando análisis del mercado...</p>
-                    </div>
-                </div>
-
-                <!-- Voltímetro de Mercado (NUEVO) -->
-                <div class="sentiment-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
-                    <div class="intl-card" style="--country-color: #00D082; padding: 15px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">RIESGO MERCADO</div>
-                        <div id="market-volatility-tag" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: var(--accent-green);">
-                            <i class="ph-duotone ph-shield-check"></i> ESTABLE
-                        </div>
-                    </div>
-                    <div class="intl-card" style="--country-color: #2575FC; padding: 15px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">FUERZA BS</div>
-                        <div id="market-strength-val" style="font-size: 14px; font-weight: 800; color: var(--text-main);">92%</div>
-                        <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); border-radius: 1px; margin-top: 4px;">
-                            <div id="market-strength-fill" style="width: 92%; height: 100%; background: var(--accent-blue);"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="news-header">
-                    <span style="font-size: 14px; font-weight: 700; color: var(--text-main);">Breves de Economía</span>
-                    <a href="#" id="view-all-news">Historial <i class="ph ph-caret-right"></i></a>
-                </div>
-
-                <div id="news-feed" class="news-scroll">
-                    <!-- Las noticias se cargan dinámicamente aquí -->
-                    <div class="news-skeleton"></div>
-                    <div class="news-skeleton"></div>
-                </div>
-            </div>
+            <!-- DolarVE Insights: Noticias y Análisis (MOVido a su propia sección) -->
 
             <div style="padding: 10px 20px 24px;">
                 <h3
@@ -578,6 +537,69 @@
             </div>
 
         </section>
+        <!-- Pantalla de Análisis e Insights -->
+        <section id="insights-section" class="screen">
+            <header>
+                <div class="header-title">
+                    <span class="header-subtitle">Inteligencia DolarVE</span>
+                    <h1>Insights & Noticias</h1>
+                </div>
+            </header>
+
+            <div class="insights-screen-section" style="padding: 0 20px 24px;">
+                <!-- Card de Análisis Diario -->
+                <div class="insight-card" id="daily-insight">
+                    <div class="insight-icon"><i class="ph-duotone ph-lightbulb"></i></div>
+                    <div class="insight-text">
+                        <h4 id="insight-title">Análisis de Hoy</h4>
+                        <p id="insight-body">Cargando análisis del mercado...</p>
+                    </div>
+                </div>
+
+                <!-- Voltímetro de Mercado -->
+                <div class="sentiment-row"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+                    <div class="intl-card" style="--country-color: #00D082; padding: 15px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">
+                            RIESGO MERCADO</div>
+                        <div id="market-volatility-tag"
+                            style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: var(--accent-green);">
+                            <i class="ph-duotone ph-shield-check"></i> ESTABLE
+                        </div>
+                    </div>
+                    <div class="intl-card" style="--country-color: #2575FC; padding: 15px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">
+                            FUERZA BS</div>
+                        <div id="market-strength-val" style="font-size: 14px; font-weight: 800; color: var(--text-main);">
+                            92%</div>
+                        <div
+                            style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); border-radius: 1px; margin-top: 4px;">
+                            <div id="market-strength-fill"
+                                style="width: 92%; height: 100%; background: var(--accent-blue);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-header">
+                    <span style="font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <i class="ph ph-newspaper" style="color: var(--accent-green);"></i> Lo Último
+                    </span>
+                    <a href="#" id="view-all-news">Ver todo <i class="ph ph-caret-right"></i></a>
+                </div>
+
+                <div id="news-feed" class="news-scroll">
+                    <!-- Las noticias se cargan dinámicamente aquí -->
+                    <div class="news-skeleton"></div>
+                    <div class="news-skeleton"></div>
+                    <div class="news-skeleton"></div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: rgba(0, 208, 132, 0.05); border: 1px solid rgba(0, 208, 132, 0.1); border-radius: 18px; text-align: center;">
+                    <i class="ph-duotone ph-info" style="font-size: 24px; color: var(--accent-green); margin-bottom: 10px;"></i>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">Las noticias y análisis presentados son recopilados de fuentes económicas confiables y actualizados cada hora para tu referencia rápida.</p>
+                </div>
+            </div>
+        </section>
 
         <!-- Pantalla Ajustes -->
         <section id="settings-screen" class="screen">
@@ -672,13 +694,53 @@
 
         </section>
 
+        <!-- Navegación Maestro (Master Hub) -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active"><i class="ph-duotone ph-house"></i></a>
-            <a href="#" class="nav-item"><i class="ph-duotone ph-calculator"></i></a>
-            <a href="#" class="nav-item"><i class="ph-duotone ph-gas-pump"></i></a>
-            <a href="#" class="nav-item"><i class="ph-duotone ph-chart-line-up"></i></a>
-            <a href="#" class="nav-item"><i class="ph-duotone ph-gear-six"></i></a>
+            <a href="#" class="nav-item active" data-screen="home-screen"><i class="ph-duotone ph-house"></i></a>
+            <a href="#" class="nav-item" data-screen="calc-screen"><i class="ph-duotone ph-calculator"></i></a>
+            
+            <!-- Botón Maestro Central -->
+            <div id="master-hub-trigger" class="hub-btn-wrapper">
+                <div class="hub-btn-glow"></div>
+                <button id="master-hub-btn">
+                    <i class="ph-duotone ph-circles-four" style="font-size: 24px; color: #000;"></i>
+                </button>
+            </div>
+
+            <a href="#" class="nav-item" data-screen="insights-section"><i class="ph-duotone ph-newspaper"></i></a>
+            <a href="#" class="nav-item" data-screen="settings-screen"><i class="ph-duotone ph-user-gear"></i></a>
         </nav>
+
+        <!-- Hub de Herramientas Overlay -->
+        <div id="hub-overlay" class="hub-overlay">
+            <div class="hub-content">
+                <div class="hub-header">
+                    <h3>Centro de Control</h3>
+                    <p>Herramientas y utilidades</p>
+                </div>
+                <div class="hub-grid">
+                    <div class="hub-item" onclick="Principal.navegar('pump-screen')">
+                        <div class="hub-icon green"><i class="ph-duotone ph-gas-pump"></i></div>
+                        <span>Gasolina</span>
+                    </div>
+                    <div class="hub-item" onclick="Principal.navegar('crypto-screen')">
+                        <div class="hub-icon blue"><i class="ph-duotone ph-chart-line-up"></i></div>
+                        <span>Cripto</span>
+                    </div>
+                    <div class="hub-item disabled">
+                        <div class="hub-icon gold"><i class="ph-duotone ph-wallet"></i></div>
+                        <span>Mi Cartera</span>
+                        <div class="badge">Pronto</div>
+                    </div>
+                    <div class="hub-item disabled">
+                        <div class="hub-icon red"><i class="ph-duotone ph-calendar-check"></i></div>
+                        <span>Presupuesto</span>
+                        <div class="badge">Pronto</div>
+                    </div>
+                </div>
+                <button id="close-hub-btn" class="hub-close"><i class="ph ph-x"></i></button>
+            </div>
+        </div>
     </div>
 
     <!-- Account Picker Bottom Sheet (for COBRAR - Global Overlay) -->
@@ -1279,41 +1341,33 @@
             <div class="sheet-handle"></div>
             <div class="sheet-content">
                 <div class="update-header">
-                    <div class="update-badge">¡NUEVA VERSIÓN v2.0.4! 🚀</div>
+                    <div class="update-badge">¡NUEVA VERSIÓN v2.0.5! 🚀</div>
                     <h2>¡DolarVE se puso Pro!</h2>
                     <p>Hemos escuchado tus sugerencias. Estas son las mejoras brutales de hoy:</p>
                 </div>
                 
                 <div class="update-list">
                     <div class="update-item">
-                        <div class="update-icon green"><i class="ph-duotone ph-calculator"></i></div>
+                        <div class="update-icon green"><i class="ph-duotone ph-newspaper"></i></div>
                         <div class="update-text">
-                            <strong>Calculadora Inteligente</strong>
-                            <span>Haz sumas y restas directamente en el teclado. El total se convierte al instante.</span>
+                            <strong>¡Portal de Noticias y Análisis!</strong>
+                            <span>Nueva sección exclusiva con lo último de la economía y el Voltímetro de Mercado.</span>
+                        </div>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-icon blue"><i class="ph-duotone ph-calculator"></i></div>
+                        <div class="update-text">
+                            <strong>Calculadora con Recibos Pro</strong>
+                            <span>Mejoras en la generación de imágenes y compartición nativa (WhatsApp/RRSS).</span>
                         </div>
                     </div>
                     
                     <div class="update-item">
-                        <div class="update-icon blue"><i class="ph-duotone ph-intersect"></i></div>
+                        <div class="update-icon green"><i class="ph-duotone ph-user-circle"></i></div>
                         <div class="update-text">
-                            <strong>Selector Premium de Tasas</strong>
-                            <span>Nueva barra deslizante animada para cambiar de moneda con un toque pro.</span>
-                        </div>
-                    </div>
-                    
-                    <div class="update-item">
-                        <div class="update-icon green"><i class="ph-duotone ph-lightning"></i></div>
-                        <div class="update-text">
-                            <strong>"Brutal" Loader Experience</strong>
-                            <span>Nueva entrada de energía líquida y animaciones de alta gama al abrir.</span>
-                        </div>
-                    </div>
-                    
-                    <div class="update-item">
-                        <div class="update-icon blue"><i class="ph-duotone ph-bell-ringing"></i></div>
-                        <div class="update-text">
-                            <strong>Notificaciones y PWA Fixes</strong>
-                            <span>Alertas reparadas y guía mejorada para iPhone (Cómo instalar).</span>
+                            <strong>Perfil y Cuentas Reparadas</strong>
+                            <span>Inicio de sesión y gestión de Pago Móvil funcionando al 100%.</span>
                         </div>
                     </div>
                 </div>

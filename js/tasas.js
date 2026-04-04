@@ -327,6 +327,12 @@ const Tasas = {
                     intersect: false,
                     mode: 'index',
                 },
+                layout: {
+                    padding: {
+                        top: 35, // Espacio para que el texto "Desliza" no tape nada
+                        bottom: 5
+                    }
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
