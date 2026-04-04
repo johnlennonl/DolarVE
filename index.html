@@ -16,7 +16,7 @@
 
     <title>DolarVE | Oficial & Cripto</title>
     <link rel="stylesheet" href="css/style.css?v=11.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="manifest" href="manifest.json">
@@ -31,7 +31,7 @@
 
     <!-- Toast Notification -->
     <div class="toast-notification" id="app-toast">
-        <i class="fa-solid fa-circle-info"></i>
+        <i class="ph-duotone ph-info"></i>
         <span id="toast-message">Notificación</span>
     </div>
 
@@ -45,7 +45,7 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div id="push-bell-btn" style="cursor: pointer; position: relative; padding: 5px;">
-                        <i class="fa-solid fa-bell" id="push-bell-icon"
+                        <i class="ph-duotone ph-bell" id="push-bell-icon"
                             style="color: var(--text-muted); font-size: 20px;"></i>
                         <span id="push-bell-dot"
                             style="display: none; position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: var(--accent-red); border-radius: 50%; border: 2px solid var(--bg-color);"></span>
@@ -56,7 +56,7 @@
                             style="width: 36px; height: 36px; border-radius: 50%; background: var(--nav-bg); border: 2px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 2px 10px rgba(0,208,132,0.2);">
                             <img id="user-avatar-img" src=""
                                 style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                            <i id="user-avatar-placeholder" class="fa-solid fa-user"
+                            <i id="user-avatar-placeholder" class="ph-duotone ph-user"
                                 style="color: var(--accent-green); font-size: 16px;"></i>
                         </div>
                         <span id="user-short-name"
@@ -74,15 +74,18 @@
 
                 <div style="position: relative; z-index: 1;">
                     <div class="card-title">USD / VES (Oficial)</div>
-                    <div class="card-value"><span id="usd-bcv-price">---</span> <span
-                            style="font-size: 14px; font-weight: normal; color: var(--text-muted);">VES</span></div>
+                    <div class="card-value"
+                        style="font-size: 56px; font-weight: 800; line-height: 1.1; display: flex; align-items: baseline; gap: 8px;">
+                        <span id="usd-bcv-price">---</span>
+                        <span style="font-size: 16px; font-weight: normal; color: var(--text-muted);">VES</span>
+                    </div>
                     <div class="chart-mini" style="height: 80px; margin-top: 15px; background: transparent;">
                         <canvas id="bcvChart"></canvas>
                     </div>
                     <div class="card-footer">
                         <span class="trend-up" id="usd-trend-indicator"
                             style="background: rgba(0, 208, 132, 0.1); padding: 4px 8px; border-radius: 6px;"><i
-                                class="fa-solid fa-check-circle"></i>
+                                class="ph-duotone ph-check-circle"></i>
                             BCV</span>
                         <span style="color: var(--text-muted)" id="last-update-usd">Actualizando...</span>
                     </div>
@@ -98,64 +101,68 @@
 
             <!-- Chips for Paralelo and Euro -->
             <div class="grid-2" style="padding: 0 20px 10px;">
-                <div class="card"
-                    style="margin: 0; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+                <div class="intl-card" style="--country-color: #00D082;">
                     <div style="z-index: 1;">
-                        <div class="card-title" style="font-size: 12px; margin-bottom: 5px;">Paralelo ($)</div>
-                        <div class="card-value" style="font-size: 18px;" id="paralelo-price">---</div>
+                        <div
+                            style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">
+                            Paralelo ($)</div>
+                        <div style="font-size: 32px; font-weight: 800; color: var(--text-main);" id="paralelo-price">---
+                        </div>
                     </div>
-                    <div
-                        style="z-index: 1; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 24px; opacity: 0.1;">
-                        <i class="fa-solid fa-money-bill-trend-up"></i>
-                    </div>
-                    <div
-                        style="position: absolute; right: 0; top: 0; bottom: 0; width: 70%; background: linear-gradient(90deg, transparent, rgba(0, 208, 132, 0.1)); pointer-events: none;">
-                    </div>
+                    <i class="ph-duotone ph-chart-line-up"
+                        style="position: absolute; right: 12px; top: 12px; font-size: 18px; color: #00D082; opacity: 0.5;"></i>
                 </div>
-                <div class="card"
-                    style="margin: 0; padding: 15px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+                <div class="intl-card" style="--country-color: #2575FC;">
                     <div style="z-index: 1;">
-                        <div class="card-title" style="font-size: 12px; margin-bottom: 5px;">Euro (€)</div>
-                        <div class="card-value" style="font-size: 18px;" id="euro-top-price">---</div>
+                        <div
+                            style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">
+                            Euro (€)</div>
+                        <div style="font-size: 32px; font-weight: 800; color: var(--text-main);" id="euro-top-price">---
+                        </div>
                     </div>
-                    <div
-                        style="z-index: 1; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 24px; opacity: 0.1;">
-                        <i class="fa-solid fa-euro-sign"></i>
-                    </div>
-                    <div
-                        style="position: absolute; right: 0; top: 0; bottom: 0; width: 70%; background: linear-gradient(90deg, transparent, rgba(37, 117, 252, 0.1)); pointer-events: none;">
-                    </div>
+                    <i class="ph-duotone ph-currency-eur"
+                        style="position: absolute; right: 12px; top: 12px; font-size: 18px; color: #2575FC; opacity: 0.5;"></i>
                 </div>
             </div>
 
             <!-- Brecha Cambiaria Widget -->
-            <div class="card"
-                style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between;">
-                <div style="z-index: 1;">
-                    <div class="card-title" style="margin-bottom: 5px;">Brecha Cambiaria</div>
-                    <div class="card-value" id="brecha-value" style="font-size: 28px;">---%</div>
-                </div>
-                <div style="z-index: 1; font-size: 32px; opacity: 0.1;">
-                    <i class="fa-solid fa-scale-unbalanced"></i>
-                </div>
-                <div id="brecha-bg"
-                    style="position: absolute; right: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.1)); transition: width 1s ease;">
+            <div style="padding: 0 20px 20px;">
+                <div class="intl-card"
+                    style="--country-color: #FF4D4D; flex-direction: row; align-items: center; justify-content: space-between;">
+                    <div style="z-index: 1;">
+                        <div
+                            style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">
+                            Brecha Cambiaria</div>
+                        <div style="font-size: 32px; font-weight: 800; color: var(--text-main);" id="brecha-value">---%
+                        </div>
+                    </div>
+                    <i class="ph-duotone ph-scales" style="font-size: 24px; color: #FF4D4D; opacity: 0.5;"></i>
+                    <div id="brecha-bg"
+                        style="position: absolute; right: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.05)); transition: width 1s cubic-bezier(0.19, 1, 0.22, 1);">
+                    </div>
                 </div>
             </div>
 
-            <div style="padding: 20px 20px 10px;">
-                <h3 style="font-size: 16px; margin-bottom: 10px;">Sentimiento del Mercado</h3>
-                <div class="card" style="margin: 0; padding: 15px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
-                        <span>Bajista</span>
-                        <span>Alcista</span>
+            <div style="padding: 10px 20px 24px;">
+                <h3
+                    style="font-size: 14px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-duotone ph-activity" style="color: var(--accent-green);"></i> Sentimiento del Mercado
+                </h3>
+                <div class="intl-card" style="--country-color: #00D082; padding: 24px 28px;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                        <span style="color: var(--accent-red)">Bajista</span>
+                        <span style="color: var(--accent-green)">Alcista</span>
                     </div>
-                    <div class="sentiment-bar">
-                        <div class="sentiment-fill" id="sentiment-fill-bcv" style="width: 85%;"></div>
+                    <div class="sentiment-bar"
+                        style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.02);">
+                        <div id="sentiment-fill-bcv"
+                            style="width: 85%; height: 100%; background: linear-gradient(90deg, #FF4D4D, #F1C40F, #00D082); box-shadow: 0 0 15px rgba(0, 208, 130, 0.2); border-radius: 5px; transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1);">
+                        </div>
                     </div>
                     <div
-                        style="text-align: center; font-size: 12px; font-weight: 600; margin-top: 5px; color: var(--accent-green);">
-                        85% Alcista
+                        style="text-align: center; font-size: 13px; font-weight: 800; margin-top: 12px; color: var(--accent-green); letter-spacing: 0.5px;">
+                        <span id="sentiment-label-bcv">85% Alcista</span>
                     </div>
                 </div>
             </div>
@@ -165,76 +172,68 @@
             <div style="padding: 10px 20px 5px;">
                 <div
                     style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-globe" style="color: #f1c40f;"></i> Mercado Internacional (Dólar vs)
+                    <i class="ph-duotone ph-globe" style="color: #f1c40f;"></i> Mercado Internacional (Dólar vs)
                 </div>
 
                 <div class="grid-2" style="padding: 0; gap: 10px; grid-template-rows: repeat(2, 1fr);">
                     <!-- Colombia -->
-                    <div class="card"
-                        style="margin: 0; padding: 15px; background: rgba(241, 196, 15, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="intl-card" style="--country-color: #f1c40f;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Colombia (COP)
-                            </div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-cop-rate">
-                                --- <span style="font-size: 11px; font-weight: 400;">COP</span></div>
+                            <div
+                                style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-weight: 600;">
+                                Colombia (COP)</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--text-main);" id="home-cop-rate">
+                                ---</div>
+                            <div class="intl-ref" id="home-cop-ref">1 USD = --- COP</div>
                         </div>
-                        <div
-                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(241, 196, 15, 0.1)); pointer-events: none;">
-                        </div>
-                        <div
-                            style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #f1c40f; opacity: 0.3;">
-                            <i class="fa-solid fa-flag"></i>
+                        <img src="https://flagcdn.com/w80/co.png" class="country-flag" alt="Colombia">
+                        <div class="intl-trend" id="home-cop-trend">
+                            <i class="ph-duotone ph-caret-up"></i> 0.0%
                         </div>
                     </div>
                     <!-- Argentina (Blue) -->
-                    <div class="card"
-                        style="margin: 0; padding: 15px; background: rgba(116, 172, 223, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="intl-card" style="--country-color: #74ACDF;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Argentina (BLUE)
-                            </div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-ars-rate">
-                                --- <span style="font-size: 11px; font-weight: 400;">ARS</span></div>
+                            <div
+                                style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-weight: 600;">
+                                Argentina (BLUE)</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--text-main);" id="home-ars-rate">
+                                ---</div>
+                            <div class="intl-ref" id="home-ars-ref">1 USD = --- ARS</div>
                         </div>
-                        <div
-                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(116, 172, 223, 0.1)); pointer-events: none;">
-                        </div>
-                        <div
-                            style="position: absolute; right: 8px; top: 8px; font-size: 12px; font-weight: 800; color: #74ACDF; opacity: 0.5;">
-                            ARS
+                        <img src="https://flagcdn.com/w80/ar.png" class="country-flag" alt="Argentina">
+                        <div class="intl-trend" id="home-ars-trend">
+                            <i class="ph-duotone ph-caret-down"></i> 0.0%
                         </div>
                     </div>
                     <!-- Brasil -->
-                    <div class="card"
-                        style="margin: 0; padding: 15px; background: rgba(0, 151, 57, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="intl-card" style="--country-color: #009739;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Brasil (BRL)
-                            </div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-brl-rate">
-                                --- <span style="font-size: 11px; font-weight: 400;">BRL</span></div>
+                            <div
+                                style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-weight: 600;">
+                                Brasil (BRL)</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--text-main);" id="home-brl-rate">
+                                ---</div>
+                            <div class="intl-ref" id="home-brl-ref">1 USD = --- BRL</div>
                         </div>
-                        <div
-                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(0, 151, 57, 0.1)); pointer-events: none;">
-                        </div>
-                        <div
-                            style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #009739; opacity: 0.3;">
-                            <i class="fa-solid fa-earth-americas"></i>
+                        <img src="https://flagcdn.com/w80/br.png" class="country-flag" alt="Brasil">
+                        <div class="intl-trend" id="home-brl-trend">
+                            <i class="ph-duotone ph-caret-up"></i> 0.0%
                         </div>
                     </div>
                     <!-- Chile -->
-                    <div class="card"
-                        style="margin: 0; padding: 15px; background: rgba(213, 43, 30, 0.03); border: 1px solid var(--card-border); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="intl-card" style="--country-color: #d32f2f;">
                         <div style="position: relative; z-index: 1;">
-                            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Chile (CLP)
-                            </div>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="home-clp-rate">
-                                --- <span style="font-size: 11px; font-weight: 400;">CLP</span></div>
+                            <div
+                                style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-weight: 600;">
+                                Chile (CLP)</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--text-main);" id="home-clp-rate">
+                                ---</div>
+                            <div class="intl-ref" id="home-clp-ref">1 USD = --- CLP</div>
                         </div>
-                        <div
-                            style="position: absolute; right: 0; top: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, transparent, rgba(213, 43, 30, 0.1)); pointer-events: none;">
-                        </div>
-                        <div
-                            style="position: absolute; right: 10px; top: 10px; font-size: 14px; color: #d32f2f; opacity: 0.3;">
-                            <i class="fa-solid fa-star"></i>
+                        <img src="https://flagcdn.com/w80/cl.png" class="country-flag" alt="Chile">
+                        <div class="intl-trend" id="home-clp-trend">
+                            <i class="ph-duotone ph-caret-down"></i> 0.0%
                         </div>
                     </div>
                 </div>
@@ -246,7 +245,7 @@
                     <div
                         style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between;">
                         <span>Referencia Rápida</span>
-                        <i class="fa-solid fa-bolt" style="color: var(--accent-green);"></i>
+                        <i class="ph-duotone ph-lightning" style="color: var(--accent-green);"></i>
                     </div>
                     <div class="rate-selector"
                         style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px;">
@@ -274,7 +273,7 @@
 
                 <button id="share-daily-rate-btn" class="btn-primary"
                     style="margin-top: 20px; width: 100%; padding: 16px; font-weight: 700; background: linear-gradient(90deg, #00D084, #00a669); color: #000; border-radius: 16px; border: none; font-size: 15px; box-shadow: 0 10px 25px rgba(0, 208, 132, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;">
-                    <i class="fa-solid fa-share-from-square"></i> Compartir Imagen de Tasas
+                    <i class="ph-duotone ph-share-network"></i> Compartir Imagen de Tasas
                 </button>
             </div>
         </section>
@@ -288,17 +287,32 @@
                 </div>
                 <div class="header-icon" style="display: flex; align-items: center; gap: 5px;">
                     <div id="swap-currency-btn" style="cursor: pointer; padding: 10px;">
-                        <i class="fa-solid fa-right-left"></i>
+                        <i class="ph-duotone ph-arrows-left-right"></i>
                     </div>
                 </div>
             </header>
 
-            <div class="rate-selector"
-                style="padding: 0 20px 15px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;">
-                <button class="rate-chip active" data-rate="bcv">BCV</button>
-                <button class="rate-chip" data-rate="paralelo">Paralelo</button>
-                <button class="rate-chip" data-rate="eur">Euro</button>
-                <button class="rate-chip" data-rate="cop">Peso COP</button>
+            <!-- Selector de Tasa Premium -->
+            <div class="rate-selector-wrapper" style="padding: 0 20px 20px;">
+                <div class="rate-selector-tray">
+                    <div class="rate-indicator" id="rate-indicator"></div>
+                    <button class="rate-chip active" data-rate="bcv">
+                        <i class="ph-duotone ph-bank"></i>
+                        <span>BCV</span>
+                    </button>
+                    <button class="rate-chip" data-rate="paralelo">
+                        <i class="ph-duotone ph-chart-line-up"></i>
+                        <span>Para</span>
+                    </button>
+                    <button class="rate-chip" data-rate="eur">
+                        <i class="ph-duotone ph-currency-eur"></i>
+                        <span>Euro</span>
+                    </button>
+                    <button class="rate-chip" data-rate="cop">
+                        <i class="ph-duotone ph-globe"></i>
+                        <span>COP</span>
+                    </button>
+                </div>
             </div>
 
             <div class="calc-container">
@@ -312,6 +326,12 @@
                     <div class="value" id="calc-to-value" style="color: var(--accent-green)">0.00</div>
                 </div>
                 <div class="calc-grid">
+                    <!-- Fila de Operadores Aritméticos -->
+                    <button class="calc-btn operator" data-val="+">+</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+                    <button class="calc-btn operator" data-val="/">÷</button>
+                    
                     <button class="calc-btn">1</button><button class="calc-btn">2</button><button
                         class="calc-btn">3</button>
                     <button class="calc-btn">4</button><button class="calc-btn">5</button><button
@@ -324,10 +344,10 @@
                     <div style="grid-column: span 3; display: flex; gap: 10px;">
                         <button class="calc-btn action" id="generate-receipt-btn"
                             style="flex: 1; font-size: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i
-                                class="fa-solid fa-receipt"></i> RECIBO</button>
+                                class="ph-duotone ph-receipt"></i> RECIBO</button>
                         <button class="calc-btn action" id="generate-charge-btn"
                             style="flex: 1; background: rgba(0, 208, 132, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 208, 132, 0.2); font-size: 14px; padding: 15px; box-shadow: 0 4px 10px rgba(0,208,132,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;"><i
-                                class="fa-solid fa-file-invoice-dollar"></i> COBRAR</button>
+                                class="ph-duotone ph-hand-coins"></i> COBRAR</button>
                     </div>
                 </div>
             </div>
@@ -341,7 +361,7 @@
                     <h1>Gasolina</h1>
                 </div>
                 <div class="header-icon">
-                    <i class="fa-solid fa-gas-pump" style="color: var(--accent-green); font-size: 24px;"></i>
+                    <i class="ph-duotone ph-gas-pump" style="color: var(--accent-green); font-size: 24px;"></i>
                 </div>
             </header>
 
@@ -429,30 +449,49 @@
                 </div>
             </header>
 
-            <div class="stats-grid">
-                <div class="stats-card">
-                    <div class="header-subtitle">Codicia y Miedo</div>
-                    <div class="stats-value" id="fear-greed-value">--</div>
-                    <div style="font-size: 12px; color: var(--accent-green)">Actualizado</div>
+            <div class="stats-row"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: 5px;">
+                <div class="stats-card"
+                    style="background: var(--card-bg); border: 1px solid var(--card-border); padding: 15px; border-radius: 18px; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -10px; right: -10px; opacity: 0.05; font-size: 40px;"><i
+                            class="ph-duotone ph-chart-pie"></i></div>
+                    <div class="header-subtitle"
+                        style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 5px;">
+                        Dominio BTC</div>
+                    <div class="stats-value" id="btc-dominance"
+                        style="font-size: 22px; font-weight: 800; color: #F7931A;">--%</div>
                 </div>
-                <div class="stats-card">
-                    <div class="header-subtitle">Dominio BTC</div>
-                    <div class="stats-value" id="btc-dominance">--%</div>
-                    <div style="font-size: 12px; color: var(--text-muted)">Global</div>
+                <div class="stats-card"
+                    style="background: var(--card-bg); border: 1px solid var(--card-border); padding: 15px; border-radius: 18px; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -10px; right: -10px; opacity: 0.05; font-size: 40px;"><i
+                            class="ph-duotone ph-globe"></i></div>
+                    <div class="header-subtitle"
+                        style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 5px;">
+                        Volumen 24h</div>
+                    <div class="stats-value" id="global-volume"
+                        style="font-size: 22px; font-weight: 800; color: var(--accent-blue);">--B</div>
                 </div>
             </div>
 
-            <div style="padding: 0 20px; margin-top: 20px;">
-                <input type="text" id="crypto-search" placeholder="🔍 Buscar moneda o símbolo...">
-            </div>
-
-            <div class="crypto-list" id="dynamic-crypto-list" style="margin-top: 5px;">
-                <!-- Filled via JS -->
-                <div style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
-                    <div class="loader-spinner" style="margin: 0 auto 15px;"></div>
-                    Cargando top 20 del mercado...
+            <div style="padding: 20px; position: sticky; top: 0; z-index: 10; background: var(--bg-color);">
+                <div style="position: relative;">
+                    <i class="ph-duotone ph-magnifying-glass"
+                        style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 18px;"></i>
+                    <input type="text" id="crypto-search" placeholder="Buscar moneda o símbolo..."
+                        style="padding-left: 50px;">
                 </div>
             </div>
+
+            <div class="crypto-list" id="dynamic-crypto-list" style="margin-top: -10px;">
+                <!-- Cargador Premium -->
+                <div style="text-align: center; color: var(--text-muted); padding: 60px 20px;">
+                    <div class="loader-spinner" style="margin: 0 auto 20px; border-top-color: var(--accent-green);">
+                    </div>
+                    <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.5px;">Sincronizando mercado...
+                    </div>
+                </div>
+            </div>
+
         </section>
 
         <!-- Pantalla Ajustes -->
@@ -466,7 +505,7 @@
             <div class="settings-list">
                 <div class="settings-item">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-wand-magic-sparkles"
+                        <div style="font-weight: 600;"><i class="ph-duotone ph-magic-wand"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Animaciones UI</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Efectos de transición</div>
                     </div>
@@ -477,7 +516,7 @@
 
                 <div class="settings-item">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-bell"
+                        <div style="font-weight: 600;"><i class="ph-duotone ph-bell"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Alertas en Tiempo Real</div>
                         <div style="font-size: 11px; color: var(--text-muted);">Recibe cambios de precio al instante
                         </div>
@@ -491,7 +530,7 @@
 
                 <div class="settings-item">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-moon"
+                        <div style="font-weight: 600;"><i class="ph-duotone ph-moon"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Modo Oscuro</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Cambiar tema visual</div>
                     </div>
@@ -501,7 +540,7 @@
                 </div>
                 <div class="settings-item">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-globe"
+                        <div style="font-weight: 600;"><i class="ph-duotone ph-globe"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Idioma</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Seleccionar lenguaje</div>
                     </div>
@@ -513,28 +552,28 @@
                 </div>
                 <div class="settings-item" id="open-accounts-btn" style="cursor: pointer;">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-building-columns"
+                        <div style="font-weight: 600;"><i class="ph-duotone ph-bank"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Gestión de Cuentas</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Administra tus datos de Pago Móvil</div>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 14px;"></i>
+                    <i class="ph-duotone ph-caret-right" style="color: var(--text-muted); font-size: 14px;"></i>
                 </div>
                 <div class="settings-item" id="pwa-install-btn" style="cursor: pointer; display: none;">
                     <div>
-                        <div style="font-weight: 600;"><i id="install-icon" class="fa-solid fa-download"
+                        <div style="font-weight: 600;"><i id="install-icon" class="ph-duotone ph-download-simple"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> <span
                                 id="install-text">Instalar DolarVE</span></div>
                         <div style="font-size: 11px; color: var(--text-muted);">Ten las tasas siempre a la mano</div>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 14px;"></i>
+                    <i class="ph-duotone ph-caret-right" style="color: var(--text-muted); font-size: 14px;"></i>
                 </div>
                 <div class="settings-item" id="open-terms-btn" style="cursor: pointer;">
                     <div>
-                        <div style="font-weight: 600;"><i class="fa-solid fa-file-contract"
+                        <div style="font-weight: 600;"><i class="ph-duotone ph-scroll"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Términos y Privacidad</div>
                         <div style="font-size: 12px; color: var(--text-muted);">Información legal y de uso</div>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 14px;"></i>
+                    <i class="ph-duotone ph-caret-right" style="color: var(--text-muted); font-size: 14px;"></i>
                 </div>
             </div>
 
@@ -549,11 +588,11 @@
         </section>
 
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-calculator"></i><span>Calc</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-gas-pump"></i><span>Gasolina</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Cripto</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
+            <a href="#" class="nav-item active"><i class="ph-duotone ph-house"></i></a>
+            <a href="#" class="nav-item"><i class="ph-duotone ph-calculator"></i></a>
+            <a href="#" class="nav-item"><i class="ph-duotone ph-gas-pump"></i></a>
+            <a href="#" class="nav-item"><i class="ph-duotone ph-chart-line-up"></i></a>
+            <a href="#" class="nav-item"><i class="ph-duotone ph-gear-six"></i></a>
         </nav>
     </div>
 
@@ -561,15 +600,19 @@
     <div id="account-picker-overlay"
         style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 99998; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease;">
         <div id="account-picker-sheet"
-            style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--card-bg); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 20px)); transform: translateX(-50%) translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-            <div
-                style="width: 40px; height: 4px; background: var(--text-muted); border-radius: 2px; margin: 0 auto 15px; opacity: 0.4;">
-            </div>
-            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 5px;">Selecciona una Cuenta</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">¿A cuál cuenta deseas que te
-                paguen?</p>
+            style="position: absolute; bottom: 0; left: 50%; width: 100%; max-width: 480px; background: var(--card-bg); border-radius: 30px 30px 0 0; padding: 25px; transform: translateX(-50%) translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 700; color: #fff;">Selecciona una Cuenta</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);">¿A cuál cuenta deseas que te paguen?</p>
+                </div>
+                <div id="close-account-picker"
+                    style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="ph-duotone ph-x"></i>
+                </div>
+            </header>
             <div id="account-picker-list"
-                style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;"></div>
+                style="max-height: 40vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 20px);"></div>
         </div>
     </div>
 
@@ -590,18 +633,39 @@
                 </div>
                 <div id="close-crypto-modal"
                     style="cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 50%; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center;">
-                    <i class="fa-solid fa-xmark"></i>
+                    <i class="ph-duotone ph-x"></i>
                 </div>
             </header>
-            <div style="padding: 0 20px 20px; height: 250px; display: flex; flex-direction: column;">
-                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; text-align: center;">
-                    Historial 24h</div>
-                <div style="flex: 1; position: relative;">
+            <div style="padding: 0 24px 24px; flex: 1; display: flex; flex-direction: column;">
+                <div
+                    style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; text-align: center; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
+                    Tendencia 24h</div>
+                <div style="flex: 1; min-height: 200px; position: relative; margin-bottom: 20px;">
                     <canvas id="cryptoDetailCanvas"></canvas>
                     <div id="crypto-chart-error"
-                        style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; justify-content: center; align-items: center; color: var(--text-muted); font-size: 13px; text-align: center; flex-direction: column; gap: 10px;">
-                        <i class="fa-solid fa-chart-line" style="font-size: 24px; opacity: 0.5;"></i>
-                        Gráfico no disponible
+                        style="display: none; position: absolute; inset: 0; align-items: center; justify-content: center; text-align: center; font-size: 13px; color: var(--text-muted);">
+                        <i class="ph-duotone ph-chart-line-up"
+                            style="font-size: 24px; opacity: 0.5; margin-bottom: 10px;"></i><br>Sin datos históricos
+                    </div>
+                </div>
+
+                <div
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid var(--card-border); padding-top: 20px;">
+                    <div
+                        style="background: rgba(0, 208, 132, 0.05); padding: 12px; border-radius: 14px; text-align: center; border: 1px solid rgba(0, 208, 132, 0.1);">
+                        <div
+                            style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 700;">
+                            Máx 24h</div>
+                        <div id="crypto-high-24h" style="font-size: 15px; font-weight: 800; color: var(--accent-green)">
+                            $0.00</div>
+                    </div>
+                    <div
+                        style="background: rgba(255, 77, 77, 0.05); padding: 12px; border-radius: 14px; text-align: center; border: 1px solid rgba(255, 77, 77, 0.1);">
+                        <div
+                            style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 700;">
+                            Mín 24h</div>
+                        <div id="crypto-low-24h" style="font-size: 15px; font-weight: 800; color: var(--accent-red)">
+                            $0.00</div>
                     </div>
                 </div>
             </div>
@@ -620,7 +684,7 @@
                     style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 15px; border-radius: 12px; font-weight: 600;">Cerrar</button>
                 <button id="share-receipt-btn" class="btn-primary"
                     style="flex: 1; padding: 15px; border-radius: 12px; font-weight: 600;"><i
-                        class="fa-solid fa-share-nodes"></i> Compartir</button>
+                        class="ph-duotone ph-share-network"></i> Compartir</button>
             </div>
         </div>
     </div>
@@ -747,19 +811,20 @@
                         Datos del Beneficiario</div>
 
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i
-                                class="fa-solid fa-building-columns" style="width: 16px;"></i> Banco</span>
+                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i class="ph-duotone ph-bank"
+                                style="width: 16px;"></i> Banco</span>
                         <strong style="font-size: 13px; color: #fff;" id="charge-bank-val"
                             style="text-align: right; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">---</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i
-                                class="fa-solid fa-mobile-screen" style="width: 16px;"></i> Teléfono</span>
+                                class="ph-duotone ph-device-mobile" style="width: 16px;"></i> Teléfono</span>
                         <strong style="font-size: 13px; color: #fff;" id="charge-phone-val">---</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-id-card"
-                                style="width: 16px;"></i> Identificación</span>
+                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i
+                                class="ph-duotone ph-identification-card" style="width: 16px;"></i>
+                            Identificación</span>
                         <strong style="font-size: 13px; color: #fff;" id="charge-id-val">---</strong>
                     </div>
                 </div>
@@ -779,7 +844,7 @@
             style="width: 100%; max-width: 420px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 30px; display: flex; flex-direction: column; gap: 15px; position: relative;">
             <div id="close-auth-modal"
                 style="position: absolute; top: 18px; right: 18px; cursor: pointer; color: var(--text-muted); z-index: 2;">
-                <i class="fa-solid fa-xmark" style="font-size: 22px;"></i>
+                <i class="ph-duotone ph-x" style="font-size: 22px;"></i>
             </div>
 
             <!-- LOGIN / REGISTER VIEW -->
@@ -815,7 +880,7 @@
 
                     <!-- Loading Spinner for Auth -->
                     <div id="auth-loading" style="display: none; justify-content: center; padding: 10px;">
-                        <i class="fa-solid fa-circle-notch fa-spin"
+                        <i class="ph-duotone ph-circle-notch ph-spin"
                             style="color: var(--accent-green); font-size: 28px;"></i>
                     </div>
 
@@ -840,12 +905,12 @@
                             style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
                         <div id="profile-avatar-placeholder"
                             style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, rgba(0,208,132,0.15), rgba(62,139,255,0.1)); display: flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-user"
+                            <i class="ph-duotone ph-user"
                                 style="font-size: 32px; color: var(--accent-green); opacity: 0.6;"></i>
                         </div>
                         <div
                             style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg);">
-                            <i class="fa-solid fa-camera" style="font-size: 12px; color: #000;"></i>
+                            <i class="ph-duotone ph-camera" style="font-size: 12px; color: #000;"></i>
                         </div>
                     </div>
                     <input type="file" id="avatar-file-input" accept="image/*" style="display: none;">
@@ -861,12 +926,12 @@
                     style="background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 15px; margin-bottom: 15px;">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-calendar"
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="ph-duotone ph-calendar"
                                 style="width: 16px; margin-right: 5px;"></i>Nacimiento</span>
                         <span id="profile-dob" style="font-size: 13px; font-weight: 600;">---</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-clock"
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="ph-duotone ph-clock"
                                 style="width: 16px; margin-right: 5px;"></i>Miembro desde</span>
                         <span id="profile-created" style="font-size: 13px; font-weight: 600;">---</span>
                     </div>
@@ -874,7 +939,7 @@
 
                 <button id="auth-logout-btn"
                     style="width: 100%; padding: 14px; background: rgba(255,59,48,0.08); color: #ff3b30; border: 1px solid rgba(255,59,48,0.15); border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; font-size: 14px;"><i
-                        class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i>Cerrar Sesión</button>
+                        class="ph-duotone ph-sign-out" style="margin-right: 6px;"></i>Cerrar Sesión</button>
             </div>
         </div>
     </div>
@@ -886,7 +951,7 @@
             <div style="display: flex; align-items: start; gap: 12px;">
                 <div
                     style="width: 40px; height: 40px; background: rgba(0, 208, 132, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fa-solid fa-cookie-bite" style="color: var(--accent-green); font-size: 20px;"></i>
+                    <i class="ph-duotone ph-cookie" style="color: var(--accent-green); font-size: 20px;"></i>
                 </div>
                 <div>
                     <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main);">¿Aceptas una galleta?</h4>
@@ -914,7 +979,7 @@
                 <h3 style="font-size: 17px; font-weight: 700;">Gestión de Cuentas</h3>
                 <div id="close-accounts-modal"
                     style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fa-solid fa-xmark"></i>
+                    <i class="ph-duotone ph-x"></i>
                 </div>
             </header>
             <div style="flex: 1; overflow-y: auto; padding: 20px;">
@@ -923,14 +988,14 @@
                     style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"></div>
 
                 <!-- Add Account UI -->
-                <div id="pm-add-form-toggle"
-                    style="cursor: pointer; text-align: center; padding: 16px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 20px;">
-                    <i class="fa-solid fa-plus" style="color: var(--accent-green); margin-right: 8px;"></i>
-                    <span style="font-weight: 600; font-size: 14px;">Agregar Nueva Cuenta</span>
-                </div>
+                <button id="add-account-btn"
+                    style="width: 100%; border: 1.5px dashed var(--card-border); background: transparent; padding: 16px; border-radius: 12px; color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
+                    <i class="ph-duotone ph-plus" style="color: var(--accent-green); margin-right: 8px;"></i>
+                    Agregar nueva cuenta
+                </button>
 
                 <div id="pm-add-form"
-                    style="display: none; flex-direction: column; gap: 20px; padding: 25px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 20px; margin-bottom: 20px;">
+                    style="flex-direction: column; gap: 20px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 20px;">
                     <div class="input-group">
                         <label
                             style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Etiqueta
@@ -941,7 +1006,7 @@
                     <div class="input-group">
                         <label
                             style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;">Banco
-                            Recreceptor</label>
+                            Receptor</label>
                         <select id="pm-banco"
                             style="width: 100%; padding: 15px; background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); border-radius: 14px; outline: none; font-family: 'Outfit';">
                             <option value="" disabled selected>Selecciona un banco...</option>
@@ -1029,7 +1094,7 @@
             style="width: 100%; max-width: 480px; margin: 0 auto; color: #fff; text-align: center; transform: translateY(20px); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
             <div
                 style="width: 80px; height: 80px; background: linear-gradient(135deg, #00D084, #00a669); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 30px rgba(0,208,132,0.3);">
-                <i class="fa-solid fa-cloud-arrow-down" style="font-size: 35px; color: #000;"></i>
+                <i class="ph-duotone ph-cloud-arrow-down" style="font-size: 35px; color: #000;"></i>
             </div>
             <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 10px;">Instalar DolarVE</h2>
             <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.5;">Agrega la
@@ -1042,7 +1107,7 @@
                         style="width: 32px; height: 32px; background: var(--accent-green); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">
                         1</div>
                     <div style="font-size: 15px;">Toca el botón <strong>Compartir</strong> <i
-                            class="fa-solid fa-share-from-square"
+                            class="ph-duotone ph-share-network"
                             style="color: var(--accent-green); margin-left: 5px;"></i> en la barra inferior.</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
@@ -1076,7 +1141,7 @@
                 <h3 style="font-size: 17px; font-weight: 700;">Términos y Privacidad</h3>
                 <div id="close-terms-modal"
                     style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fa-solid fa-xmark"></i>
+                    <i class="ph-duotone ph-x"></i>
                 </div>
             </header>
             <div
@@ -1084,7 +1149,7 @@
                 <div style="text-align: center; margin-bottom: 25px;">
                     <div
                         style="width: 60px; height: 60px; background: rgba(0,208,132,0.1); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
-                        <i class="fa-solid fa-shield-halved" style="color: var(--accent-green); font-size: 28px;"></i>
+                        <i class="ph-duotone ph-shield-check" style="color: var(--accent-green); font-size: 28px;"></i>
                     </div>
                     <h2 style="color: var(--text-main); font-size: 18px; margin-bottom: 5px;">Compromiso DolarVE</h2>
                     <p style="font-size: 12px;">Última actualización: Abril 2026</p>
@@ -1125,6 +1190,14 @@
 
     <!-- Supabase SDK v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Módulos de DolarVE (Arquitectura Pro) -->
+    <script src="js/configuracion.js?v=11.0"></script>
+    <script src="js/interfaz.js?v=11.0"></script>
+    <script src="js/autenticacion.js?v=11.0"></script>
+    <script src="js/tasas.js?v=11.0"></script>
+    <script src="js/calculadora.js?v=11.0"></script>
+    <script src="js/cuentas.js?v=11.0"></script>
     <script src="js/app.js?v=11.0"></script>
     <script>
         // Force clear all old service workers and caches, then re-register

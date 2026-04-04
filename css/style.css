@@ -150,14 +150,15 @@ header {
 
 .nav-item {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
     color: var(--text-muted);
-    font-size: 10px;
     text-decoration: none;
-    transition: color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
     position: relative;
-    padding: 4px 12px;
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
 }
 
 .nav-item:active {
@@ -166,6 +167,7 @@ header {
 
 .nav-item.active {
     color: var(--accent-green);
+    background: rgba(0, 208, 132, 0.08);
 }
 
 .nav-item.active::after {
@@ -180,8 +182,8 @@ header {
 }
 
 .nav-item i {
-    font-size: 22px;
-    margin-bottom: 4px;
+    font-size: 26px;
+    transition: transform 0.3s ease;
 }
 
 /* Utilities */
@@ -278,7 +280,14 @@ header {
 }
 
 .calc-btn.operator {
+    background: rgba(37, 117, 252, 0.08);
     color: var(--accent-blue);
+    border-color: rgba(37, 117, 252, 0.15);
+    font-size: 22px;
+}
+
+.calc-btn.operator:active {
+    background: rgba(37, 117, 252, 0.15);
 }
 
 .calc-btn.action {
@@ -287,6 +296,7 @@ header {
     color: white;
     margin-top: 5px;
     font-size: 16px;
+    box-shadow: 0 4px 15px rgba(37, 117, 252, 0.2);
 }
 
 .calc-btn.danger-btn {
@@ -298,29 +308,71 @@ header {
     background: #d32f2f;
 }
 
-/* Rate Selector Chips */
-.rate-selector::-webkit-scrollbar {
-    display: none;
+/* --- Premium Segmented Rate Selector --- */
+.rate-selector-tray {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 5px;
+    display: flex;
+    gap: 4px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.rate-indicator {
+    position: absolute;
+    height: calc(100% - 10px);
+    top: 5px;
+    left: 5px;
+    background: rgba(0, 208, 132, 0.12);
+    border: 1px solid rgba(0, 208, 132, 0.3);
+    border-radius: 14px;
+    transition: all 0.45s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none;
+    z-index: 0;
+    box-shadow: 0 0 15px rgba(0, 208, 132, 0.1);
 }
 
 .rate-chip {
-    padding: 8px 16px;
-    border-radius: 20px;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    color: var(--text-muted);
+    flex: 1;
+    z-index: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 0;
     font-family: var(--font-main);
-    font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
     cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s ease;
+    transition: color 0.3s ease, transform 0.1s ease;
+}
+
+.rate-chip:active {
+    transform: scale(0.95);
 }
 
 .rate-chip.active {
-    background: rgba(0, 208, 132, 0.15);
     color: var(--accent-green);
-    border-color: var(--accent-green);
+}
+
+.rate-chip * {
+    pointer-events: none;
+}
+
+.rate-chip i {
+    font-size: 18px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.rate-chip.active i {
+    opacity: 1;
 }
 
 /* Crypto List */
@@ -555,27 +607,196 @@ body.light-theme .toast-notification {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Crypto Search Input */
+/* --- Crypto Terminal UI (Brutal Refined) --- */
+.crypto-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 20px 120px;
+}
+
+.crypto-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.crypto-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 40px;
+    background: var(--coin-color, var(--accent-green));
+    border-radius: 0 4px 4px 0;
+    opacity: 0.8;
+}
+
+.crypto-card::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, var(--coin-color, transparent) 0%, transparent 70%);
+    opacity: 0.1;
+    filter: blur(20px);
+    pointer-events: none;
+}
+
+.crypto-card:active {
+    transform: scale(0.97);
+}
+
+.crypto-card:hover {
+    border-color: var(--coin-color, var(--card-border));
+}
+
+.crypto-card .coin-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.crypto-card .coin-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+}
+
+.crypto-card .coin-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-main);
+}
+
+.crypto-card .coin-symbol {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.crypto-card .coin-price {
+    text-align: right;
+}
+
+.crypto-card .price-val {
+    font-weight: 800;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.crypto-card .change-val {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* --- Mercado Internacional (Brutal Style) --- */
+.intl-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.intl-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 30px;
+    background: var(--country-color, var(--accent-green));
+    border-radius: 0 4px 4px 0;
+    opacity: 0.7;
+}
+
+.intl-card::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, var(--country-color, transparent) 0%, transparent 70%);
+    opacity: 0.12;
+    filter: blur(15px);
+    pointer-events: none;
+}
+
+.intl-card:active {
+    transform: scale(0.97);
+}
+
+.intl-card .country-flag {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 24px;
+    height: 16px;
+    border-radius: 3px;
+    object-fit: cover;
+    opacity: 0.9;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.intl-card .intl-ref {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'Outfit';
+    font-weight: 500;
+}
+
+.intl-card .intl-trend {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
 #crypto-search {
     width: 100%;
-    padding: 16px 20px;
-    border-radius: 15px;
+    background: var(--nav-bg);
     border: 1px solid var(--card-border);
-    background: var(--card-bg);
-    color: var(--text-main);
-    font-family: var(--font-main);
-    font-size: 16px;
-    margin-bottom: 20px;
+    padding: 18px 24px;
+    border-radius: 18px;
+    color: #fff;
+    font-family: 'Outfit';
+    font-size: 15px;
     outline: none;
-    transition: border-color var(--transition);
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
 }
 
 #crypto-search:focus {
-    border-color: var(--accent-blue);
-}
-
-#crypto-search::placeholder {
-    color: var(--text-muted);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 4px rgba(0, 208, 132, 0.05);
 }
 /* Pulsing Notification Hint */
 .pulse-dot {
@@ -635,6 +856,29 @@ body.light-theme #terms-modal header {
     gap: 10px;
 }
 
+#pm-add-form {
+    display: flex;
+    flex-direction: column;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+}
+
+#pm-add-form.show {
+    max-height: 800px;
+    opacity: 1;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    padding: 25px;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
 .pump-type-btn.active {
     background: var(--accent-green) !important;
     color: #000 !important;
@@ -661,14 +905,13 @@ body.light-theme #terms-modal header {
     margin-top: -8px; /* Centers thumb over the track */
 }
 
-#pump-slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    background: var(--accent-green, #00D084);
-    border: 3px solid #000;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 15px rgba(0, 208, 132, 0.4);
+#save-pm-btn:active, #cancel-pm-btn:active {
+    transform: scale(0.96);
+}
+
+#save-pm-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 5px 15px rgba(0, 208, 132, 0.3);
 }
 
 /* --- New Modals & Account Management --- */
@@ -681,34 +924,94 @@ body.light-theme #terms-modal header {
     border-radius: 10px;
 }
 
-.account-card {
+.account-item {
     background: var(--nav-bg);
     border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 18px;
+    padding: 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: transform 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: 12px;
 }
 
-.account-card:hover {
+.account-item:hover {
+    border-color: rgba(0, 208, 132, 0.3);
     transform: translateY(-2px);
-    border-color: var(--accent-green);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.account-info {
+    flex: 1;
+}
+
+.account-info div:first-child {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.account-info div:last-child {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
 }
 
 .delete-account-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
     background: rgba(255, 77, 77, 0.1);
     color: var(--accent-red);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: 1px solid rgba(255, 77, 77, 0.2);
+    border: 1px solid rgba(255, 77, 77, 0.15);
+    transition: all 0.2s ease;
+}
+
+.delete-account-btn:hover {
+    background: var(--accent-red);
+    color: white;
+}
+
+/* --- Account Picker (Calculadora) --- */
+.picker-account-btn {
+    width: 100%;
+    padding: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.picker-account-btn:hover {
+    background: rgba(0, 208, 132, 0.05);
+    border-color: var(--accent-green);
+    transform: scale(1.02);
+}
+
+.picker-account-btn:active {
+    transform: scale(0.98);
+}
+
+.picker-account-btn .acc-label {
+    font-weight: 700;
+    color: var(--accent-green);
+    font-size: 15px;
+}
+
+.picker-account-btn .acc-bank {
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
 /* --- iOS Step Animations --- */
