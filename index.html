@@ -90,7 +90,11 @@
                         <span id="usd-bcv-price">---</span>
                         <span style="font-size: 16px; font-weight: normal; color: var(--text-muted);">VES</span>
                     </div>
-                    <div class="chart-mini" style="height: 80px; margin-top: 15px; background: transparent;">
+                    <div class="chart-mini" style="height: 140px; margin-top: 15px; background: transparent; position: relative;">
+                        <!-- Overlay Informativo Táctil -->
+                        <div id="chart-hint" style="position: absolute; top: 10px; right: 10px; font-size: 9px; color: var(--accent-green); opacity: 0.6;">
+                            <i class="ph-duotone ph-hand-tap"></i> Desliza para comparar
+                        </div>
                         <canvas id="bcvChart"></canvas>
                     </div>
                     <div class="card-footer">
@@ -166,6 +170,23 @@
                     <div class="insight-text">
                         <h4 id="insight-title">Análisis de Hoy</h4>
                         <p id="insight-body">Cargando análisis del mercado...</p>
+                    </div>
+                </div>
+
+                <!-- Voltímetro de Mercado (NUEVO) -->
+                <div class="sentiment-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+                    <div class="intl-card" style="--country-color: #00D082; padding: 15px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">RIESGO MERCADO</div>
+                        <div id="market-volatility-tag" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: var(--accent-green);">
+                            <i class="ph-duotone ph-shield-check"></i> ESTABLE
+                        </div>
+                    </div>
+                    <div class="intl-card" style="--country-color: #2575FC; padding: 15px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">FUERZA BS</div>
+                        <div id="market-strength-val" style="font-size: 14px; font-weight: 800; color: var(--text-main);">92%</div>
+                        <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); border-radius: 1px; margin-top: 4px;">
+                            <div id="market-strength-fill" style="width: 92%; height: 100%; background: var(--accent-blue);"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -324,11 +345,37 @@
                     <h1>Calculadora</h1>
                 </div>
                 <div class="header-icon" style="display: flex; align-items: center; gap: 5px;">
+                    <button id="calc-mode-toggle" style="background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); color: var(--accent-green); padding: 8px 14px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <i class="ph-duotone ph-hand-coins" style="font-size: 14px;"></i>
+                        <span id="calc-mode-text">Comisiones</span>
+                    </button>
                     <div id="swap-currency-btn" style="cursor: pointer; padding: 10px;">
                         <i class="ph-duotone ph-arrows-left-right"></i>
                     </div>
                 </div>
             </header>
+
+            <!-- Selector de Comisiones (Oculto por defecto) -->
+            <div id="commission-selector" class="rate-selector-wrapper" style="padding: 0 20px 20px; display: none;">
+                <div class="rate-selector-tray" style="grid-template-columns: repeat(4, 1fr);">
+                    <button class="rate-chip active" data-fee="paypal">
+                        <i class="ph-duotone ph-paypal-logo"></i>
+                        <span>PayPal</span>
+                    </button>
+                    <button class="rate-chip" data-fee="binance">
+                        <i class="ph-duotone ph-currency-btc"></i>
+                        <span>Binance</span>
+                    </button>
+                    <button class="rate-chip" data-fee="zelle">
+                        <i class="ph-duotone ph-lightning"></i>
+                        <span>Zelle</span>
+                    </button>
+                    <button class="rate-chip" data-fee="reserve">
+                        <i class="ph-duotone ph-circles-three"></i>
+                        <span>Reser</span>
+                    </button>
+                </div>
+            </div>
 
             <!-- Selector de Tasa Premium -->
             <div class="rate-selector-wrapper" style="padding: 0 20px 20px;">

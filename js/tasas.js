@@ -277,37 +277,84 @@ const Tasas = {
         input.dataset.ready = "true";
     },
 
-    // Dibuja el sparkline en la tarjeta principal
+    // Dibuja el gráfico comparativo (BCV vs Paralelo)
     inicializarGraficoPrincipal() {
         const ctx = document.getElementById('bcvChart');
         if (!ctx) return;
 
-        // Si ya hay un gráfico, lo destruimos para no sobrecargar
         if (window.bcvChartInstance) window.bcvChartInstance.destroy();
 
-        // Generamos una tendencia suave basada en el precio actual
         const bcv = window.DolarVE.tasas.usd || 36.50;
-        const dataTrend = [bcv * 0.98, bcv * 0.985, bcv * 0.99, bcv * 0.995, bcv * 0.992, bcv * 1];
+        const par = window.DolarVE.tasas.paralelo || 38.20;
+
+        // Mockup táctico: 7 días atrás
+        const labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Hoy'];
+        const bcvHistory = [bcv * 0.97, bcv * 0.975, bcv * 0.985, bcv * 0.982, bcv * 0.99, bcv * 0.995, bcv];
+        const parHistory = [par * 0.95, par * 0.965, par * 0.98, par * 0.99, par * 0.985, par * 0.99, par];
 
         window.bcvChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['', '', '', '', '', ''],
-                datasets: [{
-                    data: dataTrend,
-                    borderColor: '#00D084',
-                    borderWidth: 3,
-                    pointRadius: 0,
-                    fill: true,
-                    backgroundColor: 'rgba(0, 208, 132, 0.05)',
-                    tension: 0.4
-                }]
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Oficial BCV',
+                        data: bcvHistory,
+                        borderColor: '#00D084',
+                        backgroundColor: 'rgba(0, 208, 132, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#00D084',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Paralelo',
+                        data: parHistory,
+                        borderColor: '#3498db',
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                scales: { x: { display: false }, y: { display: false } }
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#161B22',
+                        titleColor: '#8B949E',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' Bs';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } }
+                    },
+                    y: {
+                        display: false,
+                        grid: { display: false }
+                    }
+                }
             }
         });
     },

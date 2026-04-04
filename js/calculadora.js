@@ -13,6 +13,11 @@ const Calculadora = {
         // 1. EVALUACIÓN ARITMÉTICA SEGURA
         const montoLimpio = this.evaluarExpresion(config.calc);
         
+        if (config.modo === 'comisiones') {
+            this.renderizarModoComisiones(montoLimpio);
+            return;
+        }
+        
         let tasaActiva = 0;
         let nombreMoneda = '';
 
@@ -96,6 +101,66 @@ const Calculadora = {
         window.DolarVE.config.direccion = !window.DolarVE.config.direccion;
         this.actualizarPantalla();
         if (window.navigator.vibrate) window.navigator.vibrate(15);
+    },
+
+    alternarModo() {
+        const config = window.DolarVE.config;
+        config.modo = config.modo === 'monedas' ? 'comisiones' : 'monedas';
+        
+        const commEl = document.getElementById('commission-selector');
+        const rateEl = document.querySelector('.rate-selector-wrapper:not(#commission-selector)');
+        const modeText = document.getElementById('calc-mode-text');
+        
+        if (config.modo === 'comisiones') {
+            if (commEl) commEl.style.display = 'block';
+            if (rateEl) rateEl.style.display = 'none';
+            if (modeText) modeText.innerText = "Conversor";
+        } else {
+            if (commEl) commEl.style.display = 'none';
+            if (rateEl) rateEl.style.display = 'block';
+            if (modeText) modeText.innerText = "Comisiones";
+        }
+        
+        this.actualizarPantalla();
+    },
+
+    renderizarModoComisiones(monto) {
+        const config = window.DolarVE.config;
+        const tasas = window.DolarVE.tasas;
+        const fromValue = document.getElementById('calc-from-value');
+        const toValue = document.getElementById('calc-to-value');
+        const fromLabel = document.getElementById('calc-from-label');
+        const toLabel = document.getElementById('calc-to-label');
+
+        const fees = {
+            'paypal': { fixed: 0.30, pct: 0.054 }, // 5.4% + 0.30
+            'binance': { fixed: 0, pct: 0.01 },    // Simulado 1% spread
+            'zelle': { fixed: 0, pct: 0 },         // 0%
+            'reserve': { fixed: 0, pct: 0.02 }     // 2%
+        };
+
+        const currentFee = fees[config.feeType || 'paypal'];
+        
+        // Si queremos RECIBIR $monto, tenemos que ENVIAR $enviar
+        // Formula: (monto + fixed) / (1 - pct)
+        const aEnviar = (monto + currentFee.fixed) / (1 - currentFee.pct);
+        const totalVes = aEnviar * (tasas.paralelo || 38.5);
+
+        if (fromValue) fromValue.innerText = config.calc;
+        if (toValue) toValue.innerText = aEnviar.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        
+        if (fromLabel) fromLabel.innerText = `QUIERO RECIBIR USD (${config.feeType.toUpperCase()})`;
+        if (toLabel) toLabel.innerText = "DEBES ENVIAR USD";
+
+        // Añadimos info de Bolívares en el footer del resultado
+        const existingInfo = document.getElementById('ves-conversion-info');
+        if (existingInfo) existingInfo.remove();
+
+        const info = document.createElement('div');
+        info.id = 'ves-conversion-info';
+        info.style = "font-size: 11px; margin-top: 5px; opacity: 0.8;";
+        info.innerHTML = `<i class="ph ph-info"></i> Equivalente: <strong>${totalVes.toLocaleString('es-VE')} Bs</strong> (Tasa Paralela)`;
+        toValue.parentElement.appendChild(info);
     },
 
     // Cambia la moneda base (USD, EUR, COP)

@@ -140,11 +140,31 @@ const Principal = {
         const swapBtn = document.getElementById('swap-currency-btn');
         if (swapBtn) swapBtn.addEventListener('click', () => Calculadora.cambiarDireccion());
 
-        // Chips de moneda de la calculadora
+        // Botón de Modo Calculadora (Conversor vs Comisiones)
+        const modeBtn = document.getElementById('calc-mode-toggle');
+        if (modeBtn) modeBtn.addEventListener('click', () => {
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
+            Calculadora.alternarModo();
+        });
+
+        // Chips de moneda (o comisiones) de la calculadora
         document.querySelectorAll('.rate-chip').forEach(chip => {
             chip.addEventListener('click', (e) => {
-                const moneda = e.target.getAttribute('data-rate');
-                Calculadora.cambiarBase(moneda);
+                const target = e.target.closest('.rate-chip');
+                if (!target) return;
+                
+                const moneda = target.getAttribute('data-rate');
+                const fee = target.getAttribute('data-fee');
+                
+                if (moneda) {
+                    Calculadora.cambiarBase(moneda);
+                } else if (fee) {
+                    window.DolarVE.config.feeType = fee;
+                    // Actualizar UI del chip activo en comisiones
+                    document.querySelectorAll('#commission-selector .rate-chip').forEach(c => c.classList.remove('active'));
+                    target.classList.add('active');
+                    Calculadora.actualizarPantalla();
+                }
             });
         });
 
@@ -548,7 +568,42 @@ const Principal = {
 
             titleEl.innerText = titulo;
             bodyEl.innerText = analisis;
+
+            // Actualizamos los nuevos indicadores de Riesgo y Fuerza
+            this.actualizarIndicadoresMercado(brecha);
         }, 3000); // Esperamos a que las tasas carguen
+    },
+
+    actualizarIndicadoresMercado(brecha) {
+        const volatilityTag = document.getElementById('market-volatility-tag');
+        const strengthVal = document.getElementById('market-strength-val');
+        const strengthFill = document.getElementById('market-strength-fill');
+
+        if (!volatilityTag || !strengthVal || !strengthFill) return;
+
+        let riesgo = "ESTABLE";
+        let colorRiesgo = "var(--accent-green)";
+        let iconRiesgo = "ph-shield-check";
+
+        if (brecha > 12) {
+            riesgo = "ALERTA";
+            colorRiesgo = "var(--accent-red)";
+            iconRiesgo = "ph-warning-octagon";
+        } else if (brecha > 6) {
+            riesgo = "CALIENTE";
+            colorRiesgo = "var(--accent-orange)";
+            iconRiesgo = "ph-flame";
+        }
+
+        volatilityTag.innerHTML = `<i class="ph-duotone ${iconRiesgo}"></i> ${riesgo}`;
+        volatilityTag.style.color = colorRiesgo;
+
+        // Fuerza del Bolívar (Inversa a la brecha, simulando confianza)
+        const fuerza = Math.max(100 - (brecha * 2.5), 10);
+        strengthVal.innerText = `${fuerza.toFixed(0)}%`;
+        strengthVal.style.color = fuerza > 70 ? 'var(--accent-green)' : (fuerza > 40 ? 'var(--accent-orange)' : 'var(--accent-red)');
+        strengthFill.style.width = `${fuerza}%`;
+        strengthFill.style.backgroundColor = strengthVal.style.color;
     }
 };
 
