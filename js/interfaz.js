@@ -284,6 +284,41 @@ const Interfaz = {
             modal.style.transform = 'scale(0.9)';
             setTimeout(() => { overlay.style.display = 'none'; }, 300);
         }
+    },
+
+    // --- Control de Anuncio de Actualización (v2.0.4) ---
+    PRO_VERSION: '2.0.4',
+
+    verificarAnuncioActualizacion() {
+        const ultimaVersionVista = localStorage.getItem('dolarve_last_version_seen');
+        const overlay = document.getElementById('update-modal-overlay');
+        const modal = document.getElementById('update-modal');
+        const btnCerrar = document.getElementById('close-update-btn');
+
+        if (ultimaVersionVista !== this.PRO_VERSION) {
+            // Mostrar anuncio después de que el splash y los datos iniciales carguen
+            setTimeout(() => {
+                if (overlay && modal) {
+                    overlay.style.display = 'block';
+                    setTimeout(() => {
+                        overlay.style.opacity = '1';
+                        modal.classList.add('show');
+                    }, 100);
+                }
+            }, 3500); // 3.5s después de iniciar (post-splash)
+        }
+
+        if (btnCerrar) {
+            btnCerrar.addEventListener('click', () => {
+                localStorage.setItem('dolarve_last_version_seen', this.PRO_VERSION);
+                if (overlay && modal) {
+                    modal.classList.remove('show');
+                    overlay.style.opacity = '0';
+                    setTimeout(() => { overlay.style.display = 'none'; }, 500);
+                }
+                if (window.navigator.vibrate) window.navigator.vibrate(20);
+            });
+        }
     }
 };
 

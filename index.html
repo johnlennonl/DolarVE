@@ -24,9 +24,20 @@
 
 <body>
     <!-- Splash Screen -->
+    <!-- Splash Screen Premium: "Liquid Glow Energy" -->
     <div id="splash-screen">
-        <div class="loader-logo">DolarVE</div>
-        <div class="loader-spinner"></div>
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="loader-content">
+            <div class="loader-logo-wrapper">
+                <div class="loader-logo">DolarVE</div>
+                <div class="loader-shine"></div>
+            </div>
+            <div class="loader-spinner-wrapper">
+                <div class="loader-spinner"></div>
+                <div class="loader-spinner-inner"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Notification -->
@@ -140,6 +151,33 @@
                     <div id="brecha-bg"
                         style="position: absolute; right: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.05)); transition: width 1s cubic-bezier(0.19, 1, 0.22, 1);">
                     </div>
+                </div>
+            </div>
+
+            <!-- DolarVE Insights: Noticias y Análisis -->
+            <div class="insights-screen-section" style="padding: 0 20px 24px;">
+                <div style="font-size: 11px; color: var(--accent-green); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-duotone ph-newspaper" style="font-size: 16px;"></i> DolarVE Insights
+                </div>
+                
+                <!-- Card de Análisis Diario -->
+                <div class="insight-card" id="daily-insight">
+                    <div class="insight-icon"><i class="ph-duotone ph-lightbulb"></i></div>
+                    <div class="insight-text">
+                        <h4 id="insight-title">Análisis de Hoy</h4>
+                        <p id="insight-body">Cargando análisis del mercado...</p>
+                    </div>
+                </div>
+
+                <div class="news-header">
+                    <span style="font-size: 14px; font-weight: 700; color: var(--text-main);">Breves de Economía</span>
+                    <a href="#" id="view-all-news">Historial <i class="ph ph-caret-right"></i></a>
+                </div>
+
+                <div id="news-feed" class="news-scroll">
+                    <!-- Las noticias se cargan dinámicamente aquí -->
+                    <div class="news-skeleton"></div>
+                    <div class="news-skeleton"></div>
                 </div>
             </div>
 
@@ -1184,6 +1222,58 @@
             <div style="padding: 20px; background: var(--nav-bg); border-top: 1px solid var(--card-border);">
                 <button id="confirm-terms-btn"
                     style="width: 100%; padding: 15px; background: var(--accent-green); color: #000; border: none; border-radius: 14px; font-weight: 700; cursor: pointer;">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Novedades (v2.0.4) -->
+    <div id="update-modal-overlay" class="modal-overlay">
+        <div id="update-modal" class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-content">
+                <div class="update-header">
+                    <div class="update-badge">¡NUEVA VERSIÓN v2.0.4! 🚀</div>
+                    <h2>¡DolarVE se puso Pro!</h2>
+                    <p>Hemos escuchado tus sugerencias. Estas son las mejoras brutales de hoy:</p>
+                </div>
+                
+                <div class="update-list">
+                    <div class="update-item">
+                        <div class="update-icon green"><i class="ph-duotone ph-calculator"></i></div>
+                        <div class="update-text">
+                            <strong>Calculadora Inteligente</strong>
+                            <span>Haz sumas y restas directamente en el teclado. El total se convierte al instante.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="update-item">
+                        <div class="update-icon blue"><i class="ph-duotone ph-intersect"></i></div>
+                        <div class="update-text">
+                            <strong>Selector Premium de Tasas</strong>
+                            <span>Nueva barra deslizante animada para cambiar de moneda con un toque pro.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="update-item">
+                        <div class="update-icon green"><i class="ph-duotone ph-lightning"></i></div>
+                        <div class="update-text">
+                            <strong>"Brutal" Loader Experience</strong>
+                            <span>Nueva entrada de energía líquida y animaciones de alta gama al abrir.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="update-item">
+                        <div class="update-icon blue"><i class="ph-duotone ph-bell-ringing"></i></div>
+                        <div class="update-text">
+                            <strong>Notificaciones y PWA Fixes</strong>
+                            <span>Alertas reparadas y guía mejorada para iPhone (Cómo instalar).</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="close-update-btn" class="update-action-btn">
+                    ¡BRUTAL, A DARLE! 🚀
+                </button>
             </div>
         </div>
     </div>

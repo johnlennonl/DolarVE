@@ -39,6 +39,11 @@ const Principal = {
         
         // 8. PWA e Instalación
         this.inicializarPWA();
+        Interfaz.verificarAnuncioActualizacion();
+
+        // 9. Noticias y Análisis (DolarVE Insights)
+        this.obtenerNoticiasEconomicas();
+        this.generarAnalisisMercado();
         
         // 9. Actualización Automática (Tiempo Real) - Cada 5 minutos
         setInterval(() => {
@@ -424,6 +429,126 @@ const Principal = {
                 }
             });
         }
+    },
+
+    // --- DolarVE Insights & News Logic ---
+    async obtenerNoticiasEconomicas() {
+        const feedContainer = document.getElementById('news-feed');
+        if (!feedContainer) return;
+
+        const fuentes = [
+            'https://www.bancaynegocios.com/feed/',
+            'https://www.descifrado.com/feed/',
+            'https://finanzasdigital.com/feed/'
+        ];
+
+        for (const url of fuentes) {
+            try {
+                const rssUrl = encodeURIComponent(url);
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&t=${Date.now()}`);
+                const data = await response.json();
+
+                if (data.status === 'ok' && data.items.length > 0) {
+                    this.poblarNewsFeed(data.items, url.includes('bancaynegocios') ? 'Banca y Negocios' : 'Economía');
+                    this.iniciarAutoScrollNoticias();
+                    return; // Si funciona una, paramos
+                }
+            } catch (e) {
+                console.warn(`[DolarVE] Error con fuente ${url}:`, e);
+            }
+        }
+
+        feedContainer.innerHTML = '<p style="font-size:12px; color:var(--text-muted); padding:10px;">Contenido temporalmente no disponible. Intenta más tarde.</p>';
+    },
+
+    poblarNewsFeed(noticias, fuenteNombre) {
+        const feedContainer = document.getElementById('news-feed');
+        if (!feedContainer || !noticias.length) return;
+
+        feedContainer.innerHTML = noticias.slice(0, 6).map(news => {
+            const fecha = new Date(news.pubDate).toLocaleDateString('es-VE', { day: 'numeric', month: 'short' });
+            // Limpiar el título de caracteres raros HTML si vienen
+            const tituloLimpio = news.title.replace(/&quot;/g, '"').replace(/&#8230;/g, '...');
+            
+            return `
+                <div class="news-item" onclick="window.open('${news.link}', '_blank')">
+                    <div class="news-tag">${news.categories[0] || 'Economía'}</div>
+                    <div class="news-title">${tituloLimpio}</div>
+                    <div class="news-meta">
+                        <span><i class="ph ph-clock"></i> ${fecha}</span>
+                        <span>${fuenteNombre}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    iniciarAutoScrollNoticias() {
+        const feed = document.getElementById('news-feed');
+        if (!feed) return;
+
+        let interval;
+        let isPaused = false;
+
+        const startScrolling = () => {
+            interval = setInterval(() => {
+                if (isPaused) return;
+
+                const cardWidth = 280 + 15; // Ancho noticia + gap
+                const currentScroll = feed.scrollLeft;
+                const maxScroll = feed.scrollWidth - feed.clientWidth;
+
+                if (currentScroll >= maxScroll - 5) {
+                    feed.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    feed.scrollBy({ left: cardWidth, behavior: 'smooth' });
+                }
+            }, 5000); // 5 segundos
+        };
+
+        feed.addEventListener('mouseenter', () => isPaused = true);
+        feed.addEventListener('mouseleave', () => isPaused = false);
+        feed.addEventListener('touchstart', () => isPaused = true);
+        feed.addEventListener('touchend', () => {
+            setTimeout(() => isPaused = false, 2000);
+        });
+
+        startScrolling();
+    },
+
+    generarAnalisisMercado() {
+        const titleEl = document.getElementById('insight-title');
+        const bodyEl = document.getElementById('insight-body');
+        if (!titleEl || !bodyEl) return;
+
+        setTimeout(() => {
+            const bcv = window.DolarVE.tasas.bcv || 0;
+            const paralelo = window.DolarVE.tasas.paralelo || 0;
+
+            if (bcv <= 0) {
+                bodyEl.innerText = "Esperando actualización de tasas oficiales...";
+                return;
+            }
+
+            const brecha = ((paralelo - bcv) / bcv) * 100;
+
+            let analisis = "";
+            let titulo = "Análisis de Mercado";
+
+            if (brecha > 15) {
+                titulo = "⚠️ Brecha Elevada";
+                analisis = `La diferencia entre el oficial y el paralelo supera el ${brecha.toFixed(1)}%. Se recomienda cautela en fijación de precios en Bs.`;
+            } else if (brecha > 5) {
+                titulo = "📊 Mercado Activo";
+                analisis = `La brecha se mantiene estable en ${brecha.toFixed(1)}%. Los comercios están ajustando inventarios según la tasa promedio.`;
+            } else {
+                titulo = "✅ Mercado Estable";
+                analisis = "Las tasas oficial y paralela están muy cerca una de la otra. Es un buen momento para transacciones bancarias nacionales.";
+            }
+
+            titleEl.innerText = titulo;
+            bodyEl.innerText = analisis;
+        }, 3000); // Esperamos a que las tasas carguen
     }
 };
 
