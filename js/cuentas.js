@@ -1,10 +1,20 @@
 // ==========================================
-// Módulo de Gestión de Cuentas - DolarVE
-// Aquí guardamos tus datos de Pago Móvil para los recibos.
-// Todo queda seguro en la nube de Supabase.
-// ==========================================
 
 const Cuentas = {
+    // Mapa de iconos oficiales por banco
+    getBankIcon(banco) {
+        const b = (banco || "").toUpperCase();
+        if (b.includes('BANESCO')) return 'img/bancos/banesco.png';
+        if (b.includes('MERCANTIL')) return 'img/bancos/bancoMercantil.png';
+        if (b.includes('VENEZUELA')) return 'img/bancos/bancoVenezuela.png';
+        if (b.includes('PROVINCIAL')) return 'img/bancos/bancoProvincial.png';
+        if (b.includes('BNC') || b.includes('NACIONAL DE CREDITO')) return 'img/bancos/banconacionaldecredito.png';
+        if (b.includes('BANCAMIGA')) return 'img/bancos/bancamiga.png';
+        if (b.includes('BANCARIBE')) return 'img/bancos/bancaribe.png';
+        if (b.includes('EXTERIOR')) return 'img/bancos/bancoExterior.png';
+        return null;
+    },
+
     // Función para traer todas las cuentas guardadas del usuario
     async cargarCuentas() {
         if (!window.DolarVE.supabase || !window.DolarVE.usuario) return;
@@ -37,19 +47,29 @@ const Cuentas = {
         }
 
         // Pintamos las cuentas en la lista
-        listContainer.innerHTML = accounts.map(acc => `
-            <div class="account-item">
-                <div class="account-info">
-                    <div style="font-weight: 700; color: #fff;">${acc.banco_nombre}</div>
-                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                        ${acc.tipo_documento}${acc.numero_documento} • ${acc.prefijo_tel}-${acc.numero_tel}
+        listContainer.innerHTML = accounts.map(acc => {
+            const logo = this.getBankIcon(acc.banco_nombre);
+            const logoHtml = logo 
+                ? `<img src="${logo}" class="account-bank-icon">`
+                : `<i class="ph-duotone ph-bank" style="font-size: 20px; color: var(--accent-green); opacity: 0.5;"></i>`;
+
+            return `
+                <div class="account-item">
+                    <div class="account-bank-logo">
+                        ${logoHtml}
                     </div>
+                    <div class="account-info">
+                        <div style="font-weight: 700; color: #fff; font-size: 14px;">${acc.banco_nombre}</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                            ${acc.tipo_documento}${acc.numero_documento} • ${acc.prefijo_tel}-${acc.numero_tel}
+                        </div>
+                    </div>
+                    <button class="delete-account-btn" onclick="Cuentas.eliminarCuenta('${acc.id}', this)">
+                        <i class="ph-duotone ph-trash"></i>
+                    </button>
                 </div>
-                <button class="delete-account-btn" onclick="Cuentas.eliminarCuenta('${acc.id}', this)">
-                    <i class="ph-duotone ph-trash"></i>
-                </button>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     },
 
     // Para borrar esa cuenta que ya no usas

@@ -1649,6 +1649,7 @@ body.light-theme #terms-modal header {
     color: var(--text-main);
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 1.4;
@@ -1762,3 +1763,412 @@ body.light-theme #terms-modal header {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
 }
+
+/* --- Crypto Pulse Cards --- */
+.pulse-card {
+    min-width: 140px;
+    background: rgba(22, 27, 34, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.pulse-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--pulse-color);
+    box-shadow: 0 0 10px var(--pulse-color);
+}
+
+.pulse-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pulse-icon {
+    font-size: 20px;
+    color: var(--pulse-color);
+    filter: drop-shadow(0 0 5px var(--pulse-color));
+}
+
+.pulse-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.pulse-ticker {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pulse-value {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-top: 2px;
+}
+
+#home-crypto-pulse::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- Crypto Marquee Animado --- */
+.pulse-marquee {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 10px 0;
+}
+
+.pulse-track {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+    animation: crypto-scroll 40s linear infinite;
+}
+
+.pulse-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes crypto-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* --- Mini Calculadora Cripto --- */
+.mini-calc-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px 15px;
+    margin-top: 5px;
+}
+
+.calc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.calc-status {
+    background: rgba(0, 208, 132, 0.1);
+    color: var(--accent-green);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 8px;
+}
+
+.calc-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-group {
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 5px;
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.input-group input {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    width: 60px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 5px;
+    outline: none;
+}
+
+.input-group select {
+    background: none;
+    border: none;
+    color: var(--accent-green);
+    font-size: 11px;
+    font-weight: 800;
+    outline: none;
+    cursor: pointer;
+}
+
+.calc-arrow {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.calc-result {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#home-crypto-res-usd {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+/* --- Pizarra Bancaria --- */
+.banks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.bank-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 18px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.bank-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.bank-card:active {
+    transform: scale(0.96);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.bank-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bank-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--accent-green);
+}
+
+.bank-name {
+    font-size: 10px;
+    font-weight: 900;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bank-rates {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bank-rate-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rate-label {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.rate-value {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.2px;
+}
+
+/* Colores Corporativos */
+/* --- Efectos de Marca (Brand Glows) --- */
+.bank-banesco { border-left: 3px solid #00a651; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.05); }
+.bank-mercantil { border-left: 3px solid #004b8d; box-shadow: 0 4px 15px rgba(0, 75, 141, 0.05); }
+.bank-provincial { border-left: 3px solid #0066b3; box-shadow: 0 4px 15px rgba(0, 102, 179, 0.05); }
+.bank-bdv { border-left: 3px solid #e74c3c; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.05); }
+.bank-bnc { border-left: 3px solid #2c3e50; box-shadow: 0 4px 15px rgba(44, 62, 80, 0.05); }
+.bank-bancaribe { border-left: 3px solid #f1c40f; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.05); }
+.bank-exterior { border-left: 3px solid #c0392b; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.05); }
+.bank-bancamiga { border-left: 3px solid #8e44ad; box-shadow: 0 4px 15px rgba(142, 68, 173, 0.05); }
+
+.bank-banesco .bank-logo { background: rgba(0, 166, 81, 0.1); color: #00a651; }
+.bank-mercantil .bank-logo { background: rgba(0, 75, 141, 0.1); color: #004b8d; }
+.bank-provincial .bank-logo { background: rgba(0, 102, 179, 0.1); color: #0066b3; }
+.bank-bdv .bank-logo { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+.bank-bnc .bank-logo { background: rgba(44, 62, 80, 0.1); color: #2c3e50; }
+.bank-bancaribe .bank-logo { background: rgba(241, 196, 15, 0.1); color: #f1c40f; }
+.bank-exterior .bank-logo { background: rgba(192, 57, 43, 0.1); color: #c0392b; }
+.bank-bancamiga .bank-logo { background: rgba(142, 68, 173, 0.1); color: #8e44ad; }
+
+/* --- Gestión de Cuentas: Elite UI --- */
+.account-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.account-bank-logo {
+    width: 42px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.account-bank-icon {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.account-info {
+    flex: 1;
+}
+
+.delete-account-btn {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-account-btn:active {
+    transform: scale(0.9);
+    background: rgba(231, 76, 60, 0.2);
+}
+
+/* --- Selector de Cuentas (Calculadora) --- */
+.picker-account-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: inherit;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.picker-account-btn:active {
+    transform: scale(0.97);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.picker-account-logo {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.picker-bank-icon {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+}
+
+.picker-account-content {
+    flex: 1;
+}
+
+.acc-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-green);
+    margin-bottom: 2px;
+}
+
+.acc-bank {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Brand Accents para el Selector --- */
+.picker-account-btn.bank-banesco { border-left: 4px solid #00a651; }
+.picker-account-btn.bank-mercantil { border-left: 4px solid #004b8d; }
+.picker-account-btn.bank-provincial { border-left: 4px solid #0066b3; }
+.picker-account-btn.bank-bdv { border-left: 4px solid #e74c3c; }
+.picker-account-btn.bank-bnc { border-left: 4px solid #2c3e50; }
+.picker-account-btn.bank-bancaribe { border-left: 4px solid #f1c40f; }
+.picker-account-btn.bank-exterior { border-left: 4px solid #c0392b; }
+.picker-account-btn.bank-bancamiga { border-left: 4px solid #8e44ad; }

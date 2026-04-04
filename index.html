@@ -267,6 +267,99 @@
                 </div>
             </div>
 
+            <!-- Crypto Pulse: Top 3 Activos -->
+            <div style="padding: 15px 20px 5px;">
+                <div
+                    style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-duotone ph-chart-line-up" style="color: var(--accent-green);"></i> Crypto Pulse (24h)
+                </div>
+                
+                <div id="home-crypto-pulse" class="pulse-marquee">
+                    <div class="pulse-track" id="pulse-track">
+                        <!-- BTC Card -->
+                        <div class="pulse-card" id="pulse-btc" style="--pulse-color: #F7931A;">
+                            <div class="pulse-icon"><i class="ph-fill ph-currency-btc"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">BTC</span><span class="pulse-value" id="home-btc-val">---</span></div>
+                        </div>
+                        <!-- ETH Card -->
+                        <div class="pulse-card" id="pulse-eth" style="--pulse-color: #627EEA;">
+                            <div class="pulse-icon"><i class="ph-fill ph-currency-eth"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">ETH</span><span class="pulse-value" id="home-eth-val">---</span></div>
+                        </div>
+                        <!-- USDT Card -->
+                        <div class="pulse-card" id="pulse-usdt" style="--pulse-color: #26A17B;">
+                            <div class="pulse-icon"><i class="ph-fill ph-shield-check"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">USDT</span><span class="pulse-value" id="home-usdt-val">---</span></div>
+                        </div>
+                        <!-- BNB Card -->
+                        <div class="pulse-card" id="pulse-bnb" style="--pulse-color: #F3BA2F;">
+                            <div class="pulse-icon"><i class="ph-fill ph-currency-circle-dollar"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">BNB</span><span class="pulse-value" id="home-bnb-val">---</span></div>
+                        </div>
+                        <!-- SOL Card -->
+                        <div class="pulse-card" id="pulse-sol" style="--pulse-color: #14F195;">
+                            <div class="pulse-icon"><i class="ph-fill ph-infinity"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">SOL</span><span class="pulse-value" id="home-sol-val">---</span></div>
+                        </div>
+                        <!-- XRP Card -->
+                        <div class="pulse-card" id="pulse-xrp" style="--pulse-color: #23292F;">
+                            <div class="pulse-icon"><i class="ph-fill ph-chart-line"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">XRP</span><span class="pulse-value" id="home-xrp-val">---</span></div>
+                        </div>
+                        <!-- DOGE Card -->
+                        <div class="pulse-card" id="pulse-doge" style="--pulse-color: #C2A633;">
+                            <div class="pulse-icon"><i class="ph-fill ph-dog"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">DOGE</span><span class="pulse-value" id="home-doge-val">---</span></div>
+                        </div>
+                        <!-- SHIB Card -->
+                        <div class="pulse-card" id="pulse-shib" style="--pulse-color: #FFA143;">
+                            <div class="pulse-icon"><i class="ph-fill ph-fire"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">SHIB</span><span class="pulse-value" id="home-shib-val">---</span></div>
+                        </div>
+                        <!-- TRX Card -->
+                        <div class="pulse-card" id="pulse-trx" style="--pulse-color: #FF0013;">
+                            <div class="pulse-icon"><i class="ph-fill ph-bolt"></i></div>
+                            <div class="pulse-info"><span class="pulse-ticker">TRX</span><span class="pulse-value" id="home-trx-val">---</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crypto Quick Calc: Mini Widget -->
+                <div id="crypto-quick-calc" class="mini-calc-card">
+                    <div class="calc-header">
+                        <span><i class="ph-duotone ph-calculator"></i> Conversor Rápido Cripto</span>
+                        <div class="calc-status">LIVE</div>
+                    </div>
+                    <div class="calc-inputs">
+                        <div class="input-group">
+                            <input type="number" id="home-crypto-amt" placeholder="1.0" value="1.0" step="any">
+                            <select id="home-crypto-select">
+                                <option value="BTC" selected>BTC</option>
+                                <option value="ETH">ETH</option>
+                                <option value="BNB">BNB</option>
+                                <option value="SOL">SOL</option>
+                                <option value="XRP">XRP</option>
+                                <option value="DOGE">DOGE</option>
+                                <option value="TRX">TRX</option>
+                            </select>
+                        </div>
+                        <div class="calc-arrow"><i class="ph-duotone ph-arrow-right"></i></div>
+                        <div class="calc-result">
+                            <div id="home-crypto-res-usd">$ ---</div>
+                            <div id="home-crypto-res-ves">--- Bs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de Acceso a Pizarra Bancaria -->
+                <div style="margin-top: 15px;">
+                    <button onclick="Principal.navegar('banks-section')" 
+                        style="width: 100%; background: rgba(52, 152, 219, 0.1); border: 1px solid rgba(52, 152, 219, 0.2); color: #3498db; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; letter-spacing: 0.5px;">
+                        <i class="ph-duotone ph-bank" style="font-size: 16px;"></i> Ver Pizarra de Bancos en Vivo
+                    </button>
+                </div>
+            </div>
+
             <div style="padding: 20px 20px 10px;">
                 <!-- Referencia Rápida Interactiva -->
                 <div class="card" style="margin: 0; padding: 15px;">
@@ -277,11 +370,11 @@
                     </div>
                     <div class="rate-selector"
                         style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px;">
-                        <button class="rate-chip quick-amt-btn" data-amt="10">$10</button>
+                        <button class="rate-chip quick-amt-btn active" data-amt="10">$10</button>
                         <button class="rate-chip quick-amt-btn" data-amt="25">$25</button>
                         <button class="rate-chip quick-amt-btn" data-amt="50">$50</button>
                         <button class="rate-chip quick-amt-btn" data-amt="75">$75</button>
-                        <button class="rate-chip quick-amt-btn active" data-amt="100">$100</button>
+                        <button class="rate-chip quick-amt-btn" data-amt="100">$100</button>
                     </div>
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 208, 132, 0.05); padding: 12px 15px; border-radius: 8px; border-left: 3px solid var(--accent-green);">
@@ -296,6 +389,10 @@
                             <div style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 2px;"
                                 id="quick-ref-eur">--- Bs</div>
                         </div>
+                    </div>
+                    <!-- Diferencia/Gap -->
+                    <div id="quick-ref-gap" style="margin-top: 10px; font-size: 10px; color: var(--accent-red); font-weight: 600; text-align: center; background: rgba(255, 107, 107, 0.05); padding: 5px; border-radius: 6px; border: 1px dashed rgba(255, 107, 107, 0.2); display: none;">
+                        Diferencia del Mercado: 0.00 Bs
                     </div>
                 </div>
 
@@ -702,6 +799,38 @@
                 <div style="font-size: 11px; margin-top: 8px; opacity: 0.4;">Desarrollado por John Lennon 🇻🇪</div>
             </div>
 
+        </section>
+
+        <!-- Pantalla Pizarra de Bancos -->
+        <section id="banks-section" class="screen">
+            <header>
+                <div class="header-title">
+                    <span class="header-subtitle">Oficial BCV</span>
+                    <h1>Pizarra Bancaria</h1>
+                </div>
+                <div class="header-icon" onclick="Principal.navegar('home-screen')">
+                    <i class="ph-duotone ph-house"></i>
+                </div>
+            </header>
+
+            <div style="padding: 15px 20px;">
+                <!-- Nota de Veracidad Dinámica -->
+                <div style="background: rgba(0, 208, 132, 0.05); border: 1px dashed rgba(0, 208, 132, 0.2); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <i class="ph-duotone ph-shield-check" style="color: var(--accent-green); font-size: 24px;"></i>
+                    <span style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                        <strong style="color: var(--accent-green); display: block; margin-bottom: 2px;">Tasa de Veracidad BCV</strong>
+                        Todas las entidades operan bajo la Tasa de Referencia Nacional (Promedio Ponderado de Operaciones Bancarias).
+                    </span>
+                </div>
+
+                <div id="dynamic-banks-list" class="banks-grid">
+                    <!-- Se poblará dinámicamente -->
+                </div>
+                
+                <div style="padding: 20px; font-size: 10px; color: var(--text-muted); text-align: center;">
+                    *Los valores pueden variar según la agencia local.
+                </div>
+            </div>
         </section>
 
         <!-- Navegación Maestro (Master Hub) -->

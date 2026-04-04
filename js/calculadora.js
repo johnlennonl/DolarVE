@@ -279,12 +279,36 @@ const Calculadora = {
             return;
         }
 
-        listado.innerHTML = cuentas.map((acc, i) => `
-            <button data-idx="${i}" class="picker-account-btn">
-                <div class="acc-label">${acc.etiqueta || 'Cuenta Personal'}</div>
-                <div class="acc-bank">${acc.banco_nombre || acc.banco}</div>
-            </button>
-        `).join('');
+        listado.innerHTML = cuentas.map((acc, i) => {
+            const banco = (acc.banco_nombre || acc.banco || "").toUpperCase();
+            let brandClass = '';
+            if (banco.includes('BANESCO')) brandClass = 'bank-banesco';
+            else if (banco.includes('MERCANTIL')) brandClass = 'bank-mercantil';
+            else if (banco.includes('VENEZUELA')) brandClass = 'bank-bdv';
+            else if (banco.includes('PROVINCIAL')) brandClass = 'bank-provincial';
+            else if (banco.includes('BNC') || banco.includes('NACIONAL DE CREDITO')) brandClass = 'bank-bnc';
+            else if (banco.includes('BANCAMIGA')) brandClass = 'bank-bancamiga';
+            else if (banco.includes('BANCARIBE')) brandClass = 'bank-bancaribe';
+            else if (banco.includes('EXTERIOR')) brandClass = 'bank-exterior';
+
+            const logo = window.Cuentas ? window.Cuentas.getBankIcon(banco) : null;
+            const logoHtml = logo 
+                ? `<img src="${logo}" class="picker-bank-icon">`
+                : `<i class="ph-duotone ph-bank" style="font-size: 18px; color: var(--accent-green);"></i>`;
+
+            return `
+                <button data-idx="${i}" class="picker-account-btn ${brandClass}">
+                    <div class="picker-account-logo">
+                        ${logoHtml}
+                    </div>
+                    <div class="picker-account-content">
+                        <div class="acc-label">${acc.etiqueta || 'Cuenta Personal'}</div>
+                        <div class="acc-bank">${acc.banco_nombre || acc.banco}</div>
+                    </div>
+                    <i class="ph-duotone ph-caret-right" style="font-size: 14px; color: var(--text-muted); opacity: 0.5;"></i>
+                </button>
+            `;
+        }).join('');
 
         listado.querySelectorAll('button').forEach(btn => {
             btn.addEventListener('click', () => {

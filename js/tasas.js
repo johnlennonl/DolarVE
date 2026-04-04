@@ -74,8 +74,15 @@ const Tasas = {
             Interfaz.mostrarNotificacion('⚠️ Usando datos guardados (conexión inestable)');
         }
         
-        // Cargamos las criptomonedas también
+        // 1. Cargamos el Pulso del Home rápido con Binance (Más estable)
+        this.obtenerPulseBinance();
+
+        // 2. Cargamos las criptomonedas completas con CoinGecko
         this.cargarCriptos();
+
+        // 3. Cargamos los Bancos (Nuevo v2.2) y Configuramos Modales
+        this.obtenerTasasBancos();
+        this.configurarModales();
     },
 
     // Si no hay señal, usamos lo último que guardamos en el navegador
@@ -159,12 +166,24 @@ const Tasas = {
     // Trae el Top 50 de Criptos de CoinGecko y datos globales
     async cargarCriptos() {
         const listContainer = document.getElementById('dynamic-crypto-list');
+        
+        // --- 0. CARGAR DESDE CACHÉ (FALLBACK INMEDIATO) ---
+        const cacheCryptos = JSON.parse(localStorage.getItem('dolarve_crypto_cache') || '[]');
+        if (cacheCryptos.length > 0) {
+            this.cryptoData = cacheCryptos;
+            this.renderizarListaCriptos(cacheCryptos);
+            this.actualizarCryptoPulse(cacheCryptos);
+        }
+
         try {
             // 1. Intentamos traer monedas primero
             const coinsRes = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false');
             if (!coinsRes.ok) throw new Error('CoinGecko Limit');
             const coins = await coinsRes.json();
+            
             this.cryptoData = coins;
+            // Guardar en caché para la próxima vez
+            localStorage.setItem('dolarve_crypto_cache', JSON.stringify(coins));
 
             // 2. Intentamos traer datos globales
             try {
@@ -183,15 +202,18 @@ const Tasas = {
                 console.warn('[DolarVE] No se pudo cargar dominio BTC');
             }
 
-            // 3. Renderizamos la lista
+            // 3. Renderizamos la lista y el pulso del Home
             this.renderizarListaCriptos(coins);
+            this.actualizarCryptoPulse(coins);
 
             // 4. Activamos el buscador
             this.inicializarBuscadorCripto();
 
         } catch (e) {
             console.warn('[DolarVE] Error cargando criptos:', e);
-            if (listContainer) {
+            
+            // Si falló el servidor, pero no teníamos caché antes
+            if (this.cryptoData.length === 0 && listContainer) {
                 listContainer.innerHTML = `
                     <div style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
                         <i class="ph-duotone ph-warning-circle" style="font-size: 32px; color: var(--accent-red); margin-bottom: 10px;"></i>
@@ -260,6 +282,70 @@ const Tasas = {
                 </div>
             `;
         }).join('');
+    },
+
+    // TRAEMOS LOS PRECIOS TOP DESDE BINANCE PARA EL HOME
+    async obtenerPulseBinance() {
+        try {
+            // Símbolos: Los 9 más importantes/virales
+            const symbols = ["BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT","XRPUSDT","DOGEUSDT","SHIBUSDT","ADAUSDT","TRXUSDT"];
+            const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`);
+            if (!res.ok) throw new Error('Binance Limit');
+            const data = await res.json();
+
+            if (Array.isArray(data)) {
+                data.forEach(item => {
+                    const symbol = item.symbol.replace('USDT', '');
+                    const price = parseFloat(item.lastPrice);
+                    const change = parseFloat(item.priceChangePercent);
+                    const isUp = change >= 0;
+                    const color = isUp ? 'var(--accent-green)' : 'var(--accent-red)';
+
+                    const elId = `home-${symbol.toLowerCase()}-val`;
+                    const el = document.getElementById(elId);
+                    
+                    if (el) {
+                        const decimals = price < 1 ? 6 : (price < 100 ? 2 : 0);
+                        const formattedPrice = price.toLocaleString('en-US', { maximumFractionDigits: decimals });
+                        el.innerHTML = `$${formattedPrice} <span style="font-size: 8px; color: ${color}; font-weight: 700;">${isUp ? '▲' : '▼'}${Math.abs(change).toFixed(1)}%</span>`;
+                    }
+                });
+
+                // El USDT no está en el fetch de USDT pairs de forma directa como USDTUSDT, lo fijamos o buscamos USDTDAI
+                const usdtEl = document.getElementById('home-usdt-val');
+                if (usdtEl) usdtEl.innerHTML = `$1.00 <span style="font-size: 8px; color: var(--accent-green); font-weight: 700;">Stable</span>`;
+                
+                // Duplicamos el track para el scroll infinito si no se ha hecho
+                const track = document.getElementById('pulse-track');
+                if (track && !track.dataset.duplicated) {
+                    track.innerHTML += track.innerHTML;
+                    track.dataset.duplicated = "true";
+                }
+
+                // Iniciamos la calculadora rápida con los nuevos precios
+                this.inicializarCryptoQuickCalc(data);
+            }
+        } catch (e) {
+            console.warn('[DolarVE] Binance falló, usando fallback de CoinGecko:', e);
+        }
+    },
+
+    actualizarCryptoPulse(coins) {
+        if (!coins || !coins.length) return;
+
+        const btc = coins.find(c => c.symbol === 'btc');
+        const eth = coins.find(c => c.symbol === 'eth');
+        const usdt = coins.find(c => c.symbol === 'usdt');
+
+        if (btc && document.getElementById('home-btc-val')) {
+            document.getElementById('home-btc-val').innerText = `$${btc.current_price.toLocaleString()}`;
+        }
+        if (eth && document.getElementById('home-eth-val')) {
+            document.getElementById('home-eth-val').innerText = `$${eth.current_price.toLocaleString()}`;
+        }
+        if (usdt && document.getElementById('home-usdt-val')) {
+            document.getElementById('home-usdt-val').innerText = `$${usdt.current_price.toFixed(2)}`;
+        }
     },
 
     inicializarBuscadorCripto() {
@@ -452,15 +538,165 @@ const Tasas = {
         }
     },
 
-    // Lógica del Surtidor de Gasolina (V12.1)
-    referenciaRapidaMonto: 100,
+    // Lógica de Referencia Rápida (V2.1)
+    referenciaRapidaMonto: 10,
     
     actualizarReferenciaRapida() {
         const tasas = window.DolarVE.tasas;
         const bcvEl = document.getElementById('quick-ref-bcv');
         const eurEl = document.getElementById('quick-ref-eur');
+        const gapEl = document.getElementById('quick-ref-gap');
+
         if (bcvEl && tasas.usd) bcvEl.innerText = (tasas.usd * this.referenciaRapidaMonto).toLocaleString('es-VE') + ' Bs';
         if (eurEl && tasas.eur) eurEl.innerText = (tasas.eur * this.referenciaRapidaMonto).toLocaleString('es-VE') + ' Bs';
+
+        // Cálculo de "La Brecha" (Diferencia en Bs)
+        if (gapEl && tasas.usd && tasas.eur) {
+            const diferencia = Math.abs(tasas.eur - tasas.usd) * this.referenciaRapidaMonto;
+            gapEl.innerText = `Diferencia del Mercado: ${diferencia.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs`;
+            gapEl.style.display = 'block';
+        }
+    },
+
+    // Mini Calculadora Cripto del Home
+    inicializarCryptoQuickCalc(binanceData) {
+        const amtInput = document.getElementById('home-crypto-amt');
+        const select = document.getElementById('home-crypto-select');
+        if (!amtInput || !select) return;
+
+        const updateCalc = () => {
+            const sym = select.value + "USDT";
+            const amt = parseFloat(amtInput.value) || 0;
+            const rates = window.DolarVE.tasas;
+            
+            let priceUsd = 1; // Default para USDT
+            if (select.value !== 'USDT') {
+                const coin = binanceData.find(c => c.symbol === sym);
+                priceUsd = coin ? parseFloat(coin.lastPrice) : 0;
+                if (!coin && select.value === 'SHIB') {
+                    // SHIB a veces tiene un par diferente o no está en la lista reducida, fallback manual si hace falta
+                    const shib = binanceData.find(c => c.symbol.includes('SHIB'));
+                    priceUsd = shib ? parseFloat(shib.lastPrice) : 0;
+                }
+            }
+
+            const totalUsd = amt * priceUsd;
+            const totalVes = totalUsd * (rates.usd || 0);
+
+            const resUsdEl = document.getElementById('home-crypto-res-usd');
+            const resVesEl = document.getElementById('home-crypto-res-ves');
+
+            if (resUsdEl) {
+                const dec = totalUsd < 1 ? 6 : 2;
+                resUsdEl.innerText = `$ ${totalUsd.toLocaleString('en-US', { maximumFractionDigits: dec })}`;
+            }
+            if (resVesEl) resVesEl.innerText = `${totalVes.toLocaleString('es-VE', { maximumFractionDigits: 2 })} Bs`;
+        };
+
+        if (!amtInput.dataset.listener) {
+            amtInput.addEventListener('input', updateCalc);
+            select.addEventListener('change', updateCalc);
+            amtInput.dataset.listener = "true";
+        }
+
+        updateCalc();
+    },
+
+    // PIZARRA BANCARIA (V2.2.1 - Motor Robusto)
+    async obtenerTasasBancos() {
+        const listContainer = document.getElementById('dynamic-banks-list');
+        if (!listContainer) return;
+
+        try {
+            // Intentamos la API de Bancos (Argentina/Global) por si acaso hay datos VE ahora
+            const res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial/bancos');
+            if (!res.ok) throw new Error('DolarApiBanksVE Not Available');
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                this.renderizarBancos(data);
+                return;
+            }
+            throw new Error('Empiric Fallback Needed');
+        } catch (e) {
+            console.log('[DolarVE] Usando Motor de Veracidad BCV para Bancos...');
+            // MOTOR DE VERACIDAD: Usamos la tasa oficial BCV promedio para todos los bancos
+            const tasaOficial = window.DolarVE.tasas.usd || 47.39; 
+            
+            const bancosOficiales = [
+                { nombre: 'Banesco', venta: tasaOficial },
+                { nombre: 'Banco de Venezuela', venta: tasaOficial },
+                { nombre: 'Mercantil', venta: tasaOficial },
+                { nombre: 'BBVA Provincial', venta: tasaOficial },
+                { nombre: 'Bancamiga', venta: tasaOficial },
+                { nombre: 'BNC', venta: tasaOficial },
+                { nombre: 'Banco Exterior', venta: tasaOficial },
+                { nombre: 'Bancaribe', venta: tasaOficial }
+            ];
+            
+            this.renderizarBancos(bancosOficiales);
+        }
+    },
+
+    renderizarBancos(bancos) {
+        const listContainer = document.getElementById('dynamic-banks-list');
+        if (!listContainer) return;
+
+        const bankMapping = {
+            'BANESCO': { class: 'bank-banesco', icon: 'ph-fill ph-bank', img: 'img/bancos/banesco.png' },
+            'MERCANTIL': { class: 'bank-mercantil', icon: 'ph-fill ph-bank', img: 'img/bancos/bancoMercantil.png' },
+            'BBVA PROVINCIAL': { class: 'bank-provincial', icon: 'ph-bold ph-bank', img: 'img/bancos/bancoProvincial.png' },
+            'BANCO DE VENEZUELA': { class: 'bank-bdv', icon: 'ph-fill ph-bank', img: 'img/bancos/bancoVenezuela.png' },
+            'BNC': { class: 'bank-bnc', icon: 'ph-fill ph-bank', img: 'img/bancos/banconacionaldecredito.png' },
+            'BANCARIBE': { class: 'bank-bancaribe', icon: 'ph-fill ph-bank', img: 'img/bancos/bancaribe.png' },
+            'BANCO EXTERIOR': { class: 'bank-exterior', icon: 'ph-fill ph-bank', img: 'img/bancos/bancoExterior.png' },
+            'BANCAMIGA': { class: 'bank-bancamiga', icon: 'ph-fill ph-bank', img: 'img/bancos/bancamiga.png' }
+        };
+
+        listContainer.innerHTML = bancos.map(b => {
+            const info = bankMapping[b.nombre.toUpperCase()] || { class: '', icon: 'ph-fill ph-bank' };
+            const logoHtml = info.img 
+                ? `<img src="${info.img}" style="width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">`
+                : `<i class="${info.icon}"></i>`;
+
+            return `
+                <div class="bank-card ${info.class}">
+                    <div class="bank-header">
+                        <div class="bank-logo">${logoHtml}</div>
+                        <div class="bank-name">${b.nombre}</div>
+                    </div>
+                    <div class="bank-rates">
+                        <div class="bank-rate-row">
+                            <span class="rate-label">OFICIAL BCV</span>
+                            <span class="rate-value">${b.venta.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    configurarModales() {
+        // Cierre del Modal de Cripto
+        const closeBtn = document.getElementById('close-crypto-modal');
+        const overlay = document.getElementById('crypto-modal-overlay');
+        const modal = document.getElementById('crypto-modal');
+
+        if (closeBtn && overlay && modal) {
+            const cerrar = () => {
+                overlay.style.opacity = '0';
+                modal.style.transform = 'translateY(100%)';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            };
+
+            closeBtn.onclick = cerrar;
+            
+            // Cerrar al tocar fuera (en el fondo oscuro)
+            overlay.onclick = (e) => {
+                if (e.target === overlay) cerrar();
+            };
+        }
     },
 
     refrescarSurtidor() {
