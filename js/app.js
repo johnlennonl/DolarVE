@@ -478,6 +478,7 @@ const Principal = {
             // Ordenar por fecha (más reciente primero)
             todasLasNoticias.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
             this.poblarNewsFeed(todasLasNoticias);
+            this.poblarHomeTicker(todasLasNoticias);
             this.iniciarAutoScrollNoticias();
         } else {
             feedContainer.innerHTML = `
@@ -514,6 +515,33 @@ const Principal = {
                 </div>
             `;
         }).join('');
+    },
+
+    poblarHomeTicker(noticias) {
+        const tickerContainer = document.getElementById('news-ticker-container');
+        const tickerContent = document.getElementById('home-news-ticker');
+        if (!tickerContainer || !tickerContent || !noticias.length) return;
+
+        // Limpiamos y preparamos el contenido
+        // Duplicamos el contenido para que el scroll infinito sea fluido
+        const tickerHTML = noticias.slice(0, 5).map(news => {
+            const tituloLimpio = news.title
+                .replace(/&quot;/g, '"')
+                .replace(/&#8220;/g, '"')
+                .replace(/&#8221;/g, '"')
+                .replace(/&#8230;/g, '...')
+                .replace(/&amp;/g, '&');
+            
+            return `
+                <div class="ticker-item" onclick="Principal.navegar('insights-section')">
+                    <div class="ticker-dot"></div>
+                    ${tituloLimpio}
+                </div>
+            `;
+        }).join('');
+
+        tickerContent.innerHTML = tickerHTML + tickerHTML; // Doble para loop infinito
+        tickerContainer.style.display = 'block';
     },
 
     iniciarAutoScrollNoticias() {

@@ -1686,12 +1686,79 @@ body.light-theme #terms-modal header {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Sentiment Analysis Details --- */
-.sentiment-row .intl-card {
-    transition: all 0.3s ease;
+/* --- Market News Ticker (Marquee) --- */
+.ticker-container {
+    padding: 0 20px;
+    margin-bottom: 20px;
+    animation: slideUpFade 0.8s ease forwards;
+    animation-delay: 0.1s;
+    opacity: 0;
 }
 
-.sentiment-row .intl-card:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+.ticker-wrapper {
+    background: rgba(22, 27, 34, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.ticker-label {
+    background: var(--accent-green);
+    color: #000;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+    margin-right: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(0, 208, 130, 0.3);
+}
+
+.ticker-content {
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-scroll 35s linear infinite;
+    padding-right: 50px;
+}
+
+.ticker-item {
+    color: var(--text-main);
+    font-size: 13px;
+    font-weight: 500;
+    margin-right: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.ticker-item:hover {
+    color: var(--accent-green);
+}
+
+.ticker-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    opacity: 0.4;
+}
+
+@keyframes ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
