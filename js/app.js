@@ -366,6 +366,34 @@ const Principal = {
     navegar(pantalla) {
         this.cerrarHub();
         Interfaz.cambiarPantalla(pantalla);
+        
+        // Si volvemos al Home, forzamos el refresco de los componentes dinámicos
+        if (pantalla === 'home-screen') {
+            this.refrescarComponentesHome();
+        }
+    },
+
+    // Asegura que los componentes del Home (Ticker, Pulse) se vean al volver
+    refrescarComponentesHome() {
+        console.log('[DolarVE] Refrescando componentes del Home para estabilidad...');
+        
+        // 1. Forzamos redibujado del Ticker de Noticias
+        const ticker = document.getElementById('news-ticker-container');
+        if (ticker && ticker.style.display !== 'none') {
+            ticker.style.display = 'none';
+            ticker.offsetHeight; // Force reflow
+            ticker.style.display = 'block';
+        }
+
+        // 2. Forzamos redibujado del Crypto Pulse (Live Feed)
+        const pulse = document.getElementById('home-crypto-pulse');
+        if (pulse) {
+            pulse.style.opacity = '0.99'; 
+            setTimeout(() => { pulse.style.opacity = '1'; }, 10);
+        }
+
+        // 3. Reiniciamos el scroll de las noticias de Insight si estaban activas
+        this.iniciarAutoScrollNoticias();
     },
 
     actualizarUISeleccion(activeItem) {

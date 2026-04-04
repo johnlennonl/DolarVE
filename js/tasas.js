@@ -317,9 +317,14 @@ const Tasas = {
                 
                 // Duplicamos el track para el scroll infinito si no se ha hecho
                 const track = document.getElementById('pulse-track');
-                if (track && !track.dataset.duplicated) {
-                    track.innerHTML += track.innerHTML;
-                    track.dataset.duplicated = "true";
+                if (track) {
+                    // Si el track está vacío por algún error, o solo tiene los items una vez, forzamos duplicación
+                    const originalItemsCount = track.querySelectorAll('.pulse-card').length;
+                    
+                    if (!track.dataset.duplicated || originalItemsCount < 10) { 
+                        track.innerHTML += track.innerHTML;
+                        track.dataset.duplicated = "true";
+                    }
                 }
 
                 // Iniciamos la calculadora rápida con los nuevos precios
