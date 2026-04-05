@@ -16,7 +16,19 @@
 
     <title>DolarVE | Oficial & Cripto</title>
     <link rel="stylesheet" href="css/style.css?v=11.0">
+    <link rel="stylesheet" href="css/cartera.css?v=7.0">
+
+    <!-- Librerías Premium v5.4 Elite Pro -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://unpkg.com/@formkit/auto-animate@0.8.2/dist/index.umd.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="manifest" href="manifest.json">
@@ -64,16 +76,15 @@
                     <div id="user-profile-btn"
                         style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
                         <div
-                            style="width: 36px; height: 36px; border-radius: 50%; background: var(--nav-bg); border: 2px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 2px 10px rgba(0,208,132,0.2);">
-                            <img id="user-avatar-img" src=""
-                                style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                            <i id="user-avatar-placeholder" class="ph-duotone ph-user"
-                                style="color: var(--accent-green); font-size: 16px;"></i>
+                            style="width: 36px; height: 36px; border-radius: 10px; background: rgba(0, 208, 132, 0.1); border: 1.5px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 4px 15px rgba(0,208,132,0.15);">
+                            <img id="user-avatar-img" src="img/selfie.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="John">
+                            <div id="user-avatar-placeholder" style="display: none;">
+                                <i class="ph-fill ph-user" style="color: var(--accent-green); font-size: 18px;"></i>
+                            </div>
                         </div>
                         <span id="user-short-name"
-                            style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Ingresar</span>
+                            style="font-size: 10px; color: var(--text-muted); font-weight: 600;">John</span>
                     </div>
-                </div>
             </header>
 
             <!-- Market News Ticker (Cinta de Noticias) -->
@@ -100,11 +111,14 @@
                         <span id="usd-bcv-price">---</span>
                         <span style="font-size: 16px; font-weight: normal; color: var(--text-muted);">VES</span>
                     </div>
-                    <div class="chart-mini" style="height: 140px; margin-top: 15px; background: transparent; position: relative;">
+                    <div class="chart-mini"
+                        style="height: 140px; margin-top: 15px; background: transparent; position: relative;">
                         <!-- Overlay Informativo Táctil Premium -->
-                        <div id="chart-hint" style="position: absolute; top: 5px; right: 5px; font-size: 9px; color: var(--accent-green); background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 20px; backdrop-filter: blur(4px); z-index: 10; border: 1px solid rgba(0, 208, 132, 0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); pointer-events: none; display: flex; align-items: center; gap: 4px;">
-                            <i class="ph-duotone ph-hand-tap" style="font-size: 11px;"></i> 
-                            <span style="font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Desliza para comparar</span>
+                        <div id="chart-hint"
+                            style="position: absolute; top: 5px; right: 5px; font-size: 9px; color: var(--accent-green); background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 20px; backdrop-filter: blur(4px); z-index: 10; border: 1px solid rgba(0, 208, 132, 0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); pointer-events: none; display: flex; align-items: center; gap: 4px;">
+                            <i class="ph-duotone ph-hand-tap" style="font-size: 11px;"></i>
+                            <span style="font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Desliza
+                                para comparar</span>
                         </div>
                         <canvas id="bcvChart"></canvas>
                     </div>
@@ -273,53 +287,62 @@
                     style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                     <i class="ph-duotone ph-chart-line-up" style="color: var(--accent-green);"></i> Crypto Pulse (24h)
                 </div>
-                
+
                 <div id="home-crypto-pulse" class="pulse-marquee">
                     <div class="pulse-track" id="pulse-track">
                         <!-- BTC Card -->
                         <div class="pulse-card" id="pulse-btc" style="--pulse-color: #F7931A;">
                             <div class="pulse-icon"><i class="ph-fill ph-currency-btc"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">BTC</span><span class="pulse-value" id="home-btc-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">BTC</span><span class="pulse-value"
+                                    id="home-btc-val">---</span></div>
                         </div>
                         <!-- ETH Card -->
                         <div class="pulse-card" id="pulse-eth" style="--pulse-color: #627EEA;">
                             <div class="pulse-icon"><i class="ph-fill ph-currency-eth"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">ETH</span><span class="pulse-value" id="home-eth-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">ETH</span><span class="pulse-value"
+                                    id="home-eth-val">---</span></div>
                         </div>
                         <!-- USDT Card -->
                         <div class="pulse-card" id="pulse-usdt" style="--pulse-color: #26A17B;">
                             <div class="pulse-icon"><i class="ph-fill ph-shield-check"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">USDT</span><span class="pulse-value" id="home-usdt-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">USDT</span><span class="pulse-value"
+                                    id="home-usdt-val">---</span></div>
                         </div>
                         <!-- BNB Card -->
                         <div class="pulse-card" id="pulse-bnb" style="--pulse-color: #F3BA2F;">
                             <div class="pulse-icon"><i class="ph-fill ph-currency-circle-dollar"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">BNB</span><span class="pulse-value" id="home-bnb-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">BNB</span><span class="pulse-value"
+                                    id="home-bnb-val">---</span></div>
                         </div>
                         <!-- SOL Card -->
                         <div class="pulse-card" id="pulse-sol" style="--pulse-color: #14F195;">
                             <div class="pulse-icon"><i class="ph-fill ph-infinity"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">SOL</span><span class="pulse-value" id="home-sol-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">SOL</span><span class="pulse-value"
+                                    id="home-sol-val">---</span></div>
                         </div>
                         <!-- XRP Card -->
                         <div class="pulse-card" id="pulse-xrp" style="--pulse-color: #23292F;">
                             <div class="pulse-icon"><i class="ph-fill ph-chart-line"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">XRP</span><span class="pulse-value" id="home-xrp-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">XRP</span><span class="pulse-value"
+                                    id="home-xrp-val">---</span></div>
                         </div>
                         <!-- DOGE Card -->
                         <div class="pulse-card" id="pulse-doge" style="--pulse-color: #C2A633;">
                             <div class="pulse-icon"><i class="ph-fill ph-dog"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">DOGE</span><span class="pulse-value" id="home-doge-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">DOGE</span><span class="pulse-value"
+                                    id="home-doge-val">---</span></div>
                         </div>
                         <!-- SHIB Card -->
                         <div class="pulse-card" id="pulse-shib" style="--pulse-color: #FFA143;">
                             <div class="pulse-icon"><i class="ph-fill ph-fire"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">SHIB</span><span class="pulse-value" id="home-shib-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">SHIB</span><span class="pulse-value"
+                                    id="home-shib-val">---</span></div>
                         </div>
                         <!-- TRX Card -->
                         <div class="pulse-card" id="pulse-trx" style="--pulse-color: #FF0013;">
                             <div class="pulse-icon"><i class="ph-fill ph-bolt"></i></div>
-                            <div class="pulse-info"><span class="pulse-ticker">TRX</span><span class="pulse-value" id="home-trx-val">---</span></div>
+                            <div class="pulse-info"><span class="pulse-ticker">TRX</span><span class="pulse-value"
+                                    id="home-trx-val">---</span></div>
                         </div>
                     </div>
                 </div>
@@ -353,7 +376,7 @@
 
                 <!-- Botón de Acceso a Pizarra Bancaria -->
                 <div style="margin-top: 15px;">
-                    <button onclick="Principal.navegar('banks-section')" 
+                    <button onclick="Principal.navegar('banks-section')"
                         style="width: 100%; background: rgba(52, 152, 219, 0.1); border: 1px solid rgba(52, 152, 219, 0.2); color: #3498db; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; letter-spacing: 0.5px;">
                         <i class="ph-duotone ph-bank" style="font-size: 16px;"></i> Ver Pizarra de Bancos en Vivo
                     </button>
@@ -391,7 +414,8 @@
                         </div>
                     </div>
                     <!-- Diferencia/Gap -->
-                    <div id="quick-ref-gap" style="margin-top: 10px; font-size: 10px; color: var(--accent-red); font-weight: 600; text-align: center; background: rgba(255, 107, 107, 0.05); padding: 5px; border-radius: 6px; border: 1px dashed rgba(255, 107, 107, 0.2); display: none;">
+                    <div id="quick-ref-gap"
+                        style="margin-top: 10px; font-size: 10px; color: var(--accent-red); font-weight: 600; text-align: center; background: rgba(255, 107, 107, 0.05); padding: 5px; border-radius: 6px; border: 1px dashed rgba(255, 107, 107, 0.2); display: none;">
                         Diferencia del Mercado: 0.00 Bs
                     </div>
                 </div>
@@ -411,7 +435,8 @@
                     <h1>Calculadora</h1>
                 </div>
                 <div class="header-icon" style="display: flex; align-items: center; gap: 5px;">
-                    <button id="calc-mode-toggle" style="background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); color: var(--accent-green); padding: 8px 14px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <button id="calc-mode-toggle"
+                        style="background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); color: var(--accent-green); padding: 8px 14px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 5px;">
                         <i class="ph-duotone ph-hand-coins" style="font-size: 14px;"></i>
                         <span id="calc-mode-text">Comisiones</span>
                     </button>
@@ -482,17 +507,28 @@
                     <button class="calc-btn operator" data-val="-">-</button>
                     <button class="calc-btn operator" data-val="*">×</button>
                     <button class="calc-btn operator" data-val="/">÷</button>
-                    
-                    <button class="calc-btn">1</button><button class="calc-btn">2</button><button
-                        class="calc-btn">3</button>
-                    <button class="calc-btn">4</button><button class="calc-btn">5</button><button
-                        class="calc-btn">6</button>
-                    <button class="calc-btn">7</button><button class="calc-btn">8</button><button
-                        class="calc-btn">9</button>
-                    <button class="calc-btn">.</button><button class="calc-btn">0</button><button
-                        class="calc-btn danger-btn">C</button>
 
-                    <div style="grid-column: span 3; display: flex; gap: 10px;">
+                    <button class="calc-btn">1</button>
+                    <button class="calc-btn">2</button>
+                    <button class="calc-btn">3</button>
+                    <button class="calc-btn operator" data-val="*">×</button>
+
+                    <button class="calc-btn">4</button>
+                    <button class="calc-btn">5</button>
+                    <button class="calc-btn">6</button>
+                    <button class="calc-btn operator" data-val="-">-</button>
+
+                    <button class="calc-btn">7</button>
+                    <button class="calc-btn">8</button>
+                    <button class="calc-btn">9</button>
+                    <button class="calc-btn operator" data-val="+">+</button>
+
+                    <button class="calc-btn">.</button>
+                    <button class="calc-btn">0</button>
+                    <button class="calc-btn danger-btn" data-val="DEL"><i class="ph ph-backspace"></i></button>
+                    <button class="calc-btn danger-btn" data-val="C">C</button>
+
+                    <div style="grid-column: span 4; display: flex; gap: 10px; margin-top: 5px;">
                         <button class="calc-btn action" id="generate-receipt-btn"
                             style="flex: 1; font-size: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i
                                 class="ph-duotone ph-receipt"></i> RECIBO</button>
@@ -654,56 +690,55 @@
             </header>
 
             <div class="insights-screen-section" style="padding: 0 20px 24px;">
-                <!-- Card de Análisis Diario -->
-                <div class="insight-card" id="daily-insight">
+                <!-- Card de Análisis Diario (Elite UI) -->
+                <div class="insight-card-elite" id="daily-insight">
                     <div class="insight-icon"><i class="ph-duotone ph-lightbulb"></i></div>
                     <div class="insight-text">
-                        <h4 id="insight-title">Análisis de Hoy</h4>
-                        <p id="insight-body">Cargando análisis del mercado...</p>
+                        <h4 id="insight-title">Análisis de Inteligencia</h4>
+                        <p id="insight-body">Sincronizando con el mercado...</p>
                     </div>
                 </div>
 
-                <!-- Voltímetro de Mercado -->
-                <div class="sentiment-row"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
-                    <div class="intl-card" style="--country-color: #00D082; padding: 15px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">
-                            RIESGO MERCADO</div>
-                        <div id="market-volatility-tag"
-                            style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: var(--accent-green);">
-                            <i class="ph-duotone ph-shield-check"></i> ESTABLE
+                <!-- Voltímetro de Mercado (Elite Gauge Style) -->
+                <div class="sentiment-row-elite">
+                    <div class="gauge-card">
+                        <div class="gauge-label">RIESGO MERCADO</div>
+                        <div id="market-volatility-tag" class="gauge-value">
+                            <i class="ph-duotone ph-shield-check" style="color: var(--accent-green);"></i> ESTABLE
                         </div>
                     </div>
-                    <div class="intl-card" style="--country-color: #2575FC; padding: 15px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px;">
-                            FUERZA BS</div>
-                        <div id="market-strength-val" style="font-size: 14px; font-weight: 800; color: var(--text-main);">
-                            92%</div>
-                        <div
-                            style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); border-radius: 1px; margin-top: 4px;">
-                            <div id="market-strength-fill"
-                                style="width: 92%; height: 100%; background: var(--accent-blue);"></div>
+
+                    <div class="gauge-card">
+                        <div class="gauge-label">FUERZA BS</div>
+                        <div class="gauge-value" id="market-strength-val">92%</div>
+                        <div class="gauge-track">
+                            <div id="market-strength-fill" class="gauge-fill" style="width: 92%;"></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="news-header">
-                    <span style="font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                        <i class="ph ph-newspaper" style="color: var(--accent-green);"></i> Lo Último
+                    <span
+                        style="font-size: 14px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                        Lo Último
                     </span>
                     <a href="#" id="view-all-news">Ver todo <i class="ph ph-caret-right"></i></a>
                 </div>
 
                 <div id="news-feed" class="news-scroll">
-                    <!-- Las noticias se cargan dinámicamente aquí -->
-                    <div class="news-skeleton"></div>
+                    <!-- Las noticias se cargarán con .news-item-elite -->
                     <div class="news-skeleton"></div>
                     <div class="news-skeleton"></div>
                 </div>
-                
-                <div style="margin-top: 30px; padding: 20px; background: rgba(0, 208, 132, 0.05); border: 1px solid rgba(0, 208, 132, 0.1); border-radius: 18px; text-align: center;">
-                    <i class="ph-duotone ph-info" style="font-size: 24px; color: var(--accent-green); margin-bottom: 10px;"></i>
-                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">Las noticias y análisis presentados son recopilados de fuentes económicas confiables y actualizados cada hora para tu referencia rápida.</p>
+
+                <div
+                    style="margin-top: 30px; padding: 25px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; text-align: center; backdrop-filter: blur(5px);">
+                    <i class="ph-duotone ph-info"
+                        style="font-size: 26px; color: var(--accent-green); margin-bottom: 12px; display: block; filter: drop-shadow(0 0 5px rgba(0, 208, 132, 0.3));"></i>
+                    <p style="font-size: 11px; color: var(--text-muted); line-height: 1.6; font-weight: 500;">
+                        Análisis generado por el algoritmo **DolarVE Intelligence**.
+                        Datos actualizados cada 60 minutos basados en tendencias interbancarias y de mercado paralelo.
+                    </p>
                 </div>
             </div>
         </section>
@@ -815,29 +850,35 @@
 
             <div style="padding: 15px 20px;">
                 <!-- Nota de Veracidad Dinámica -->
-                <div style="background: rgba(0, 208, 132, 0.05); border: 1px dashed rgba(0, 208, 132, 0.2); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div
+                    style="background: rgba(0, 208, 132, 0.05); border: 1px dashed rgba(0, 208, 132, 0.2); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
                     <i class="ph-duotone ph-shield-check" style="color: var(--accent-green); font-size: 24px;"></i>
                     <span style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
-                        <strong style="color: var(--accent-green); display: block; margin-bottom: 2px;">Tasa de Veracidad BCV</strong>
-                        Todas las entidades operan bajo la Tasa de Referencia Nacional (Promedio Ponderado de Operaciones Bancarias).
+                        <strong style="color: var(--accent-green); display: block; margin-bottom: 2px;">Tasa de
+                            Veracidad BCV</strong>
+                        Todas las entidades operan bajo la Tasa de Referencia Nacional (Promedio Ponderado de
+                        Operaciones Bancarias).
                     </span>
                 </div>
 
                 <div id="dynamic-banks-list" class="banks-grid">
                     <!-- Se poblará dinámicamente -->
                 </div>
-                
+
                 <div style="padding: 20px; font-size: 10px; color: var(--text-muted); text-align: center;">
                     *Los valores pueden variar según la agencia local.
                 </div>
             </div>
         </section>
 
+        <!-- Pantalla Mi Cartera (v7.0 Modular) -->
+        <section id="portfolio-screen" class="screen"></section>
+
         <!-- Navegación Maestro (Master Hub) -->
         <nav class="bottom-nav">
             <a href="#" class="nav-item active" data-screen="home-screen"><i class="ph-duotone ph-house"></i></a>
             <a href="#" class="nav-item" data-screen="calc-screen"><i class="ph-duotone ph-calculator"></i></a>
-            
+
             <!-- Botón Maestro Central -->
             <div id="master-hub-trigger" class="hub-btn-wrapper">
                 <div class="hub-btn-glow"></div>
@@ -866,10 +907,12 @@
                         <div class="hub-icon blue"><i class="ph-duotone ph-chart-line-up"></i></div>
                         <span>Cripto</span>
                     </div>
-                    <div class="hub-item disabled">
-                        <div class="hub-icon gold"><i class="ph-duotone ph-wallet"></i></div>
-                        <span>Mi Cartera</span>
-                        <div class="badge">Pronto</div>
+                    <div id="hub-item-portfolio" class="hub-item" onclick="Principal.navegar('portfolio-screen')">
+                        <div id="hub-icon-portfolio" class="hub-icon gold">
+                            <i class="ph-duotone ph-wallet"></i>
+                        </div>
+                        <span class="hub-item-label">Mi Cartera</span>
+                        <div id="hub-badge-portfolio" class="badge" style="background: var(--cv-red); color: #fff;">BETA!</div>
                     </div>
                     <div class="hub-item disabled">
                         <div class="hub-icon red"><i class="ph-duotone ph-calendar-check"></i></div>
@@ -886,15 +929,17 @@
     <div id="account-picker-overlay"
         style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 99998; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease;">
         <div id="account-picker-sheet"
-            style="position: absolute; bottom: 0; left: 50%; width: 100%; max-width: 480px; background: var(--card-bg); border-radius: 30px 30px 0 0; padding: 25px; transform: translateX(-50%) translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            style="position: absolute; bottom: 0; left: 50%; width: 100%; max-width: 480px; background: var(--card-bg); border-radius: 30px 30px 0 0; padding: 20px 25px 30px; transform: translateX(-50%) translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); border-top: 1px solid rgba(255,255,255,0.1);">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <div>
-                    <h3 style="font-size: 18px; font-weight: 700; color: #fff;">Selecciona una Cuenta</h3>
-                    <p style="font-size: 12px; color: var(--text-muted);">¿A cuál cuenta deseas que te paguen?</p>
+                    <h3 style="font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.3px;">Selecciona una
+                        Cuenta</h3>
+                    <p style="font-size: 11px; color: var(--text-muted); font-weight: 500;">¿A qué cuenta deseas cobrar?
+                    </p>
                 </div>
                 <div id="close-account-picker"
-                    style="cursor: pointer; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="ph-duotone ph-x"></i>
+                    style="cursor: pointer; width: 34px; height: 34px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="ph-bold ph-x" style="font-size: 14px; color: #fff;"></i>
                 </div>
             </header>
             <div id="account-picker-list"
@@ -1484,13 +1529,14 @@
                     <h2>¡DolarVE se puso Pro!</h2>
                     <p>Hemos escuchado tus sugerencias. Estas son las mejoras brutales de hoy:</p>
                 </div>
-                
+
                 <div class="update-list">
                     <div class="update-item">
                         <div class="update-icon green"><i class="ph-duotone ph-newspaper"></i></div>
                         <div class="update-text">
                             <strong>¡Portal de Noticias y Análisis!</strong>
-                            <span>Nueva sección exclusiva con lo último de la economía y el Voltímetro de Mercado.</span>
+                            <span>Nueva sección exclusiva con lo último de la economía y el Voltímetro de
+                                Mercado.</span>
                         </div>
                     </div>
 
@@ -1501,7 +1547,7 @@
                             <span>Mejoras en la generación de imágenes y compartición nativa (WhatsApp/RRSS).</span>
                         </div>
                     </div>
-                    
+
                     <div class="update-item">
                         <div class="update-icon green"><i class="ph-duotone ph-user-circle"></i></div>
                         <div class="update-text">
@@ -1510,12 +1556,13 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <button id="close-update-btn" class="update-action-btn">
                     ¡BRUTAL, A DARLE! 🚀
                 </button>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Supabase SDK v2 -->
@@ -1528,6 +1575,7 @@
     <script src="js/tasas.js?v=11.0"></script>
     <script src="js/calculadora.js?v=11.0"></script>
     <script src="js/cuentas.js?v=11.0"></script>
+    <script src="js/cartera.js?v=11.0"></script>
     <script src="js/app.js?v=11.0"></script>
     <script>
         // Force clear all old service workers and caches, then re-register
@@ -1544,6 +1592,15 @@
             });
         }
     </script>
+    <!-- Loader "Brutal" Glassmorphism (v6.9) -->
+    <div id="cv-loader-overlay" class="cv-loader-overlay">
+        <div class="cv-loader-box" style="display: flex; align-items: center; justify-content: center;">
+            <div class="cv-loader-spinner"
+                style="font-size: 32px; color: var(--accent-green); animation: cv-spin-infinity 1s linear infinite;">
+                <i class="ph-duotone ph-circle-notch"></i>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

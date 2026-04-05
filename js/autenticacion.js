@@ -13,12 +13,13 @@ const Autenticacion = {
     // Configura los eventos de cambio de sesión (entrar/salir)
     inicializarEscuchaSesion() {
         window.DolarVE.supabase.auth.onAuthStateChange((event, session) => {
-            console.log('[DolarVE] Evento de sesión:', event);
+            console.log('[DolarVE] Evento de sesión:', event, !!session);
             this.actualizarInterfazUsuario(session?.user || null);
             
-            // Si el pana entró, cargamos sus cuentas de pago móvil
+            // Si el pana entró, cargamos sus cuentas y su CARTERA CUSTOM
             setTimeout(() => { 
                 if (typeof Cuentas !== 'undefined') Cuentas.cargarCuentas(); 
+                if (typeof Cartera !== 'undefined' && session?.user) Cartera.cargarDesdeSupabase();
             }, 500);
         });
     },
@@ -83,6 +84,11 @@ const Autenticacion = {
             if (loginView) loginView.style.display = 'block';
             if (profileView) profileView.style.display = 'none';
         }
+
+        // Sincronizar estados del Hub (Bloqueo/Habilitación de Mi Cartera)
+        if (window.Principal && Principal.actualizarEstadosHub) {
+            Principal.actualizarEstadosHub();
+        }
     },
 
     // Subida de foto pal' Supabase Storage
@@ -118,9 +124,19 @@ const Autenticacion = {
     // Función para chao sesión
     async cerrarSesion() {
         const { error } = await window.DolarVE.supabase.auth.signOut();
-        if (error) Interfaz.mostrarNotificacion('Error al salir: ' + error.message);
-        else {
-            Interfaz.mostrarNotificacion('Sesión cerrada, vuelve pronto chamo.');
+        if (error) {
+            Interfaz.mostrarNotificacion('Error al salir: ' + error.message);
+        } else {
+            Interfaz.mostrarNotificacion('Sesión cerrada. Limpiando datos...');
+            
+            // Seguridad v7.4.9: Limpiar todo rastro local para evitar filtraciones entre cuentas
+            localStorage.removeItem('dolarve_cartera_v4');
+            localStorage.removeItem('sb-ntuivcufqswvlytyvszq-auth-token'); // Limpiar token de Supabase explícitamente si es necesario
+            
+            // Forzar recarga completa para purgar memoria JS
+            setTimeout(() => {
+                location.href = 'index.html'; 
+            }, 1000);
         }
     },
 

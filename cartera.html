@@ -1,0 +1,190 @@
+<!-- Navbar Minimalista (v7.2) -->
+<div class="cv-portfolio-nav">
+    <div class="cv-floating-home" onclick="Principal.navegar('home-screen')">
+        <i class="ph-bold ph-house-simple"></i>
+    </div>
+    <h2 class="cv-nav-title">Mi Cartera</h2>
+    <div class="cv-floating-add" onclick="Cartera.abrirSelectorPerfiles()">
+        <i class="ph-bold ph-dots-three"></i>
+    </div>
+</div>
+
+<div class="cv-main-infinite">
+    <!-- Master Balance Section (v7.2 Refined) -->
+    <div id="portfolio-total-card" class="cv-card-main-static">
+        <div id="cv-active-profile-card" class="cv-active-profile-content">
+            <!-- Layout Horizontal: Se poblará dinámicamente -->
+        </div>
+        
+        <!-- Contenedor del Gráfico v7.2 -->
+        <div class="cv-chart-box" id="cv-main-chart"></div>
+
+        <div id="portfolio-wallet-tabs" class="cv-currency-selector-row">
+            <!-- Selector de Moneda Minimalista -->
+        </div>
+
+        <div style="text-align: center; margin-top: 15px;">
+            <span id="portfolio-last-sync" style="font-size: 10px; color: var(--cv-text-muted); opacity: 0.5;">Actualizado ahora</span>
+        </div>
+    </div>
+
+    <!-- Action Bar (Revolut Style) -->
+    <div class="cv-btn-group">
+        <div class="cv-btn-wrapper" onclick="Cartera.abrirModal('IN')">
+            <div class="cv-btn-circle in">
+                <i class="ph-bold ph-plus"></i>
+            </div>
+            <span class="cv-btn-label">Ingreso</span>
+        </div>
+        
+        <div class="cv-btn-wrapper" onclick="Cartera.abrirModal('OUT')">
+            <div class="cv-btn-circle out">
+                <i class="ph-bold ph-minus"></i>
+            </div>
+            <span class="cv-btn-label">Gasto</span>
+        </div>
+
+        <div class="cv-btn-wrapper" onclick="Cartera.abrirSelectorPerfiles()">
+            <div class="cv-btn-circle more">
+                <i class="ph-bold ph-dots-three"></i>
+            </div>
+            <span class="cv-btn-label">Perfiles</span>
+        </div>
+    </div>
+
+    <!-- Recent Activity List -->
+    <div class="cv-section-title" id="portfolio-history-title">Actividad Reciente</div>
+    <div id="portfolio-history-list" class="cv-history-container">
+        <!-- Historial Dinámico -->
+    </div>
+
+    <!-- Botón Ver Historial PREMIUM -->
+    <div style="padding: 20px 20px 40px;">
+        <div id="cv-btn-ver-historial" class="cv-btn-history">
+            <i class="ph-bold ph-clock-counter-clockwise"></i>
+            Ver Historial Completo
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="portfolio-empty-state" style="display: none; padding: 40px 20px; text-align: center;">
+        <i class="ph-duotone ph-folder-open" style="font-size: 48px; color: var(--cv-text-muted); opacity: 0.3;"></i>
+        <p style="margin-top: 15px; color: var(--cv-text-muted); font-size: 14px;">No hay movimientos registrados.</p>
+    </div>
+</div>
+
+<!-- MODAL: Selector de Perfiles (Bottom Sheet FIXED v7.2) -->
+<div id="cv-profile-selector-overlay" class="cv-modal-overlay" style="display: none;">
+    <div class="cv-bottom-sheet">
+        <div class="cv-sheet-handle"></div>
+        <header class="cv-sheet-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: #fff; font-size: 18px;">Mis Perfiles</h3>
+            <button class="cv-btn-circle-mini" style="width: 32px; height: 32px; border-radius: 50%; background: #fff; color: #000; border: none; font-size: 16px;" onclick="Cartera.abrirModalPerfil()">+</button>
+        </header>
+        <div id="cv-profiles-list" class="cv-profiles-vertical-list">
+            <!-- Lista Limpia de Perfiles -->
+        </div>
+        <div class="cv-sheet-footer" style="margin-top: 25px;">
+            <button class="cv-btn cv-btn-secondary" onclick="Cartera.cerrarSelectorPerfiles()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- OTROS MODALES (Editor, Operación) - Mantienen su estructura pero heredan los nuevos estilos -->
+<div id="p-profile-modal-overlay" class="cv-modal-overlay" style="display: none;">
+    <div class="cv-modal-content">
+        <div class="cv-modal-handle"></div>
+        <header class="cv-modal-header">
+            <h3 id="p-profile-modal-title" style="color:#fff; font-size: 22px; font-weight: 800; margin: 0;">Gestionar Perfil</h3>
+            <p style="font-size: 13px; color: var(--cv-text-muted); margin: 0;">Personaliza la identidad de esta cuenta</p>
+        </header>
+        <div class="cv-modal-body">
+            <div class="cv-input-group">
+                <label>Nombre Personalizado</label>
+                <input type="text" id="p-profile-name" placeholder="Ej: Trabajo, Ahorros...">
+            </div>
+            <label>Color de Identidad</label>
+            <div class="cv-color-grid">
+                <div class="color-chip active" style="background: #1e113a" data-color="#1e113a"></div>
+                <div class="color-chip" style="background: #00d084" data-color="#00d084"></div>
+                <div class="color-chip" style="background: #2575fc" data-color="#2575fc"></div>
+                <div class="color-chip" style="background: #ff4d4d" data-color="#ff4d4d"></div>
+                <div class="color-chip" style="background: #f1c40f" data-color="#f1c40f"></div>
+                <div class="color-chip" style="background: #9b59b6" data-color="#9b59b6"></div>
+            </div>
+            <label>Icono</label>
+            <div id="cv-icon-selector" class="cv-icon-grid">
+                <div class="icon-chip active" data-icon="ph-fill ph-user"><i class="ph-fill ph-user"></i></div>
+                <div class="icon-chip" data-icon="ph-fill ph-storefront"><i class="ph-fill ph-storefront"></i></div>
+                <div class="icon-chip" data-icon="ph-fill ph-piggy-bank"><i class="ph-fill ph-piggy-bank"></i></div>
+                <div class="icon-chip" data-icon="ph-fill ph-fork-knife"><i class="ph-fill ph-fork-knife"></i></div>
+                <div class="icon-chip" data-icon="ph-fill ph-airplane-tilt"><i class="ph-fill ph-airplane-tilt"></i></div>
+                <div class="icon-chip" data-icon="ph-fill ph-house"><i class="ph-fill ph-house"></i></div>
+                <div class="icon-chip" data-icon="ph-fill ph-car"><i class="ph-fill ph-car"></i></div>
+                <div class="icon-chip" data-icon="ph-fill ph-briefcase"><i class="ph-fill ph-briefcase"></i></div>
+            </div>
+        </div>
+        <footer class="cv-modal-footer">
+            <button id="save-p-profile-btn" class="cv-btn cv-btn-primary">Guardar Cambios</button>
+            <button class="cv-btn cv-btn-secondary" onclick="Cartera.cerrarModalPerfil()">Cancelar</button>
+        </footer>
+    </div>
+</div>
+
+<div id="p-op-modal-overlay" class="cv-modal-overlay" style="display: none;">
+    <div class="cv-modal-content">
+        <div class="cv-modal-handle"></div>
+        <header class="cv-modal-header">
+            <h3 id="p-op-title" style="color:#fff; font-size: 24px; font-weight: 900; margin: 0;">Registrar Operación</h3>
+            <p id="p-op-subtitle" style="font-size: 13px; color: var(--cv-text-muted); margin: 0;">Completa los detalles de la transacción</p>
+        </header>
+        <div class="cv-modal-body">
+            <div class="cv-input-group">
+                <label>Monto</label>
+                <div class="cv-amount-input-wrapper">
+                    <input type="number" id="p-op-amount" placeholder="0.00" inputmode="decimal">
+                    <select id="p-op-currency" style="background: rgba(255,255,255,0.05); color:#fff; border: 1px solid var(--cv-border); border-radius: 12px; padding: 0 10px;">
+                        <option value="USD">USD</option>
+                        <option value="VES">VES</option>
+                    </select>
+                </div>
+            </div>
+            <div id="p-conversion-box" class="cv-conversion-box" style="display:none; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; color: var(--cv-green); display: flex; align-items: center; gap: 10px;">
+                <i class="ph-bold ph-arrows-left-right"></i>
+                <span id="p-conversion-text">Equivale a: $0.00</span>
+            </div>
+            <div class="cv-input-group">
+                <label>Concepto / Categoría</label>
+                <input type="text" id="p-op-category" placeholder="Ej: Pago de servicios, Venta...">
+            </div>
+        </div>
+        <footer class="cv-modal-footer">
+            <button id="save-p-op-btn" class="cv-btn cv-btn-primary">Confirmar</button>
+            <button class="cv-btn cv-btn-secondary" onclick="Cartera.cerrarModal()">Descartar</button>
+        </footer>
+    </div>
+</div>
+
+<!-- MODAL: Historial Completo v7.5.3 (NUEVO) -->
+<div id="cv-history-modal-overlay" class="cv-modal-overlay" style="display: none;">
+    <div class="cv-modal-content full-screen" style="height: 100% !important; border-radius: 0 !important; display: flex; flex-direction: column;">
+        <div class="cv-modal-handle"></div>
+        <header class="cv-modal-header" style="flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 25px;">
+            <div>
+               <h3 style="color:#fff; font-size: 22px; font-weight: 900; margin: 0;">Historial Completo</h3>
+               <p style="font-size: 13px; color: var(--cv-text-muted); margin: 0;">Todos tus movimientos registrados</p>
+            </div>
+            <div class="cv-btn-circle" style="width: 40px; height: 40px; font-size: 20px; cursor: pointer;" onclick="Cartera.cerrarModalHistorial()">
+                <i class="ph-bold ph-x"></i>
+            </div>
+        </header>
+        <div class="cv-modal-body" style="padding: 0; overflow-y: auto; flex: 1;">
+            <div id="cv-full-history-list" class="cv-history-container" style="padding: 20px 25px;">
+                <!-- Se poblará dinámicamente -->
+            </div>
+        </div>
+        <footer class="cv-modal-footer" style="padding: 20px 25px;">
+            <button class="cv-btn cv-btn-secondary" onclick="Cartera.cerrarModalHistorial()">Cerrar</button>
+        </footer>
+    </div>
+</div>

@@ -52,7 +52,12 @@ const Principal = {
             Tasas.obtenerDatosTasas();
         }, 300000);
         
-        // 10. Cableado de eventos legales
+        // 10. Mi Cartera v4.0 (NUEVO)
+        if (window.Cartera) {
+            Cartera.inicializar();
+        }
+
+        // 11. Cableado de eventos legales
         this.configurarEventosLegales();
     },
 
@@ -345,11 +350,40 @@ const Principal = {
     abrirHub() {
         const hub = document.getElementById('hub-overlay');
         if (hub) {
+            // --- Seguridad & Personalización Mi Cartera v4.1 (Polishing) ---
+            this.actualizarEstadosHub();
+
             hub.style.display = 'flex';
             setTimeout(() => {
                 hub.classList.add('show');
                 if (window.navigator.vibrate) window.navigator.vibrate(20);
             }, 10);
+        }
+    },
+
+    // Actualiza visualmente el Hub según la sesión (v7.4.7)
+    actualizarEstadosHub() {
+        const user = window.DolarVE?.usuario;
+        const portfolioItem = document.getElementById('hub-item-portfolio');
+        const portfolioIcon = document.getElementById('hub-icon-portfolio');
+        const portfolioBadge = document.getElementById('hub-badge-portfolio');
+
+        if (portfolioItem && portfolioIcon && portfolioBadge) {
+            if (user) {
+                // MODO: Autenticado - Mostramos BETA!
+                portfolioItem.classList.remove('disabled');
+                portfolioBadge.style.display = 'block';
+                portfolioBadge.innerText = 'BETA!';
+                portfolioBadge.style.background = 'var(--cv-red)';
+                portfolioIcon.innerHTML = `<i class="ph-fill ph-wallet"></i>`;
+            } else {
+                // MODO: Invitado (Requiere sesión)
+                portfolioItem.classList.add('disabled');
+                portfolioBadge.style.display = 'block';
+                portfolioBadge.innerText = 'Inicie Sesión';
+                portfolioBadge.style.background = 'rgba(255,255,255,0.08)'; // Estilo original mutado
+                portfolioIcon.innerHTML = `<i class="ph-fill ph-lock-key"></i>`;
+            }
         }
     },
 
@@ -364,35 +398,96 @@ const Principal = {
     },
     
     navegar(pantalla) {
+        // --- Auth Guard para Mi Cartera v4.0.2 ---
+        if (pantalla === 'portfolio-screen' && !window.DolarVE?.usuario) {
+            this.cerrarHub();
+            Interfaz.mostrarNotificacion('⚠️ Debes iniciar sesión para usar Mi Cartera');
+            // Abrir modal de auth
+            const authModal = document.getElementById('auth-modal-overlay');
+            if (authModal) {
+                authModal.style.display = 'flex';
+                setTimeout(() => authModal.style.opacity = '1', 10);
+            }
+            return;
+        }
+
         this.cerrarHub();
+
+        // [NUEVO v6.9] Inmersión Total & Loader (Entrada y Salida)
+        const entrarCartera = pantalla === 'portfolio-screen';
+        const salirCartera = document.body.classList.contains('portfolio-active') && pantalla !== 'portfolio-screen';
+
+        if (entrarCartera || salirCartera) {
+            if (window.Cartera) Cartera.mostrarLoader();
+            
+            setTimeout(async () => {
+                if (entrarCartera) {
+                    document.body.classList.add('portfolio-active');
+                    // Inicializar módulo modular v7.0
+                    if (window.Cartera) await Cartera.inicializar();
+                } else {
+                    document.body.classList.remove('portfolio-active');
+                }
+                
+                Interfaz.cambiarPantalla(pantalla);
+                if (pantalla === 'home-screen') this.refrescarComponentesHome();
+                
+                setTimeout(() => {
+                    if (window.Cartera) Cartera.ocultarLoader();
+                }, 800);
+            }, 600);
+            return;
+        }
+
+        document.body.classList.remove('portfolio-active');
         Interfaz.cambiarPantalla(pantalla);
         
-        // Si volvemos al Home, forzamos el refresco de los componentes dinámicos
+        // Refrescos dinámicos según pantalla
         if (pantalla === 'home-screen') {
             this.refrescarComponentesHome();
         }
     },
 
-    // Asegura que los componentes del Home (Ticker, Pulse) se vean al volver
+    // Asegura que los componentes del Home (Ticker, Pulse) se vean al volver (Optimizado iPhone v3.1)
     refrescarComponentesHome() {
-        console.log('[DolarVE] Refrescando componentes del Home para estabilidad...');
+        console.log('[DolarVE] Resurrección de Animaciones Home (Forced v3.1)...');
         
-        // 1. Forzamos redibujado del Ticker de Noticias
-        const ticker = document.getElementById('news-ticker-container');
-        if (ticker && ticker.style.display !== 'none') {
-            ticker.style.display = 'none';
-            ticker.offsetHeight; // Force reflow
-            ticker.style.display = 'block';
+        const resetAnimacion = (elId, animOriginal) => {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            
+            // 1. Limpieza total de animación para que el navegador "olvide" el estado anterior
+            el.style.animation = 'none';
+            el.style.webkitAnimation = 'none';
+            
+            // 2. Forzamos un reflow profundo (esto es lo que "despierta" al motor CSS)
+            void el.offsetWidth;
+            
+            // 3. Re-inyectamos la animación en el siguiente frame de dibujo
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    el.style.animation = animOriginal;
+                    el.style.webkitAnimation = animOriginal;
+                    // Forzamos visibilidad y aceleración GPU
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateZ(0)';
+                }, 10);
+            });
+        };
+
+        // Reseteamos el Ticker y el Pulse track independientemente
+        resetAnimacion('home-news-ticker', 'ticker-scroll 45s linear infinite');
+        resetAnimacion('pulse-track', 'crypto-scroll 45s linear infinite');
+
+        // Además, refrescamos el contenedor general para iPhone
+        const tickerContainer = document.getElementById('news-ticker-container');
+        if (tickerContainer) {
+            tickerContainer.style.visibility = 'hidden';
+            void tickerContainer.offsetHeight;
+            setTimeout(() => { tickerContainer.style.visibility = 'visible'; }, 50);
         }
 
-        // 2. Forzamos redibujado del Crypto Pulse (Live Feed)
-        const pulse = document.getElementById('home-crypto-pulse');
-        if (pulse) {
-            pulse.style.opacity = '0.99'; 
-            setTimeout(() => { pulse.style.opacity = '1'; }, 10);
-        }
-
-        // 3. Reiniciamos el scroll de las noticias de Insight si estaban activas
+        // Reiniciamos el scroll de las noticias de Insight si estaban activas
         this.iniciarAutoScrollNoticias();
     },
 
@@ -527,18 +622,21 @@ const Principal = {
             // Limpiar títulos de entidades HTML comunes
             const tituloLimpio = news.title
                 .replace(/&quot;/g, '"')
+                .replace(/&#8211;/g, '-')
+                .replace(/&#8220;/g, '"')
+                .replace(/&#8221;/g, '"')
                 .replace(/&#8230;/g, '...')
                 .replace(/&amp;/g, '&');
 
-            const categoria = news.categories && news.categories.length > 0 ? news.categories[0] : 'VENEZUELA';
+            const categoria = news.categories && news.categories.length > 0 ? news.categories[0] : 'ECONOMÍA';
             
             return `
-                <div class="news-item" onclick="window.open('${news.link}', '_blank')">
-                    <div class="news-tag">${categoria.toUpperCase()}</div>
-                    <div class="news-title">${tituloLimpio}</div>
-                    <div class="news-meta">
-                        <span><i class="ph ph-clock"></i> ${fecha}</span>
-                        <span>${news.fuenteApp}</span>
+                <div class="news-item-elite" onclick="window.open('${news.link}', '_blank')">
+                    <div class="news-pill">${categoria}</div>
+                    <div class="news-title-elite">${tituloLimpio}</div>
+                    <div class="news-footer">
+                        <span class="news-source">${news.fuenteApp}</span>
+                        <span class="news-date">${fecha}</span>
                     </div>
                 </div>
             `;
@@ -594,25 +692,34 @@ const Principal = {
     },
 
     generarAnalisisMercado() {
+        const cardParent = document.getElementById('daily-insight');
         const titleEl = document.getElementById('insight-title');
         const bodyEl = document.getElementById('insight-body');
-        if (!titleEl || !bodyEl) return;
+        if (!titleEl || !bodyEl || !cardParent) return;
+
         const bcv = window.DolarVE.tasas.usd || 0;
         const paralelo = window.DolarVE.tasas.paralelo || 0;
         if (bcv <= 0) return;
+
         const brecha = ((paralelo - bcv) / bcv) * 100;
         let analisis = "";
-        let titulo = "Análisis de Mercado";
-        if (brecha > 15) {
+        let titulo = "Fuerza del Mercado";
+        
+        // Reset state
+        cardParent.classList.remove('alert-high');
+
+        if (brecha > 12) {
             titulo = "⚠️ Brecha Elevada";
-            analisis = `La diferencia es del ${brecha.toFixed(2)}%. Se recomienda cautela.`;
+            analisis = `La diferencia es del ${brecha.toFixed(2)}%. Se recomienda cautela en transacciones fuera del BCV.`;
+            cardParent.classList.add('alert-high'); // Activa el resplandor rojo
         } else if (brecha > 5) {
             titulo = "📊 Mercado Activo";
-            analisis = `La brecha se mantiene estable en el ${brecha.toFixed(2)}%.`;
+            analisis = `La brecha se mantiene estable en el ${brecha.toFixed(2)}%. Movimiento regular.`;
         } else {
             titulo = "✅ Mercado Estable";
-            analisis = "Las tasas oficial y paralela están muy cerca.";
+            analisis = "Las tasas oficial y paralela están en alta convergencia. Escenario ideal.";
         }
+
         titleEl.innerText = titulo;
         bodyEl.innerText = analisis;
         this.actualizarIndicadoresMercado(brecha);
@@ -623,11 +730,29 @@ const Principal = {
         const strengthVal = document.getElementById('market-strength-val');
         const strengthFill = document.getElementById('market-strength-fill');
         if (!volatilityTag || !strengthVal || !strengthFill) return;
-        let riesgo = brecha > 12 ? "ALERTA" : (brecha > 6 ? "CALIENTE" : "ESTABLE");
-        volatilityTag.innerHTML = `<i class="ph-duotone ph-shield-check"></i> ${riesgo}`;
+
+        let riesgo = "ESTABLE";
+        let color = "var(--accent-green)";
+        let icon = "ph-shield-check";
+
+        if (brecha > 12) {
+            riesgo = "ALERTA";
+            color = "#ff4d4d";
+            icon = "ph-warning-octagon";
+        } else if (brecha > 6) {
+            riesgo = "VOLÁTIL";
+            color = "#f39c12";
+            icon = "ph-chart-line-up";
+        }
+
+        volatilityTag.style.color = color;
+        volatilityTag.innerHTML = `<i class="ph-duotone ${icon}"></i> ${riesgo}`;
+
         const fuerza = Math.max(100 - (brecha * 2.5), 10);
         strengthVal.innerText = `${fuerza.toFixed(0)}%`;
         strengthFill.style.width = `${fuerza}%`;
+        strengthFill.style.background = color;
+        strengthFill.style.boxShadow = `0 0 10px ${color}`;
     },
 
     // Función Maestra para compartir la imagen actual generada

@@ -294,7 +294,7 @@ const Calculadora = {
             const logo = window.Cuentas ? window.Cuentas.getBankIcon(banco) : null;
             const logoHtml = logo 
                 ? `<img src="${logo}" class="picker-bank-icon">`
-                : `<i class="ph-duotone ph-bank" style="font-size: 18px; color: var(--accent-green);"></i>`;
+                : `<i class="ph-duotone ph-bank" style="font-size: 20px; color: var(--accent-green);"></i>`;
 
             return `
                 <button data-idx="${i}" class="picker-account-btn ${brandClass}">
@@ -305,7 +305,7 @@ const Calculadora = {
                         <div class="acc-label">${acc.etiqueta || 'Cuenta Personal'}</div>
                         <div class="acc-bank">${acc.banco_nombre || acc.banco}</div>
                     </div>
-                    <i class="ph-duotone ph-caret-right" style="font-size: 14px; color: var(--text-muted); opacity: 0.5;"></i>
+                    <i class="ph-duotone ph-caret-right picker-arrow"></i>
                 </button>
             `;
         }).join('');
