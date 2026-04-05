@@ -445,6 +445,8 @@ const Principal = {
         // Refrescos dinámicos según pantalla
         if (pantalla === 'home-screen') {
             this.refrescarComponentesHome();
+        } else if (pantalla === 'pump-screen') {
+            if (window.Tasas) Tasas.obtenerEstacionesCercanas();
         }
     },
 

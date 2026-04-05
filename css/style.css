@@ -1855,6 +1855,52 @@ body.light-theme #terms-modal header {
     100% { transform: translate3d(-50%, 0, 0); }
 }
 
+/* --- Nearby Gas Stations v7.7.0 --- */
+.gas-station-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.gas-station-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
+}
+
+.gas-station-card:active {
+    transform: scale(0.98);
+}
+
+.gas-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+
+.gas-city {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.gas-status {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 /* --- Crypto Pulse Cards --- */
 .pulse-card {
     min-width: 140px;

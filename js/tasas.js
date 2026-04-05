@@ -704,6 +704,114 @@ const Tasas = {
         }
     },
 
+    // --- Geolocalización de Gasolineras v7.7.0 ---
+    estacionesData: [
+        { nombre: 'E/S Chuao', lat: 10.4851, lng: -66.8372, ciudad: 'Caracas', status: 'Operativa' },
+        { nombre: 'E/S Las Mercedes', lat: 10.4820, lng: -66.8631, ciudad: 'Caracas', status: 'Operativa' },
+        { nombre: 'E/S El Cafetal', lat: 10.4715, lng: -66.8324, ciudad: 'Caracas', status: 'Sin Cola' },
+        { nombre: 'E/S La Estancia', lat: 10.3885, lng: -71.4392, ciudad: 'Cabimas', status: 'Operativa' },
+        { nombre: 'E/S Delicias', lat: 10.3952, lng: -71.4421, ciudad: 'Cabimas', status: 'Operativa' },
+        { nombre: 'E/S El Amparo', lat: 10.6695, lng: -71.6548, ciudad: 'Maracaibo', status: 'Sin Cola' },
+        { nombre: 'E/S Los Olivos', lat: 10.6821, lng: -71.6425, ciudad: 'Maracaibo', status: 'Operativa' },
+        { nombre: 'E/S Prebo', lat: 10.2195, lng: -68.0163, ciudad: 'Valencia', status: 'Operativa' },
+        { nombre: 'E/S El Obelisco', lat: 10.0632, lng: -69.3524, ciudad: 'Barquisimeto', status: 'Operativa' },
+        { nombre: 'E/S Paramillo', lat: 7.7833, lng: -72.2166, ciudad: 'San Cristóbal', status: 'Operativa' }
+    ],
+
+    async obtenerEstacionesCercanas(forzar = false) {
+        const container = document.getElementById('nearby-gas-stations');
+        if (!container) return;
+
+        const permitido = localStorage.getItem('dolarve_location_allowed') === 'true';
+        
+        if (!permitido && !forzar) {
+            this.renderizarPromptUbicacion();
+            return;
+        }
+
+        container.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                <div class="loader-spinner-inner" style="width: 20px; height: 20px; margin: 0 auto 10px;"></div>
+                <div style="font-size: 11px;">Buscando estaciones cercanas...</div>
+            </div>
+        `;
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                localStorage.setItem('dolarve_location_allowed', 'true');
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                
+                const cercanas = this.estacionesData.map(est => {
+                    const dist = this.calcularDistancia(lat, lng, est.lat, est.lng);
+                    return { ...est, distancia: dist };
+                }).sort((a, b) => a.distancia - b.distancia).slice(0, 3);
+
+                this.renderizarEstaciones(cercanas);
+            },
+            (err) => {
+                console.warn('[DolarVE] Error ubicación:', err);
+                container.innerHTML = `
+                    <div style="background: rgba(255, 77, 77, 0.05); border: 1px dashed rgba(255, 77, 77, 0.2); padding: 15px; border-radius: 12px; text-align: center;">
+                        <i class="ph-duotone ph-map-pin-slash" style="font-size: 20px; color: var(--accent-red); margin-bottom: 8px;"></i>
+                        <div style="font-size: 11px; color: var(--text-muted);">No pudimos obtener tu ubicación.</div>
+                        <button onclick="Tasas.obtenerEstacionesCercanas(true)" style="margin-top: 10px; background: none; border: 1px solid var(--accent-red); color: var(--accent-red); padding: 5px 12px; border-radius: 8px; font-size: 10px; cursor: pointer;">Reintentar</button>
+                    </div>
+                `;
+            },
+            { timeout: 10000 }
+        );
+    },
+
+    calcularDistancia(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radio de la Tierra en km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    },
+
+    renderizarPromptUbicacion() {
+        const container = document.getElementById('nearby-gas-stations');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="card" style="margin: 0; padding: 20px; text-align: center; background: rgba(52, 152, 219, 0.05); border: 1px solid rgba(52, 152, 219, 0.1);">
+                <i class="ph-duotone ph-map-pin" style="font-size: 32px; color: #3498db; margin-bottom: 12px;"></i>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">Gasolineras Cercanas</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">Activa tu ubicación para encontrar las estaciones de servicio más próximas a ti.</div>
+                <button onclick="Tasas.obtenerEstacionesCercanas(true)" class="btn-primary" style="width: 100%; background: #3498db; color: #fff; padding: 12px; font-size: 13px;">Activar Ubicación</button>
+            </div>
+        `;
+    },
+
+    renderizarEstaciones(estaciones) {
+        const container = document.getElementById('nearby-gas-stations');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                <i class="ph-duotone ph-map-pin" style="color: #3498db;"></i> Estaciones Cercanas
+            </div>
+            <div class="gas-list" style="display: flex; flex-direction: column; gap: 10px;">
+                ${estaciones.map(est => `
+                    <div class="gas-station-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${est.lat},${est.lng}', '_blank')">
+                        <div class="gas-info">
+                            <div class="gas-name">${est.nombre}</div>
+                            <div class="gas-city">${est.ciudad} • ${est.distancia.toFixed(1)} km</div>
+                        </div>
+                        <div class="gas-status" style="background: ${est.status === 'Sin Cola' ? 'rgba(0, 208, 132, 0.1)' : 'rgba(255, 255, 255, 0.05)'}; color: ${est.status === 'Sin Cola' ? 'var(--accent-green)' : 'var(--text-muted)'}">
+                            ${est.status}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
     refrescarSurtidor() {
         const pumpLitersEl = document.getElementById('pump-liters');
         const pumpTotalVesEl = document.getElementById('pump-total-ves');
