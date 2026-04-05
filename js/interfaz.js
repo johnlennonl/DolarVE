@@ -301,8 +301,8 @@ const Interfaz = {
         }
     },
 
-    // --- Control de Anuncio de Actualización (v2.0.4) ---
-    PRO_VERSION: '2.0.4',
+    // --- Control de Anuncio de Actualización (v7.7.1) ---
+    PRO_VERSION: '7.7.1',
 
     verificarAnuncioActualizacion() {
         const ultimaVersionVista = localStorage.getItem('dolarve_last_version_seen');
