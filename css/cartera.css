@@ -191,7 +191,7 @@ body.portfolio-active .bottom-nav {
 .cv-modal-overlay.active .cv-bottom-sheet { transform: translateY(0); }
 
 .cv-modal-content {
-    width: 100%; max-width: 500px; background: #121214; border: 1px solid var(--cv-border); border-radius: 32px 32px 0 0; padding: 10px 25px 40px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.4);
+    width: 100%; max-width: 500px; background: #121214; border: 1px solid var(--cv-border); border-radius: 32px 32px 0 0; padding: 15px 25px 40px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.4);
 }
 .cv-modal-overlay.active .cv-modal-content { transform: translateY(0); }
 
@@ -211,14 +211,14 @@ body.portfolio-active .bottom-nav {
 }
 
 .cv-modal-handle {
-    width: 40px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 20px; margin: 0 auto 20px;
+    width: 40px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 20px; margin: 0 auto 5px;
 }
 
 .cv-modal-header {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 25px;
+    gap: 4px;
+    margin-bottom: 20px;
 }
 
 .cv-modal-footer {

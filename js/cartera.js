@@ -385,19 +385,34 @@ const Cartera = {
         return this.perfiles.find(p => p.id === this.perfilActivoId) || this.perfiles[0];
     },
 
-    calcularPatrimonioTotalUSD(perfil) {
-        let total = 0;
-        const balances = { USD: 0, VES: 0, USDT: 0, EUR: 0 };
+    calcularPatrimonioTotal(perfil, monDestino = 'USD') {
+        let balances = { USD: 0, VES: 0, USDT: 0, EUR: 0 };
         perfil.movimientos.forEach(m => {
-            if (m.tipo === 'IN') balances[m.moneda] += m.monto;
-            else balances[m.moneda] -= m.monto;
+            const monto = parseFloat(m.monto) || 0;
+            if (m.tipo === 'IN') balances[m.moneda] += monto;
+            else balances[m.moneda] -= monto;
         });
         
         const tasas = window.DolarVE?.tasas || {};
-        total += balances.USD + balances.USDT;
-        total += balances.VES / (tasas.usd || 1); // Usar 'usd' como tasa BCV
-        total += balances.EUR * (tasas.eur / tasas.usd || 1.1); // Proporción EUR/USD si es necesario o directa
-        return total;
+        const tUSD = parseFloat(tasas.usd) || 1;
+        const tEUR = parseFloat(tasas.eur) || (tUSD * 1.1);
+        
+        // 1. Convertimos todo a VES primero (por ser la base de la API)
+        let totalVES = 0;
+        totalVES += balances.VES;
+        totalVES += balances.USD * tUSD;
+        totalVES += balances.USDT * tUSD;
+        totalVES += balances.EUR * tEUR;
+
+        // 2. Retornamos en la moneda deseada
+        if (monDestino === 'VES') return totalVES;
+        return totalVES / tUSD;
+    },
+
+    alternarMonedaTotal() {
+        if (this.monedaActiva !== 'TOTAL') return;
+        this.tasaPreferenciaRef = this.tasaPreferenciaRef === 'BCV' ? 'PARALELO' : 'BCV'; // Reusamos el estado para no crear flags extras
+        this.renderizar();
     },
 
     renderizar() {
@@ -407,33 +422,61 @@ const Cartera = {
         // Actualizar UI Camaleón (Radial Gradient v7.2)
         document.documentElement.style.setProperty('--cv-profile-color', perfil.color);
 
-        // Render Card Principal (Layout Horizontal v7.2)
+        // Render Card Principal (v7.6.0 Multi-Logic)
         const card = document.getElementById('cv-active-profile-card');
         if (card) {
-            const total = this.monedaActiva === 'TOTAL' ? this.calcularPatrimonioTotalUSD(perfil) : this.getSaldoMoneda(perfil, this.monedaActiva);
-            const simbolo = this.getSimbolo(this.monedaActiva);
+            let total, simbolo, eqLabel, eqValue, eqSymbol;
+            const tasas = window.DolarVE?.tasas || {};
+            const tUSD = parseFloat(tasas.usd) || 1;
+            const tPAR = parseFloat(tasas.paralelo) || tUSD;
+
+            if (this.monedaActiva === 'TOTAL') {
+                // El TOTAL se muestra en USD o VES según la selección
+                const mostrarEnBs = (this.tasaPreferenciaRef === 'PARALELO'); // Truco: PARALELO = Ver en Bs para TOTAL
+                total = this.calcularPatrimonioTotal(perfil, mostrarEnBs ? 'VES' : 'USD');
+                simbolo = mostrarEnBs ? 'Bs' : '$';
+                
+                // Equivalencia cruzada para el TOTAL
+                eqLabel = mostrarEnBs ? 'en Dólares' : `al ${this.tasaPreferenciaRef}`;
+                eqSymbol = mostrarEnBs ? '$' : 'Bs';
+                eqValue = mostrarEnBs ? (total / tUSD) : (total * (this.tasaPreferenciaRef === 'BCV' ? tUSD : tPAR));
+            } else {
+                // Monedas individuales
+                total = this.getSaldoMoneda(perfil, this.monedaActiva);
+                simbolo = this.getSimbolo(this.monedaActiva);
+                
+                if (this.monedaActiva === 'VES') {
+                    eqLabel = 'en Dólares';
+                    eqSymbol = '$';
+                    eqValue = total / tUSD;
+                } else {
+                    eqLabel = `Al ${this.tasaPreferenciaRef}`;
+                    eqSymbol = 'Bs';
+                    const factor = (this.monedaActiva === 'EUR') ? (parseFloat(tasas.eur) || (tUSD * 1.1)) : tUSD;
+                    const tasaFinal = this.tasaPreferenciaRef === 'BCV' ? factor : (factor * (tPAR / tUSD));
+                    eqValue = total * tasaFinal;
+                }
+            }
             
             card.innerHTML = `
                 <div class="cv-profile-header-main">
                     <div class="cv-icon-main" style="background: ${perfil.color}66; color: #fff; border: 2px solid ${perfil.color}88;">
                         <i class="${perfil.icono}"></i>
                     </div>
-                    <span class="cv-profile-name-tag">${perfil.nombre}</span>
+                    <span class="cv-profile-name-tag">${perfil.nombre} ${this.monedaActiva === 'TOTAL' ? '<small style="opacity:0.6; margin-left:5px;">(Patrimonio)</small>' : ''}</span>
                 </div>
-                <div class="cv-balance-hero">
+                <div class="cv-balance-hero" onclick="Cartera.monedaActiva === 'TOTAL' ? Cartera.alternarMonedaTotal() : Cartera.alternarTasaReferencia()" style="cursor: pointer;">
                     <span class="cv-hero-symbol">${simbolo}</span>
                     <h2 class="cv-hero-amount">${total.toLocaleString('es-VE', {minimumFractionDigits:2})}</h2>
                 </div>
-                ${this.monedaActiva !== 'VES' ? `
                 <div class="cv-balance-equivalency" onclick="Cartera.alternarTasaReferencia()" style="cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: -5px; opacity: 0.8;">
                     <span style="font-size: 13px; font-weight: 600; color: #fff;">
-                       ≈ Bs ${ (total * (this.tasaPreferenciaRef === 'BCV' ? (window.DolarVE?.tasas?.usd || 1) : (window.DolarVE?.tasas?.paralelo || (window.DolarVE?.tasas?.usd || 1)))) .toLocaleString('es-VE', {minimumFractionDigits:2}) }
+                       ≈ ${eqSymbol} ${ eqValue.toLocaleString('es-VE', {minimumFractionDigits:2}) }
                     </span>
                     <span style="font-size: 9px; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: ${this.tasaPreferenciaRef === 'BCV' ? 'var(--cv-green)' : '#ffcc00'}; font-weight: 800; text-transform: uppercase;">
-                        ${this.tasaPreferenciaRef}
+                        ${eqLabel}
                     </span>
                 </div>
-                ` : ''}
             `;
         }
 
