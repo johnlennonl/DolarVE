@@ -50,7 +50,7 @@ const Cartera = {
     async cargarEstructura() {
         console.log('[Cartera] Cargando estructura modular cartera.html...');
         try {
-            const response = await fetch('cartera.html');
+            const response = await fetch('cartera.html?v=' + Date.now());
             const html = await response.text();
             const container = document.getElementById('portfolio-screen');
             if (container) {
