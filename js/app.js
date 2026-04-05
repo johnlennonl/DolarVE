@@ -475,16 +475,18 @@ const Principal = {
             });
         };
 
-        // Reseteamos el Ticker y el Pulse track independientemente
-        resetAnimacion('home-news-ticker', 'ticker-scroll 45s linear infinite');
+        // Reseteamos el Ticker y el Pulse track independientemente (v7.6.5 Sync)
+        resetAnimacion('home-news-ticker', 'ticker-scroll 35s linear infinite');
         resetAnimacion('pulse-track', 'crypto-scroll 45s linear infinite');
 
-        // Además, refrescamos el contenedor general para iPhone
+        // Además, refrescamos el contenedor general para asegurar visibilidad en iPhone/Safari
         const tickerContainer = document.getElementById('news-ticker-container');
         if (tickerContainer) {
-            tickerContainer.style.visibility = 'hidden';
+            // Forzamos el reinicio de la animación de entrada (Fade In + Slide Up)
+            tickerContainer.style.animation = 'none';
             void tickerContainer.offsetHeight;
-            setTimeout(() => { tickerContainer.style.visibility = 'visible'; }, 50);
+            tickerContainer.style.animation = 'slideUpFade 0.8s ease forwards';
+            tickerContainer.style.opacity = '1';
         }
 
         // Reiniciamos el scroll de las noticias de Insight si estaban activas

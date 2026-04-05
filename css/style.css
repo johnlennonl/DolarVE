@@ -1774,8 +1774,8 @@ body.light-theme #terms-modal header {
 }
 
 @keyframes slideUpFade {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translate3d(0, 20px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* --- Market News Ticker (Marquee) --- */
@@ -1851,8 +1851,8 @@ body.light-theme #terms-modal header {
 }
 
 @keyframes ticker-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
 }
 
 /* --- Crypto Pulse Cards --- */
