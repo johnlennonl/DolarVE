@@ -262,7 +262,7 @@ const Cartera = {
                 </div>
                 <div class="cv-profile-details">
                     <span class="p-name">${p.nombre}</span>
-                    <span class="p-balance">$ ${this.calcularPatrimonioTotalUSD(p).toLocaleString('es-VE', {minimumFractionDigits:2})}</span>
+                    <span class="p-balance">${this.getSimbolo('USD')} ${this.calcularPatrimonioTotal(p).toLocaleString('es-VE', {minimumFractionDigits:2})}</span>
                 </div>
                 <div class="cv-profile-actions">
                     <div class="cv-profile-edit-btn" onclick="event.stopPropagation(); Cartera.abrirModalPerfil('${p.id}')">
@@ -592,7 +592,7 @@ const Cartera = {
                     <span class="h-date">${new Date(m.fecha).toLocaleDateString()}</span>
                 </div>
                 <div class="cv-hist-value">
-                    ${m.tipo === 'IN' ? '+' : '-'}${m.monto.toLocaleString('es-VE', {minimumFractionDigits:2})}
+                    ${m.tipo === 'IN' ? '+' : '-'}${this.getSimbolo(m.moneda)} ${m.monto.toLocaleString('es-VE', {minimumFractionDigits:2})}
                 </div>
             </div>
         `).join('');
@@ -635,7 +635,7 @@ const Cartera = {
                     <span class="h-date">${new Date(m.fecha).toLocaleDateString()} · ${m.moneda}</span>
                 </div>
                 <div class="cv-hist-value">
-                    ${m.tipo === 'IN' ? '+' : '-'}${m.monto.toLocaleString('es-VE', {minimumFractionDigits:2})} ${m.moneda === 'VES' ? 'Bs' : '$'}
+                    ${m.tipo === 'IN' ? '+' : '-'}${this.getSimbolo(m.moneda)} ${m.monto.toLocaleString('es-VE', {minimumFractionDigits:2})}
                 </div>
             </div>
         `).join('');
