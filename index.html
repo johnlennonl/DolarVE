@@ -36,14 +36,11 @@
 
 <body>
     <!-- Splash Screen -->
-    <!-- Splash Screen Premium: "Liquid Glow Energy" -->
+    <!-- Splash Screen Minimalista Premium -->
     <div id="splash-screen">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
         <div class="loader-content">
             <div class="loader-logo-wrapper">
                 <div class="loader-logo">DolarVE</div>
-                <div class="loader-shine"></div>
             </div>
             <div class="loader-spinner-wrapper">
                 <div class="loader-spinner"></div>
@@ -115,7 +112,7 @@
                         style="height: 140px; margin-top: 15px; background: transparent; position: relative;">
                         <!-- Overlay Informativo Táctil Premium -->
                         <div id="chart-hint"
-                            style="position: absolute; top: 5px; right: 5px; font-size: 9px; color: var(--accent-green); background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 20px; backdrop-filter: blur(4px); z-index: 10; border: 1px solid rgba(0, 208, 132, 0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); pointer-events: none; display: flex; align-items: center; gap: 4px;">
+                            style="position: absolute; top: 5px; right: 5px; font-size: 9px; color: var(--text-main); background: rgba(120, 120, 120, 0.15); padding: 4px 8px; border-radius: 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; border: 1px solid var(--card-border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); pointer-events: none; display: flex; align-items: center; gap: 4px;">
                             <i class="ph-duotone ph-hand-tap" style="font-size: 11px;"></i>
                             <span style="font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Desliza
                                 para comparar</span>
@@ -727,7 +724,7 @@
                         style="font-size: 14px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;">
                         Lo Último
                     </span>
-                    <a href="#" id="view-all-news">Ver todo <i class="ph ph-caret-right"></i></a>
+                    <a href="#" id="view-all-news" onclick="window.open('https://news.google.com/search?q=economia+venezuela', '_blank')">Ver todo <i class="ph ph-caret-right"></i></a>
                 </div>
 
                 <div id="news-feed" class="news-scroll">

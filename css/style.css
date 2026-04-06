@@ -733,80 +733,25 @@ header {
     transform: translateX(-50%) scale(1.1);
 }
 
-/* Background Animated Blobs */
-.blob {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.2;
-    z-index: 0;
-    animation: blob-move 20s infinite alternate;
-}
-
-.blob-1 {
-    background: var(--accent-green);
-    top: -10%;
-    left: -10%;
-}
-
-.blob-2 {
-    background: var(--accent-blue);
-    bottom: -10%;
-    right: -10%;
-    animation-delay: -5s;
-}
-
-@keyframes blob-move {
-    0% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(50px, 30px) scale(1.2); }
-    66% { transform: translate(-30px, 50px) scale(0.9); }
-    100% { transform: translate(0, 0) scale(1); }
-}
-
 .loader-content {
     position: relative;
     z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
+    gap: 20px;
 }
 
-/* Logo with Shiny Effect */
+/* Logo minimalista */
 .loader-logo-wrapper {
     position: relative;
-    overflow: hidden;
 }
 
 .loader-logo {
     font-size: 42px;
     font-weight: 800;
     letter-spacing: -1px;
-    background: linear-gradient(135deg, #FFFFFF 0%, #A5A5A5 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-}
-
-.loader-shine {
-    position: absolute;
-    top: 0;
-    left: -150%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255,255,255,0.4) 50%, 
-                transparent 100%);
-    animation: shimmer 2.5s infinite;
-}
-
-@keyframes shimmer {
-    0% { left: -150%; }
-    100% { left: 150%; }
+    color: var(--text-main);
 }
 
 /* Dual Glowing Spinner */
@@ -819,11 +764,10 @@ header {
 .loader-spinner {
     width: 100%;
     height: 100%;
-    border: 3px solid rgba(255,255,255,0.05);
+    border: 3px solid rgba(255,255,255,0.05); /* En modo claro apenas visible, pero no molesta */
     border-top: 3px solid var(--accent-green);
     border-radius: 50%;
     animation: spin 1.2s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
-    filter: drop-shadow(0 0 8px var(--accent-green));
 }
 
 .loader-spinner-inner {
@@ -836,7 +780,6 @@ header {
     border-bottom: 2px solid var(--accent-blue);
     border-radius: 50%;
     animation: spin 0.8s linear infinite reverse;
-    filter: drop-shadow(0 0 5px var(--accent-blue));
 }
 
 @keyframes spin {
@@ -849,13 +792,14 @@ header {
     top: calc(env(safe-area-inset-top, 20px) + 20px);
     left: 50%;
     transform: translateX(-50%) translateY(-120px);
-    background: rgba(22, 27, 34, 0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(120, 120, 120, 0.25);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     color: var(--text-main);
     padding: 20px 30px;
     border-radius: 24px;
-    border: 1px solid rgba(0, 208, 132, 0.3);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     z-index: 999999;
     display: flex;
     flex-direction: column;
@@ -990,31 +934,7 @@ body.light-theme .toast-notification {
     transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.intl-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 30px;
-    background: var(--country-color, var(--accent-green));
-    border-radius: 0 4px 4px 0;
-    opacity: 0.7;
-}
 
-.intl-card::after {
-    content: '';
-    position: absolute;
-    right: -10px;
-    top: -10px;
-    width: 60px;
-    height: 60px;
-    background: radial-gradient(circle, var(--country-color, transparent) 0%, transparent 70%);
-    opacity: 0.12;
-    filter: blur(15px);
-    pointer-events: none;
-}
 
 .intl-card:active {
     transform: scale(0.97);
@@ -1551,10 +1471,8 @@ body.light-theme #terms-modal header {
 }
 
 .insight-card-elite {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 28px;
     padding: 25px;
     display: flex;
@@ -1565,20 +1483,20 @@ body.light-theme #terms-modal header {
     z-index: 1;
     overflow: hidden;
     transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .insight-card-elite::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
     pointer-events: none;
 }
 
 /* Dynamic State: High Alert */
 .insight-card-elite.alert-high {
-    border: 1px solid rgba(255, 77, 77, 0.2);
-    background: linear-gradient(135deg, rgba(255, 77, 77, 0.05) 0%, rgba(20, 20, 20, 0.4) 100%);
+    border: 1px solid rgba(255, 77, 77, 0.4);
+    background: linear-gradient(135deg, rgba(255, 77, 77, 0.08) 0%, var(--card-bg) 100%);
     box-shadow: 0 10px 40px rgba(255, 77, 77, 0.1);
 }
 
@@ -1697,10 +1615,8 @@ body.light-theme #terms-modal header {
 
 .news-item-elite {
     flex: 0 0 300px;
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 24px;
     padding: 22px;
     scroll-snap-align: start;
@@ -1710,6 +1626,7 @@ body.light-theme #terms-modal header {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .news-item-elite::before {
@@ -1720,13 +1637,12 @@ body.light-theme #terms-modal header {
     width: 100%;
     height: 3px;
     background: linear-gradient(90deg, var(--accent-green), transparent);
-    opacity: 0.4;
+    opacity: 0.8;
 }
 
 .news-item-elite:active {
     transform: translateY(-5px) scale(0.98);
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent-green);
 }
 
 .news-pill {
@@ -1760,7 +1676,7 @@ body.light-theme #terms-modal header {
     align-items: center;
     margin-top: auto;
     padding-top: 10px;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid var(--card-border);
 }
 
 .news-source {
@@ -1771,7 +1687,8 @@ body.light-theme #terms-modal header {
 
 .news-date {
     font-size: 10px;
-    color: rgba(255,255,255,0.3);
+    color: var(--text-muted);
+    opacity: 0.8;
 }
 
 /* Skeletons */
@@ -1805,17 +1722,17 @@ body.light-theme #terms-modal header {
 }
 
 .ticker-wrapper {
-    background: rgba(22, 27, 34, 0.4);
+    background: rgba(120, 120, 120, 0.15);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
     border-radius: 12px;
     overflow: hidden;
     position: relative;
     padding: 8px 0;
     display: flex;
     align-items: center;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .ticker-label {
