@@ -10,7 +10,7 @@ const Principal = {
 
         // 1. Cargamos el tema (Luz u Oscuridad)
         Interfaz.cargarTemaGuardado();
-        
+
         // 2. Quitamos el Splash Screen después de un ratico
         setTimeout(() => {
             Interfaz.ocultarSplashScreen();
@@ -27,31 +27,31 @@ const Principal = {
         }
 
         // 5. ¡A buscar los reales! Traemos las tasas de una vez
-        Tasas.cargarDatosCache(); 
+        Tasas.cargarDatosCache();
         await Tasas.obtenerDatosTasas();
-        
+
         // 6. Iniciamos el Surtidor y la Referencia rápida
         Tasas.refrescarSurtidor();
         Tasas.actualizarReferenciaRapida();
-        this.generarAnalisisMercado(); 
+        this.generarAnalisisMercado();
 
         // 7. Ponemos a valer las notificaciones y cookies
         Interfaz.inicializarPush();
         Interfaz.verificarCookies();
-        
+
         // 8. PWA e Instalación
         this.inicializarPWA();
         Interfaz.verificarAnuncioActualizacion();
 
         // 9. Noticias y Análisis (DolarVE Insights)
         this.obtenerNoticiasEconomicas();
-        
+
         // 9. Actualización Automática (Tiempo Real) - Cada 5 minutos
         setInterval(() => {
             console.log('[DolarVE] Actualización periódica en curso...');
             Tasas.obtenerDatosTasas();
         }, 300000);
-        
+
         // 10. Mi Cartera v4.0 (NUEVO)
         if (window.Cartera) {
             Cartera.inicializar();
@@ -158,10 +158,10 @@ const Principal = {
             chip.addEventListener('click', (e) => {
                 const target = e.target.closest('.rate-chip');
                 if (!target) return;
-                
+
                 const moneda = target.getAttribute('data-rate');
                 const fee = target.getAttribute('data-fee');
-                
+
                 if (moneda) {
                     Calculadora.cambiarBase(moneda);
                 } else if (fee) {
@@ -211,7 +211,7 @@ const Principal = {
                 const accionBtn = document.getElementById('auth-action-btn');
                 const toggleTexto = document.getElementById('auth-toggle-text');
                 const camposRegistro = document.getElementById('auth-register-fields');
-                
+
                 if (esRegistro) {
                     titulo.innerText = "Crear Cuenta";
                     accionBtn.innerText = "Regístrate";
@@ -240,7 +240,7 @@ const Principal = {
                     fechaNacimiento: document.getElementById('auth-dob')?.value,
                     esRegistro: esRegistro // Capturado por closure
                 };
-                
+
                 // Llamamos a la función maestra unificada
                 Autenticacion.procesarFormulario(datos);
             });
@@ -284,11 +284,11 @@ const Principal = {
         const btnToggleFormCuentas = document.getElementById('add-account-btn');
         const btnCancelarCuenta = document.getElementById('cancel-pm-btn');
         const formNuevaCuenta = document.getElementById('pm-add-form');
-        
+
         if (btnToggleFormCuentas && formNuevaCuenta) {
             btnToggleFormCuentas.addEventListener('click', () => formNuevaCuenta.classList.toggle('show'));
         }
-        
+
         if (btnCancelarCuenta && formNuevaCuenta) {
             btnCancelarCuenta.addEventListener('click', () => formNuevaCuenta.classList.remove('show'));
         }
@@ -340,7 +340,7 @@ const Principal = {
         if (btnCompartirRecibo) {
             btnCompartirRecibo.addEventListener('click', () => Principal.compartirImagenGenerada());
         }
-        
+
         // Surtidor de Gasolina
         const sliderGasofa = document.getElementById('pump-slider');
         if (sliderGasofa) sliderGasofa.addEventListener('input', () => Tasas.refrescarSurtidor());
@@ -373,7 +373,7 @@ const Principal = {
                 // MODO: Autenticado - Mostramos BETA!
                 portfolioItem.classList.remove('disabled');
                 portfolioBadge.style.display = 'block';
-                portfolioBadge.innerText = 'BETA!';
+                portfolioBadge.innerText = 'MUY PRONTO!';
                 portfolioBadge.style.background = 'var(--cv-red)';
                 portfolioIcon.innerHTML = `<i class="ph-fill ph-wallet"></i>`;
             } else {
@@ -396,7 +396,7 @@ const Principal = {
             }, 400);
         }
     },
-    
+
     navegar(pantalla) {
         // --- Auth Guard para Mi Cartera v4.0.2 ---
         if (pantalla === 'portfolio-screen' && !window.DolarVE?.usuario) {
@@ -419,7 +419,7 @@ const Principal = {
 
         if (entrarCartera || salirCartera) {
             if (window.Cartera) Cartera.mostrarLoader();
-            
+
             setTimeout(async () => {
                 if (entrarCartera) {
                     document.body.classList.add('portfolio-active');
@@ -428,10 +428,10 @@ const Principal = {
                 } else {
                     document.body.classList.remove('portfolio-active');
                 }
-                
+
                 Interfaz.cambiarPantalla(pantalla);
                 if (pantalla === 'home-screen') this.refrescarComponentesHome();
-                
+
                 setTimeout(() => {
                     if (window.Cartera) Cartera.ocultarLoader();
                 }, 800);
@@ -441,7 +441,7 @@ const Principal = {
 
         document.body.classList.remove('portfolio-active');
         Interfaz.cambiarPantalla(pantalla);
-        
+
         // Refrescos dinámicos según pantalla
         if (pantalla === 'home-screen') {
             this.refrescarComponentesHome();
@@ -453,18 +453,18 @@ const Principal = {
     // Asegura que los componentes del Home (Ticker, Pulse) se vean al volver (Optimizado iPhone v3.1)
     refrescarComponentesHome() {
         console.log('[DolarVE] Resurrección de Animaciones Home (Forced v3.1)...');
-        
+
         const resetAnimacion = (elId, animOriginal) => {
             const el = document.getElementById(elId);
             if (!el) return;
-            
+
             // 1. Limpieza total de animación para que el navegador "olvide" el estado anterior
             el.style.animation = 'none';
             el.style.webkitAnimation = 'none';
-            
+
             // 2. Forzamos un reflow profundo (esto es lo que "despierta" al motor CSS)
             void el.offsetWidth;
-            
+
             // 3. Re-inyectamos la animación en el siguiente frame de dibujo
             requestAnimationFrame(() => {
                 setTimeout(() => {
@@ -509,7 +509,7 @@ const Principal = {
         const installModalOverlay = document.getElementById('install-modal-overlay');
         const installModal = document.getElementById('install-modal');
         const closeInstallModal = document.getElementById('close-install-modal');
-        
+
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
@@ -517,9 +517,9 @@ const Principal = {
             if (installBtn) installBtn.style.display = 'flex';
             if (isIOS) {
                 if (installText) installText.innerText = 'Cómo instalar en iPhone';
-                if (installIcon) { 
-                    installIcon.className = 'ph-duotone ph-apple-logo'; 
-                    installIcon.style.color = '#fff'; 
+                if (installIcon) {
+                    installIcon.className = 'ph-duotone ph-apple-logo';
+                    installIcon.style.color = '#fff';
                 }
             } else if (/Android/i.test(navigator.userAgent)) {
                 if (installText) installText.innerText = 'Instalar en Android';
@@ -572,7 +572,7 @@ const Principal = {
         if (!feedContainer) return;
 
         console.log('[DolarVE] Buscando noticias frescas...');
-        
+
         const fuentes = [
             { url: 'https://www.bancaynegocios.com/feed/', name: 'Banca y Negocios' },
             { url: 'https://www.descifrado.com/feed/', name: 'Descifrado' },
@@ -587,7 +587,7 @@ const Principal = {
                 // Usamos un cache-buster t=Date.now()
                 const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&t=${Date.now()}`);
                 const data = await response.json();
-                
+
                 if (data.status === 'ok' && data.items.length > 0) {
                     // Mapeamos para incluir el nombre de la fuente
                     const itemsConFuente = data.items.slice(0, 4).map(item => ({
@@ -596,8 +596,8 @@ const Principal = {
                     }));
                     todasLasNoticias = [...todasLasNoticias, ...itemsConFuente];
                 }
-            } catch (e) { 
-                console.warn(`[DolarVE] Falló fuente ${fuente.name}:`, e); 
+            } catch (e) {
+                console.warn(`[DolarVE] Falló fuente ${fuente.name}:`, e);
             }
         }
 
@@ -633,7 +633,7 @@ const Principal = {
                 .replace(/&amp;/g, '&');
 
             const categoria = news.categories && news.categories.length > 0 ? news.categories[0] : 'ECONOMÍA';
-            
+
             return `
                 <div class="news-item-elite" onclick="window.open('${news.link}', '_blank')">
                     <div class="news-pill">${categoria}</div>
@@ -661,7 +661,7 @@ const Principal = {
                 .replace(/&#8221;/g, '"')
                 .replace(/&#8230;/g, '...')
                 .replace(/&amp;/g, '&');
-            
+
             return `
                 <div class="ticker-item" onclick="Principal.navegar('insights-section')">
                     <div class="ticker-dot"></div>
@@ -677,16 +677,16 @@ const Principal = {
     iniciarAutoScrollNoticias() {
         const feed = document.getElementById('news-feed');
         if (!feed || feed.dataset.scrolling === 'true') return;
-        
+
         feed.dataset.scrolling = 'true';
         let scrollDir = 1;
-        
+
         setInterval(() => {
             if (!document.getElementById('insights-section').classList.contains('active')) return;
-            
+
             const currentScroll = feed.scrollLeft;
             const maxScroll = feed.scrollWidth - feed.clientWidth;
-            
+
             if (currentScroll >= maxScroll - 2) {
                 feed.scrollTo({ left: 0, behavior: 'smooth' });
             } else {
@@ -708,7 +708,7 @@ const Principal = {
         const brecha = ((paralelo - bcv) / bcv) * 100;
         let analisis = "";
         let titulo = "Fuerza del Mercado";
-        
+
         // Reset state
         cardParent.classList.remove('alert-high');
 
