@@ -704,20 +704,8 @@ const Tasas = {
         }
     },
 
-    // --- Geolocalización de Gasolineras v7.7.0 ---
-    estacionesData: [
-        { nombre: 'E/S Chuao', lat: 10.4851, lng: -66.8372, ciudad: 'Caracas', status: 'Operativa' },
-        { nombre: 'E/S Las Mercedes', lat: 10.4820, lng: -66.8631, ciudad: 'Caracas', status: 'Operativa' },
-        { nombre: 'E/S El Cafetal', lat: 10.4715, lng: -66.8324, ciudad: 'Caracas', status: 'Sin Cola' },
-        { nombre: 'E/S La Estancia', lat: 10.3885, lng: -71.4392, ciudad: 'Cabimas', status: 'Operativa' },
-        { nombre: 'E/S Delicias', lat: 10.3952, lng: -71.4421, ciudad: 'Cabimas', status: 'Operativa' },
-        { nombre: 'E/S El Amparo', lat: 10.6695, lng: -71.6548, ciudad: 'Maracaibo', status: 'Sin Cola' },
-        { nombre: 'E/S Los Olivos', lat: 10.6821, lng: -71.6425, ciudad: 'Maracaibo', status: 'Operativa' },
-        { nombre: 'E/S Prebo', lat: 10.2195, lng: -68.0163, ciudad: 'Valencia', status: 'Operativa' },
-        { nombre: 'E/S El Obelisco', lat: 10.0632, lng: -69.3524, ciudad: 'Barquisimeto', status: 'Operativa' },
-        { nombre: 'E/S Paramillo', lat: 7.7833, lng: -72.2166, ciudad: 'San Cristóbal', status: 'Operativa' }
-    ],
-
+    // --- Geolocalización de Gasolineras Dynamic v7.7.5 ---
+    
     async obtenerEstacionesCercanas(forzar = false) {
         const container = document.getElementById('nearby-gas-stations');
         if (!container) return;
@@ -730,37 +718,108 @@ const Tasas = {
         }
 
         container.innerHTML = `
-            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
-                <div class="loader-spinner-inner" style="width: 20px; height: 20px; margin: 0 auto 10px;"></div>
-                <div style="font-size: 11px;">Buscando estaciones cercanas...</div>
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <div class="loader-spinner" style="margin: 0 auto 15px; width: 30px; height: 30px; border-top-color: var(--accent-green);"></div>
+                <div style="font-size: 13px; font-weight: 600;">Sincronizando estaciones...</div>
             </div>
         `;
 
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
+            async (pos) => {
                 localStorage.setItem('dolarve_location_allowed', 'true');
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
                 
-                const cercanas = this.estacionesData.map(est => {
-                    const dist = this.calcularDistancia(lat, lng, est.lat, est.lng);
-                    return { ...est, distancia: dist };
-                }).sort((a, b) => a.distancia - b.distancia).slice(0, 3);
+                try {
+                    // Fetch real data from Supabase
+                    let estaciones = [];
+                    if (window.DolarVE.supabase) {
+                        const { data, error } = await window.DolarVE.supabase.from('gas_stations').select('*');
+                        if (!error && data) estaciones = data;
+                    }
 
-                this.renderizarEstaciones(cercanas);
+                    // Fallback to minimal data if supabase fails or table empty
+                    if (estaciones.length === 0) {
+                        estaciones = [
+                            { id: '1', name: 'E/S Chuao', latitude: 10.4851, longitude: -66.8372, city: 'Caracas', status: 'Operativa' },
+                            { id: '2', name: 'E/S El Cafetal', latitude: 10.4715, longitude: -66.8324, city: 'Caracas', status: 'Sin Cola' },
+                            { id: '3', name: 'E/S Las Mercedes', latitude: 10.4820, longitude: -66.8631, city: 'Caracas', status: 'Poca Cola' },
+                            // Cabimas (Tu ubicación local)
+                            { id: '4', name: 'E/S La Estancia', latitude: 10.3885, longitude: -71.4392, city: 'Cabimas', status: 'Operativa' },
+                            { id: '5', name: 'E/S Delicias', latitude: 10.3952, longitude: -71.4421, city: 'Cabimas', status: 'Sin Cola' },
+                            { id: '6', name: 'E/S El Amparo', latitude: 10.6695, longitude: -71.6548, city: 'Maracaibo', status: 'Poca Cola' }
+                        ];
+                    }
+
+                    const cercanas = estaciones.map(est => {
+                        const dist = this.calcularDistancia(lat, lng, est.latitude, est.longitude);
+                        return { ...est, distancia: dist };
+                    }).sort((a, b) => a.distancia - b.distancia);
+
+                    // --- Filtro de Geocerca Inteligente (v7.8) ---
+                    // Si tenemos estaciones a menos de 50km, mostramos SOLO esas (máximo 3)
+                    // Esto evita mostrar Caracas (500km) si estás en Cabimas.
+                    const estacionesMuyCerca = cercanas.filter(e => e.distancia < 50);
+                    const resultadoFinal = estacionesMuyCerca.length > 0 ? estacionesMuyCerca.slice(0, 3) : cercanas.slice(0, 3);
+
+                    this.renderizarEstaciones(resultadoFinal);
+                } catch (e) {
+                    console.error('[DolarVE] Error fetching gas:', e);
+                }
             },
             (err) => {
-                console.warn('[DolarVE] Error ubicación:', err);
+                const errorMsg = err.code === 1 ? 'Ubicación denegada. Actívala en ajustes.' : 'Error al obtener ubicación.';
                 container.innerHTML = `
-                    <div style="background: rgba(255, 77, 77, 0.05); border: 1px dashed rgba(255, 77, 77, 0.2); padding: 15px; border-radius: 12px; text-align: center;">
-                        <i class="ph-duotone ph-map-pin-slash" style="font-size: 20px; color: var(--accent-red); margin-bottom: 8px;"></i>
-                        <div style="font-size: 11px; color: var(--text-muted);">No pudimos obtener tu ubicación.</div>
-                        <button onclick="Tasas.obtenerEstacionesCercanas(true)" style="margin-top: 10px; background: none; border: 1px solid var(--accent-red); color: var(--accent-red); padding: 5px 12px; border-radius: 8px; font-size: 10px; cursor: pointer;">Reintentar</button>
+                    <div class="card" style="margin: 0; padding: 25px; text-align: center; background: rgba(255, 77, 77, 0.05); border: 1px dashed rgba(255, 77, 77, 0.2);">
+                        <i class="ph-duotone ph-map-pin-slash" style="font-size: 32px; color: var(--accent-red); margin-bottom: 15px;"></i>
+                        <div style="font-size: 13px; color: var(--text-main); font-weight: 700;">${errorMsg}</div>
+                        <button onclick="Tasas.obtenerEstacionesCercanas(true)" class="btn-primary" style="margin-top: 15px; background: var(--accent-red); width: 100%;">Reintentar</button>
                     </div>
                 `;
             },
-            { timeout: 10000 }
+            { timeout: 10000, enableHighAccuracy: true }
         );
+    },
+
+    async reportarStatus(stationId, nuevoStatus) {
+        if (window.navigator.vibrate) window.navigator.vibrate(20);
+        
+        Interfaz.mostrarNotificacion(`📡 Reportando: ${nuevoStatus}...`);
+
+        try {
+            if (window.DolarVE.supabase) {
+                const { error } = await window.DolarVE.supabase
+                    .from('gas_stations')
+                    .update({ 
+                        status: nuevoStatus, 
+                        last_updated: new Date().toISOString() 
+                    })
+                    .eq('id', stationId);
+
+                if (error) throw error;
+                Interfaz.mostrarNotificacion('✅ ¡Reporte enviado con éxito!');
+            } else {
+                // Fallback Local para que el usuario pueda probar sin Supabase configurado
+                this.estacionesCercanasCache = (this.estacionesCercanasCache || []).map(est => {
+                    if (est.id === stationId) return { ...est, status: nuevoStatus, last_updated: new Date().toISOString() };
+                    return est;
+                });
+                this.renderizarEstaciones(this.estacionesCercanasCache);
+                Interfaz.mostrarNotificacion('⚠️ Reporte local (Modo Demo)');
+            }
+            
+            this.obtenerEstacionesCercanas(true); // Intentar refrescar de todas formas
+        } catch (e) {
+            console.error('[DolarVE] Error reporte:', e);
+            Interfaz.mostrarNotificacion('❌ Fallo al reportar. Verifica tu DB.');
+            
+            // Si falló Supabase, igual actualizamos localmente para feedback inmediato
+            this.estacionesCercanasCache = (this.estacionesCercanasCache || []).map(est => {
+                if (est.id === stationId) return { ...est, status: nuevoStatus, last_updated: new Date().toISOString() };
+                return est;
+            });
+            this.renderizarEstaciones(this.estacionesCercanasCache);
+        }
     },
 
     calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -792,24 +851,75 @@ const Tasas = {
         const container = document.getElementById('nearby-gas-stations');
         if (!container) return;
 
+        // Guardamos en caché local para el modo demo
+        this.estacionesCercanasCache = estaciones;
+
         container.innerHTML = `
-            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                <i class="ph-duotone ph-map-pin" style="color: #3498db;"></i> Estaciones Cercanas
+            <div style="font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-duotone ph-gas-pump" style="color: var(--accent-green); font-size: 18px;"></i> Bombas Cercanas (Cabimas)
+                </div>
+                <button onclick="Tasas.obtenerEstacionesCercanas(true)" style="background: none; border: none; cursor: pointer; color: var(--accent-green); display: flex; align-items: center; gap: 5px;">
+                    <span id="update-indicator-gas" style="font-size: 9px; font-weight: 800;">RECARGAR</span>
+                    <i class="ph ph-arrows-clockwise" style="font-size: 14px;"></i>
+                </button>
             </div>
-            <div class="gas-list" style="display: flex; flex-direction: column; gap: 10px;">
-                ${estaciones.map(est => `
-                    <div class="gas-station-card" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${est.lat},${est.lng}', '_blank')">
-                        <div class="gas-info">
-                            <div class="gas-name">${est.nombre}</div>
-                            <div class="gas-city">${est.ciudad} • ${est.distancia.toFixed(1)} km</div>
+            <div class="gas-list" style="display: flex; flex-direction: column; gap: 12px;">
+                ${estaciones.map(est => {
+                    // Mapeo dinámico de estatus a clases CSS
+                    let statusClass = 'status-operative';
+                    if (est.status === 'Sin Cola') statusClass = 'status-free';
+                    if (est.status === 'Poca Cola') statusClass = 'status-low';
+                    if (est.status === 'Mucha Cola') statusClass = 'status-high';
+                    if (est.status === 'Cerrada') statusClass = 'status-closed';
+                    if (est.status === 'Operativa') statusClass = 'status-operative';
+
+                    const lastUpd = est.last_updated ? new Date(est.last_updated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '---';
+                    const numReports = est.reports_count || 0;
+                    
+                    return `
+                    <div class="gas-station-card">
+                        <div class="gas-card-header" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${est.latitude || est.lat},${est.longitude || est.lng}', '_blank')">
+                            <div>
+                                <div class="gas-name">${est.name || est.nombre}</div>
+                                <div class="gas-city">${est.city || est.ciudad} • <span style="color: var(--accent-blue)">A ${est.distancia.toFixed(1)} km</span></div>
+                            </div>
+                            <div class="gas-status-badge ${statusClass}">
+                                ${est.status}
+                            </div>
                         </div>
-                        <div class="gas-status" style="background: ${est.status === 'Sin Cola' ? 'rgba(0, 208, 132, 0.1)' : 'rgba(255, 255, 255, 0.05)'}; color: ${est.status === 'Sin Cola' ? 'var(--accent-green)' : 'var(--text-muted)'}">
-                            ${est.status}
+
+                        ${numReports > 0 ? `<div style="font-size: 9px; color: var(--accent-green); font-weight: 800; margin-top: -5px; opacity: 0.8; letter-spacing: 0.5px;">⭐ ${numReports} reportes de la comunidad</div>` : ''}
+
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-top: 10px; opacity: 0.8; display: flex; align-items: center; gap: 5px;">
+                            <i class="ph-duotone ph-megaphone"></i> Reportar Estado Ahora:
+                        </div>
+                        <div class="gas-report-actions" style="margin-top: 8px;">
+                            <button class="report-btn ${est.status === 'Sin Cola' ? 'active' : ''}" onclick="Tasas.reportarStatus('${est.id}', 'Sin Cola')">
+                                <i class="ph-duotone ph-check-circle"></i> Sin Cola
+                            </button>
+                            <button class="report-btn ${est.status === 'Poca Cola' ? 'active' : ''}" onclick="Tasas.reportarStatus('${est.id}', 'Poca Cola')">
+                                <i class="ph-duotone ph-clock"></i> Poca
+                            </button>
+                            <button class="report-btn ${est.status === 'Mucha Cola' ? 'active' : ''}" onclick="Tasas.reportarStatus('${est.id}', 'Mucha Cola')">
+                                <i class="ph-duotone ph-warning-diamond"></i> Mucha
+                            </button>
+                        </div>
+
+                        <div class="gas-card-footer" style="border-top: 1px dashed var(--card-border); padding-top: 12px; margin-top: 5px;">
+                            <div class="gas-distance" style="color: var(--accent-blue);">
+                                <i class="ph ph-map-trifold"></i> Guíame con GPS
+                            </div>
+                            <div class="gas-update-time">Visto hoy: ${lastUpd}</div>
                         </div>
                     </div>
-                `).join('')}
+                `}).join('')}
             </div>
         `;
+
+        // Pequeño truco para asegurar que el indicador de la esquina cambie
+        const indicator = document.getElementById('update-indicator-gas');
+        if (indicator) indicator.innerText = 'CARGADO';
     },
 
     refrescarSurtidor() {
@@ -817,22 +927,85 @@ const Tasas = {
         const pumpTotalVesEl = document.getElementById('pump-total-ves');
         const pumpTotalUsdEl = document.getElementById('pump-total-usd');
         const pumpSlider = document.getElementById('pump-slider');
+        const fuelFill = document.getElementById('fuel-fill');
+        const bubbleContainer = document.getElementById('fuel-bubbles-container');
         
         if (!pumpLitersEl) return;
 
-        const litros = parseFloat(pumpSlider?.value || 20);
+        const litrosNueva = parseFloat(pumpSlider?.value || 20);
         const precioDolar = 0.50;
-        const totalUsd = litros * precioDolar;
-        const totalVes = totalUsd * window.DolarVE.tasas.usd;
+        const totalUsd = litrosNueva * precioDolar;
+        const totalVes = totalUsd * (window.DolarVE.tasas.usd || 0);
 
-        pumpLitersEl.innerText = litros.toFixed(1);
-        if (pumpTotalUsdEl) pumpTotalUsdEl.innerText = `${totalUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD`;
-        if (pumpTotalVesEl) {
-            pumpTotalVesEl.innerText = window.DolarVE.tasas.usd > 0 
-                ? `${totalVes.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs`
-                : "Cargando...";
+        // Actualizar Galón Visual (Proporcional a 120L)
+        if (fuelFill) {
+            const porcentaje = (litrosNueva / 120) * 100;
+            fuelFill.style.height = `${porcentaje}%`;
         }
-    }
+
+        // Generar burbujas si hay movimiento
+        if (bubbleContainer) {
+            this.generarBurbujas(bubbleContainer);
+        }
+
+        // --- Animación de Conteo Fluido (Optimizado v13.2 - Bugfix Cifras) ---
+        const animarValor = (elemento, valorFinal, decimales = 2, sufijo = "") => {
+            // Limpieza extrema: solo nos quedamos con los dígitos
+            const soloDigitos = elemento.innerText.replace(/[^\d]/g, '');
+            // Convertimos a número real basándonos en los decimales que sabemos que tiene
+            const valorInicial = (parseFloat(soloDigitos) || 0) / Math.pow(10, decimales);
+            
+            const duracion = 500; 
+            const inicio = performance.now();
+
+            // Cancelar cualquier animación previa en este elemento (Seguridad v13.2)
+            if (elemento.dataset.animating === 'true') return;
+            elemento.dataset.animating = 'true';
+
+            const actualizar = (ahora) => {
+                const transcurrido = ahora - inicio;
+                const progreso = Math.min(transcurrido / duracion, 1);
+                const ease = 1 - Math.pow(1 - progreso, 4); 
+                const valorActual = valorInicial + (valorFinal - valorInicial) * ease;
+                
+                elemento.innerText = `${valorActual.toLocaleString('es-VE', { 
+                    minimumFractionDigits: decimales, 
+                    maximumFractionDigits: decimales 
+                })}${sufijo}`;
+
+                if (progreso < 1) {
+                    requestAnimationFrame(actualizar);
+                } else {
+                    elemento.dataset.animating = 'false';
+                }
+            };
+            requestAnimationFrame(actualizar);
+        };
+
+        // Solo animamos los LITROS para evitar vibraciones en la UI
+        animarValor(pumpLitersEl, litrosNueva, 1);
+
+        // Los montos se actualizan directamente o de forma inmediata
+        if (pumpTotalUsdEl) pumpTotalUsdEl.innerText = `${totalUsd.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+        if (pumpTotalVesEl && window.DolarVE.tasas.usd > 0) {
+            pumpTotalVesEl.innerText = `${totalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
+        }
+    },
+
+    generarBurbujas(container) {
+        if (Math.random() > 0.3) return; // No siempre para no saturar
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        const size = Math.random() * 8 + 4;
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        bubble.style.left = `${Math.random() * 100}%`;
+        bubble.style.bottom = `-10px`;
+        bubble.style.animationDuration = `${Math.random() * 2 + 1}s`;
+        
+        container.appendChild(bubble);
+        setTimeout(() => bubble.remove(), 3000);
+    },
 };
 
 // Alias para compatibilidad con el HTML viejo si hace falta

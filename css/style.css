@@ -218,15 +218,20 @@ header {
 .hub-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    z-index: 9999;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 10002; /* Por encima de todo */
     display: none;
     opacity: 0;
     transition: opacity 0.4s ease;
     align-items: center;
     justify-content: center;
+    padding: 20px;
+}
+
+body.light-theme .hub-overlay {
+    background: rgba(255, 255, 255, 0.7); /* Fondo claro con blur */
 }
 
 .hub-overlay.show {
@@ -270,23 +275,37 @@ header {
 }
 
 .hub-item {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px; /* Más redondeado para look Apple */
+    padding: 25px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+body.light-theme .hub-item {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
 }
 
 .hub-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+body.light-theme .hub-item:hover {
+    background: #fff;
+    border-color: var(--accent-green);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
 .hub-icon {
@@ -299,14 +318,35 @@ header {
     font-size: 24px;
 }
 
-.hub-icon.green { background: rgba(0, 208, 132, 0.1); color: var(--accent-green); }
-.hub-icon.blue { background: rgba(62, 139, 255, 0.1); color: var(--accent-blue); }
-.hub-icon.gold { background: rgba(255, 191, 0, 0.1); color: #FFBF00; }
-.hub-icon.red { background: rgba(255, 77, 77, 0.1); color: var(--accent-red); }
+.hub-icon.green { background: rgba(0, 208, 132, 0.15); color: #008f5a; }
+.hub-icon.blue { background: rgba(62, 139, 255, 0.15); color: #0056d6; }
+.hub-icon.gold { background: rgba(255, 191, 0, 0.15); color: #b8860b; }
+.hub-icon.red { background: rgba(255, 77, 77, 0.15); color: #cc0000; }
+
+body.dark-theme .hub-icon.green { color: var(--accent-green); }
+body.dark-theme .hub-icon.blue { color: var(--accent-blue); }
+body.dark-theme .hub-icon.gold { color: #f1c40f; }
+body.dark-theme .hub-icon.red { color: var(--accent-red); }
+
+.hub-header h3 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -1px;
+}
+
+body.light-theme .hub-header h3 {
+    color: #000;
+}
 
 .hub-item span {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+}
+
+body.light-theme .hub-item span {
+    color: #000;
 }
 
 .hub-item .badge {
@@ -329,15 +369,25 @@ header {
 
 .hub-close {
     margin-top: 40px;
-    width: 50px;
-    height: 50px;
-    border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+body.light-theme .hub-close {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #000;
 }
 
 .hub-close:hover {
@@ -1794,50 +1844,348 @@ body.light-theme #terms-modal header {
 }
 
 /* --- Nearby Gas Stations v7.7.0 --- */
-.gas-station-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
+/* --- Surtidor Galón Digital Pro v13.0 (Liquid Evolution) --- */
+.gas-gallon-card {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 40px !important;
+    padding: 25px 20px !important;
+    display: flex; /* Cambiado de grid a flex para mejor control responsive */
+    gap: 20px;
     align-items: center;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.06) !important;
+    overflow: hidden;
+    position: relative;
+    min-height: 250px;
+}
+
+.gallon-visual-wrapper {
+    position: relative;
+    width: 100px; /* Reducido para dar más espacio a los números */
+    height: 180px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 20px 20px 35px 35px;
+    border: 3px solid rgba(0,0,0,0.08);
+    overflow: hidden;
+    flex-shrink: 0; /* Evita que el galón se encoja */
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.05), 0 20px 40px rgba(0,0,0,0.04);
+}
+
+body.dark-theme .gallon-visual-wrapper {
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(255,255,255,0.08);
+}
+
+.fuel-liquid-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20%; /* Controlado por JS */
+    background: linear-gradient(to top, #f39c12, #f1c40f); /* Color Ámbar/Gasolina Premium */
+    transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.2);
+}
+
+/* Efecto de Olas (Waves) */
+.fuel-wave {
+    position: absolute;
+    top: -15px;
+    left: 0;
+    width: 200%;
+    height: 20px;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1000 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 50 Q 250 0 500 50 T 1000 50 V 100 H 0 Z" fill="%23f1c40f"/></svg>');
+    background-size: 50% 100%;
+    animation: fuel-wave-move 3s infinite linear;
+}
+
+@keyframes fuel-wave-move {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Burbujas divertidas */
+.fuel-bubbles {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -10px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: bubble-up 3s infinite ease-in;
+}
+
+@keyframes bubble-up {
+    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { transform: translateY(-150px) scale(1.2); opacity: 0; }
+}
+
+.digital-stats-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1; /* Ocupa el resto del espacio */
+    min-width: 0; /* Importante para que el contenido no desborde con flex */
+}
+
+.stat-group {
+    border-left: 3px solid var(--accent-green);
+    padding-left: 12px;
+    min-width: 0;
+}
+
+.stat-label {
+    font-size: 9px; /* Un poco más pequeño */
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-value-big {
+    font-size: 32px; /* Reducido de 38px */
+    font-weight: 900;
+    color: var(--text-main);
+    line-height: 1.1;
+    font-family: 'Outfit', sans-serif;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; /* Evita que el 'Bs' se baje a la siguiente línea */
+    word-break: keep-all; 
+}
+
+/* Caso especial para Bolívares que suelen ser números largos */
+#pump-total-ves {
+    font-size: 26px; /* Reducido un poco más para evitar desbordes */
+    color: var(--accent-blue);
+    letter-spacing: -0.5px; /* Comprimir un poco si es necesario */
+}
+
+.stat-value-small {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-green);
+    font-family: 'Outfit', sans-serif;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Botones de Selección Rápida Estilo Cápsula Glass */
+.quick-amt-btn {
+    padding: 12px 10px !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 16px !important;
+    color: var(--text-main) !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
     cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: 'Outfit', sans-serif !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important;
+}
+
+body.dark-theme .quick-amt-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.quick-amt-btn:hover, .quick-amt-btn:active {
+    background: var(--accent-green) !important;
+    color: white !important;
+    border-color: transparent !important;
+    transform: scale(1.08);
+    box-shadow: 0 10px 20px rgba(0, 208, 132, 0.2) !important;
+}
+
+/* Slider Personalizado Premium */
+.premium-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 12px !important;
+    border-radius: 30px !important;
+    background: rgba(0,0,0,0.05) !important;
+    outline: none;
+    transition: 0.3s;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+body.dark-theme .premium-slider {
+    background: rgba(255,255,255,0.08) !important;
+}
+
+.premium-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    background: var(--accent-green);
+    border: 4px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 208, 132, 0.4);
+    transition: all 0.2s ease;
+}
+
+.premium-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 8px 20px rgba(0, 208, 132, 0.6);
+}
+
+.premium-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-green);
+    border: 4px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 208, 132, 0.4);
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 380px) {
+    .gas-gallon-card {
+        flex-direction: column;
+        padding: 20px !important;
+        text-align: center;
+    }
+    .gallon-visual-wrapper {
+        width: 80px;
+        height: 120px;
+    }
+    .stat-group {
+        border-left: none;
+        border-bottom: 1px solid var(--card-border);
+        padding: 5px 0;
+    }
+}
+
+/* --- Nearby Gas Stations Premium --- */
+.gas-station-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 22px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* Sombra más definida */
+    position: relative;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+body.light-theme .gas-station-card {
+    background: #ffffff; /* Fondo sólido en light para contraste total */
+    border: 1px solid #e1e4e8;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
 }
 
 .gas-station-card:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateX(5px);
+    transform: translateY(-5px);
+    border-color: var(--accent-green);
 }
 
-.gas-station-card:active {
-    transform: scale(0.98);
+.gas-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .gas-name {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 800;
     color: var(--text-main);
-    margin-bottom: 2px;
+    letter-spacing: -0.5px;
 }
 
 .gas-city {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
-    font-weight: 500;
+    font-weight: 600;
+    margin-top: 2px;
 }
 
-.gas-status {
+.gas-status-badge {
     font-size: 10px;
-    font-weight: 800;
-    padding: 4px 10px;
-    border-radius: 8px;
+    font-weight: 900;
+    padding: 6px 12px;
+    border-radius: 100px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
+
+.status-free { background: rgba(0, 208, 132, 0.1); color: #00D084; border: 1px solid rgba(0, 208, 132, 0.15); }
+.status-low { background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.15); }
+.status-high { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.15); }
+.status-operative { background: rgba(52, 152, 219, 0.1); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.15); } /* Azul Operativo */
+.status-closed { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); } /* Rojo Cerrado */
+
+.gas-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid var(--card-border);
+    margin-top: 5px;
+}
+
+.gas-distance {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.gas-update-time {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Acciones de Reporte */
+.gas-report-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.report-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.report-btn i { font-size: 16px; }
+
+.report-btn:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
+.report-btn.active { border-color: var(--accent-green); background: rgba(0, 208, 132, 0.05); color: var(--accent-green); }
 
 /* --- Crypto Pulse Cards --- */
 .pulse-card {

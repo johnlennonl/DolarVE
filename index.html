@@ -555,76 +555,59 @@
                     Control de Combustible v12.1
                 </div>
 
-                <div class="card"
-                    style="margin: 0; padding: 0; background: linear-gradient(145deg, #161B22, #0d1117); border: 1px solid var(--card-border); border-radius: 28px; position: relative; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
-                    <!-- Pantalla Digital Surtidor -->
-                    <div
-                        style="background: #000; padding: 35px 25px; border-bottom: 1px solid var(--card-border); position: relative;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
-                            <div style="text-align: left;">
-                                <div
-                                    style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
-                                    Litros</div>
-                                <div style="font-size: 56px; font-family: 'DM Mono', monospace; font-weight: 700; color: #fff; line-height: 1;"
-                                    id="pump-liters">20.0</div>
+                <!-- Surtidor Galón Pro v13.0 -->
+                <div class="gas-gallon-card card">
+                    <!-- El Galón Visual -->
+                    <div class="gallon-visual-wrapper">
+                        <div id="fuel-fill" class="fuel-liquid-fill">
+                            <div class="fuel-wave"></div>
+                            <div id="fuel-bubbles-container" class="fuel-bubbles">
+                                <!-- Burbujas generadas por JS -->
                             </div>
-                            <div style="text-align: right;">
-                                <div
-                                    style="font-size: 10px; color: var(--accent-green); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
-                                    Precio /L</div>
-                                <div id="pump-price-indicator"
-                                    style="font-size: 24px; color: #fff; font-weight: 700; font-family: 'DM Mono', monospace;">
-                                    0.50$</div>
-                            </div>
-                        </div>
-
-                        <div
-                            style="text-align: center; border-top: 1px solid rgba(0, 208, 132, 0.1); padding-top: 25px;">
-                            <div
-                                style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
-                                Monto total estimado</div>
-                            <div style="font-size: 42px; font-weight: 800; color: var(--accent-green); line-height: 1; font-family: 'Outfit';"
-                                id="pump-total-ves">--- Bs</div>
-                            <div style="font-size: 18px; color: #fff; margin-top: 8px; opacity: 0.8;"
-                                id="pump-total-usd">10.00 USD</div>
-                        </div>
-
-                        <!-- Premium Glow -->
-                        <div
-                            style="position: absolute; top: 0; left: 0; right: 0; height: 100%; background: radial-gradient(circle at center, rgba(0, 208, 132, 0.05), transparent); pointer-events: none;">
                         </div>
                     </div>
 
-                    <!-- Controles Surtidor -->
-                    <div style="padding: 25px;">
-                        <div
-                            style="font-size: 13px; font-weight: 700; color: var(--accent-green); text-align: center; margin-bottom: 25px; letter-spacing: 1px;">
-                            MODO: PRECIO REGULAR ($0.50)
+                    <!-- Panel de Estadísticas Digitales -->
+                    <div class="digital-stats-panel">
+                        <div class="stat-group">
+                            <div class="stat-label">Cantidad</div>
+                            <div id="pump-liters" class="stat-value-big">20.0</div>
+                            <div class="stat-value-small">LITROS</div>
                         </div>
 
-                        <!-- Slider -->
-                        <div style="position: relative; padding: 20px 0;">
-                            <input type="range" id="pump-slider" min="1" max="100" value="20"
-                                style="width: 100%; height: 8px; background: #2D333B; border-radius: 10px; appearance: none; outline: none; cursor: pointer;">
+                        <div class="stat-group" style="border-color: var(--accent-blue);">
+                            <div class="stat-label">Total en Bolívares</div>
+                            <div id="pump-total-ves" class="stat-value-big" style="font-size: 32px;">0.00 Bs</div>
                         </div>
 
-                        <!-- Quick Select Buttons -->
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 25px;">
-                            <button onclick="updatePump(20)"
-                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">20L</button>
-                            <button onclick="updatePump(35)"
-                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">35L</button>
-                            <button onclick="updatePump(40)"
-                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">40L</button>
-                            <button onclick="updatePump(60)"
-                                style="padding: 12px; background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;">60L</button>
+                        <div class="stat-group" style="border-color: #52637a;">
+                            <div class="stat-label">Total USD ($0.50)</div>
+                            <div id="pump-total-usd" class="stat-value-big" style="font-size: 24px; opacity: 0.7;">10.00 USD</div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Controles Surtidor -->
+                <div class="card" style="margin-top: 15px; padding: 25px;">
+                    <div style="position: relative; padding: 15px 0;">
+                        <input type="range" id="pump-slider" min="1" max="120" value="20" class="premium-slider"
+                            style="width: 100%; height: 10px; background: var(--card-border); border-radius: 20px; appearance: none; outline: none; cursor: pointer;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px;">
+                        <button onclick="updatePump(20)" class="quick-amt-btn">20L</button>
+                        <button onclick="updatePump(35)" class="quick-amt-btn">35L</button>
+                        <button onclick="updatePump(40)" class="quick-amt-btn">40L</button>
+                        <button onclick="updatePump(60)" class="quick-amt-btn">60L</button>
+                    </div>
+                </div>
+
                 <!-- Gasolineras Cercanas v7.7.0 -->
-                <div id="nearby-gas-stations" style="margin-top: 25px;">
-                    <!-- Se carga dinámicamente vía Tasas.obtenerEstacionesCercanas() -->
+                <div id="nearby-gas-stations" style="margin-top: 25px; transition: all 0.3s ease;">
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <div class="loader-spinner" style="margin: 0 auto 15px; width: 30px; height: 30px; border-top-color: var(--accent-green);"></div>
+                        <div style="font-size: 13px; font-weight: 600;">Sincronizando con Cabimas...</div>
+                    </div>
                 </div>
             </div>
         </section>
