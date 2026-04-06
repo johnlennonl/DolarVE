@@ -756,13 +756,16 @@ const Tasas = {
                         return { ...est, distancia: dist };
                     }).sort((a, b) => a.distancia - b.distancia);
 
-                    // --- Filtro de Geocerca Inteligente (v7.8) ---
-                    // Si tenemos estaciones a menos de 50km, mostramos SOLO esas (máximo 3)
-                    // Esto evita mostrar Caracas (500km) si estás en Cabimas.
-                    const estacionesMuyCerca = cercanas.filter(e => e.distancia < 50);
-                    const resultadoFinal = estacionesMuyCerca.length > 0 ? estacionesMuyCerca.slice(0, 3) : cercanas.slice(0, 3);
-
-                    this.renderizarEstaciones(resultadoFinal);
+                    // --- Nueva Geocerca Profesional v7.9 ---
+                    // Si el usuario está muy lejos (>80km) de cualquier reporte,
+                    // mostramos el estado vacío en lugar de bombas de otras ciudades.
+                    const estacionesCercanasRealistas = cercanas.filter(e => e.distancia < 80);
+                    
+                    if (estacionesCercanasRealistas.length === 0) {
+                        this.mostrarEstadoVacioGasolina(container);
+                    } else {
+                        this.renderizarEstaciones(estacionesCercanasRealistas.slice(0, 3));
+                    }
                 } catch (e) {
                     console.error('[DolarVE] Error fetching gas:', e);
                 }
@@ -843,6 +846,22 @@ const Tasas = {
                 <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">Gasolineras Cercanas</div>
                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">Activa tu ubicación para encontrar las estaciones de servicio más próximas a ti.</div>
                 <button onclick="Tasas.obtenerEstacionesCercanas(true)" class="btn-primary" style="width: 100%; background: #3498db; color: #fff; padding: 12px; font-size: 13px;">Activar Ubicación</button>
+            </div>
+        `;
+    },
+
+    mostrarEstadoVacioGasolina(container) {
+        container.innerHTML = `
+            <div class="no-stations-card">
+                <i class="ph-duotone ph-map-pin-line no-stations-icon"></i>
+                <div class="no-stations-title">No hay bombas cerca</div>
+                <div class="no-stations-text">
+                    No hemos detectado aportes en tu zona (radio 80km). <br>
+                    <strong>¡Sé el primero en reportar tu estación local!</strong>
+                </div>
+                <button onclick="Interfaz.mostrarModalAportar()" class="btn-primary" style="padding: 12px 25px; border-radius: 14px;">
+                    Reportar Estación
+                </button>
             </div>
         `;
     },

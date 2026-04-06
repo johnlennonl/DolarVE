@@ -2052,6 +2052,53 @@ body.dark-theme .premium-slider {
     box-shadow: 0 5px 15px rgba(0, 208, 132, 0.4);
 }
 
+.slider-hint {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent-green);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    animation: hintBounce 2s infinite;
+}
+
+@keyframes hintBounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+.no-stations-card {
+    background: var(--card-bg) !important;
+    border: 1px dashed var(--card-border) !important;
+    border-radius: 24px !important;
+    padding: 40px 25px !important;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+}
+
+.no-stations-icon {
+    font-size: 40px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.no-stations-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.no-stations-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
 /* Ajustes para pantallas muy pequeñas */
 @media (max-width: 380px) {
     .gas-gallon-card {
