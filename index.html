@@ -877,7 +877,16 @@
         </section>
 
         <!-- Pantalla Mi Cartera (v7.0 Modular) -->
-        <section id="portfolio-screen" class="screen"></section>
+        <section id="portfolio-screen" class="screen">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; padding: 40px; text-align: center;">
+                <div style="width: 80px; height: 80px; background: rgba(255, 184, 0, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; border: 1px solid rgba(255, 184, 0, 0.2);">
+                    <i class="ph-duotone ph-lock" style="font-size: 40px; color: #FFB800;"></i>
+                </div>
+                <h2 style="font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 12px;">¡Muy Pronto!</h2>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 260px;">Estamos terminando de pulir tu nueva cartera digital. ¡Vuelve pronto para disfrutarla!</p>
+                <button onclick="Principal.navegar('home-screen')" style="margin-top: 30px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer;">Volver al Inicio</button>
+            </div>
+        </section>
 
         <!-- Navegación Maestro (Master Hub) -->
         <nav class="bottom-nav">
@@ -912,12 +921,12 @@
                         <div class="hub-icon blue"><i class="ph-duotone ph-chart-line-up"></i></div>
                         <span>Cripto</span>
                     </div>
-                    <div id="hub-item-portfolio" class="hub-item" onclick="Principal.navegar('portfolio-screen')">
+                    <div id="hub-item-portfolio" class="hub-item disabled">
                         <div id="hub-icon-portfolio" class="hub-icon gold">
                             <i class="ph-duotone ph-wallet"></i>
                         </div>
                         <span class="hub-item-label">Mi Cartera</span>
-                        <div id="hub-badge-portfolio" class="badge" style="background: var(--cv-red); color: #fff;">BETA!</div>
+                        <div id="hub-badge-portfolio" class="badge">Pronto</div>
                     </div>
                     <div class="hub-item disabled">
                         <div class="hub-icon red"><i class="ph-duotone ph-calendar-check"></i></div>
