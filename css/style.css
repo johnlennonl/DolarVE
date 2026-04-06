@@ -17,16 +17,33 @@
 }
 
 body.light-theme {
-    --bg-color: #F0F2F5;
+    /* Sistema de Fondos Elegantes (Apple Gray & Pure White) */
+    --bg-color: #F2F2F7;
     --card-bg: #FFFFFF;
-    --card-border: rgba(0, 0, 0, 0.05);
-    --text-main: #1C1E21;
-    --text-muted: #65676B;
+    --card-border: rgba(60, 60, 67, 0.15); /* Bordes sutiles y elegantes */
+    
+    /* Textos Alta Legibilidad */
+    --text-main: #000000;
+    --text-muted: #8E8E93;
+    
+    /* Acentos System (Mate y Sofisticados, eliminando brillo) */
+    --accent-green: #34C759; /* Apple System Green */
+    --accent-blue: #007AFF; /* Apple System Blue */
+    --accent-red: #FF3B30; /* Apple System Red */
+}
+
+/* Efecto de Elevación Premium para Tarjetas en Modo Claro */
+body.light-theme .card,
+body.light-theme .intl-card,
+body.light-theme .hub-item {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 body.light-theme .bottom-nav {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     border-top: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 }
 
 * {
