@@ -59,7 +59,7 @@ const Cuentas = {
                         ${logoHtml}
                     </div>
                     <div class="account-info">
-                        <div style="font-weight: 700; color: #fff; font-size: 14px;">${acc.banco_nombre}</div>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 14px;">${acc.banco_nombre}</div>
                         <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
                             ${acc.tipo_documento}${acc.numero_documento} • ${acc.prefijo_tel}-${acc.numero_tel}
                         </div>
