@@ -731,8 +731,10 @@ const Tasas = {
                 const lng = pos.coords.longitude;
                 
                 try {
+                    const radius = document.getElementById('gas-radius-select')?.value || 20000;
+                    
                     // 1. Obtener Estaciones Reales desde OpenStreetMap (API Universal)
-                    let estacionesOSM = await this.fetchDesdeOSM(lat, lng);
+                    let estacionesOSM = await this.fetchDesdeOSM(lat, lng, radius);
                     
                     // 2. Obtener reportes de status desde Supabase para esas estaciones
                     let reportesStatus = {};
@@ -769,8 +771,8 @@ const Tasas = {
                     if (cercanas.length === 0) {
                         this.mostrarEstadoVacioGasolina(container);
                     } else {
-                        // Mostramos las 5 más cercanas (antes eran 3, ahora tenemos datos de sobra)
-                        this.renderizarEstaciones(cercanas.slice(0, 5));
+                        // Mostramos las 10 más cercanas (antes eran 3, ahora tenemos datos de sobra)
+                        this.renderizarEstaciones(cercanas.slice(0, 10));
                     }
                 } catch (e) {
                     console.error('[DolarVE] Error fetch global gas:', e);
@@ -784,9 +786,100 @@ const Tasas = {
         );
     },
 
+    toggleSearchGas() {
+        const panel = document.getElementById('gas-search-container');
+        if (panel) {
+            const isHidden = panel.style.display === 'none';
+            panel.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                setTimeout(() => document.getElementById('gas-search-input').focus(), 100);
+            }
+        }
+    },
+
+    buscarGasPorNombre() {
+        const input = document.getElementById('gas-search-input');
+        const queryRaw = input.value.trim();
+        
+        if (!queryRaw) {
+            this.obtenerEstacionesCercanas(true);
+            return;
+        }
+
+        // --- Búsqueda Inteligente (Limpieza de Prefijos) ---
+        const queryLimpia = queryRaw
+            .replace(/^(E\/S|E\.S\.|Estacion de Servicio|Estacion|Gasolinera)\s+/i, '')
+            .trim();
+
+        const container = document.getElementById('nearby-gas-stations');
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <div class="loader-spinner" style="margin: 0 auto 15px; width: 30px; height: 30px; border-top-color: var(--accent-green);"></div>
+                <div style="font-size: 13px; font-weight: 600;">Buscando "${queryLimpia}"...</div>
+                <div style="font-size: 10px; margin-top: 8px;">Conectando con servidores globales...</div>
+            </div>
+        `;
+
+        // Consulta Overpass para buscar por nombre (Filtro nacional)
+        const osmQuery = `
+            [out:json][timeout:30];
+            (
+                nwr["amenity"="fuel"]["name"~"${queryLimpia}",i];
+                nwr["amenity"="fuel"]["operator"~"${queryLimpia}",i];
+                nwr["amenity"="fuel"]["brand"~"${queryLimpia}",i];
+            );
+            out center;
+        `;
+        
+        this.fetchConRespaldo(osmQuery).then(async data => {
+            if (!data || !data.elements) throw new Error('Sin datos');
+            
+            // Obtenemos coordenadas actuales para calcular distancia del usuario a los resultados encontrados
+            let userLat = 10.48, userLng = -66.90; // Default Caracas
+            try {
+                const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
+                userLat = pos.coords.latitude;
+                userLng = pos.coords.longitude;
+            } catch(e) {}
+
+            const estaciones = data.elements.map(el => {
+                const coords = el.type === 'node' ? { lat: el.lat, lon: el.lon } : { lat: el.center.lat, lon: el.center.lon };
+                const distForSearch = this.calcularDistancia(userLat, userLng, coords.lat, coords.lon);
+                
+                return {
+                    id: el.id,
+                    name: el.tags.name || el.tags.operator || el.tags.brand || `E/S Sin Nombre`,
+                    city: el.tags["addr:city"] || el.tags["addr:state"] || 'Venezuela',
+                    latitude: coords.lat,
+                    longitude: coords.lon,
+                    distancia: distForSearch,
+                    status: 'Operativa',
+                    reports_count: 0,
+                    source: 'Búsqueda Global'
+                };
+            }).sort((a, b) => a.distancia - b.distancia);
+
+            if (estaciones.length === 0) {
+                container.innerHTML = `
+                    <div class="no-stations-card">
+                        <i class="ph-duotone ph-magnifying-glass no-stations-icon"></i>
+                        <div class="no-stations-title">No hay resultados</div>
+                        <div class="no-stations-text">No encontramos "${queryRaw}". Prueba solo con el nombre principal.</div>
+                        <button onclick="Tasas.obtenerEstacionesCercanas(true)" class="btn-primary" style="padding: 10px 20px;">Ver Cercanas</button>
+                    </div>
+                `;
+            } else {
+                this.renderizarEstaciones(estaciones);
+            }
+        }).catch(e => {
+            console.error('Search failed:', e);
+            this.mostrarErrorGas(container, "Los servidores del mapa están saturados. Reintenta en unos segundos.");
+        });
+    },
+
     async fetchDesdeOSM(lat, lng, radius = 20000) {
         const query = `
-            [out:json][timeout:25];
+            [out:json][timeout:30];
             (
                 node["amenity"="fuel"](around:${radius}, ${lat}, ${lng});
                 way["amenity"="fuel"](around:${radius}, ${lat}, ${lng});
@@ -794,25 +887,41 @@ const Tasas = {
             );
             out center;
         `;
-        const url = 'https://overpass-api.de/api/interpreter';
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                body: `data=${encodeURIComponent(query)}`
-            });
-            if (!response.ok) throw new Error('API Overpass no disponible');
-            const data = await response.json();
-            
-            // Normalizar resultados (Overpass devuelve nodes/ways/relations)
-            return data.elements.map(el => {
-                const coords = el.type === 'node' ? { lat: el.lat, lon: el.lon } : { lat: el.center.lat, lon: el.center.lon };
-                return { ...el, ...coords };
-            });
-        } catch (e) {
-            console.warn('[DolarVE] OSM Fetch failed:', e);
-            return [];
-        }
+        
+        const data = await this.fetchConRespaldo(query);
+        if (!data || !data.elements) return [];
+
+        return data.elements.map(el => {
+            const coords = el.type === 'node' ? { lat: el.lat, lon: el.lon } : { lat: el.center.lat, lon: el.center.lon };
+            return { ...el, ...coords };
+        });
     },
+
+    // --- NUEVO MOTOR DE ESTABILIDAD: ROTACIÓN DE SERVIDORES ---
+    async fetchConRespaldo(query) {
+        const endpoints = [
+            'https://overpass-api.de/api/interpreter',
+            'https://lz4.overpass-api.de/api/interpreter',
+            'https://overpass.kumi.systems/api/interpreter',
+            'https://overpass-api.de/api/interpreter' // Reitento final
+        ];
+
+        for (const url of endpoints) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: `data=${encodeURIComponent(query)}`,
+                    signal: AbortSignal.timeout(10000) // 10 segundos de timeout por servidor
+                });
+                if (response.ok) return await response.json();
+                console.warn(`[DolarVE] Servidor ${url} saturado. Saltando...`);
+            } catch (e) {
+                console.warn(`[DolarVE] Fallo conexión con ${url}. Reintentando con otro...`);
+            }
+        }
+        throw new Error('Todos los servidores fallaron');
+    },
+
 
     mostrarErrorGas(container, mensaje) {
         container.innerHTML = `
@@ -944,6 +1053,7 @@ const Tasas = {
                             <div>
                                 <div class="gas-name">${est.name || est.nombre}</div>
                                 <div class="gas-city">${est.city || est.ciudad} • <span style="color: var(--accent-blue)">A ${est.distancia.toFixed(1)} km</span></div>
+                                <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; opacity: 0.7;">📍 ${est.source || 'Mapa Local'}</div>
                             </div>
                             <div class="gas-status-badge ${statusClass}">
                                 ${est.status}

@@ -605,11 +605,42 @@
                     </div>
                 </div>
 
-                <!-- Gasolineras Cercanas v7.7.0 -->
-                <div id="nearby-gas-stations" style="margin-top: 25px; transition: all 0.3s ease;">
+                <!-- Gasolineras Cercanas v8.5.0 (API OSM) -->
+                <div class="card" style="margin-top: 25px; padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--card-bg);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="ph-duotone ph-map-pin-line" style="font-size: 24px; color: var(--accent-green);"></i>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 800; color: var(--text-main);">Surtidor Pro</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">MAPA GLOBAL COOPERATIVO</div>
+                        </div>
+                    </div>
+                    <button id="btn-toggle-search" onclick="Tasas.toggleSearchGas()" class="btn-glass-icon">
+                        <i class="ph ph-magnifying-glass" style="font-size: 20px;"></i>
+                    </button>
+                </div>
+
+                <!-- Buscador Maestro (Glassmorphism) -->
+                <div id="gas-search-container" class="search-panel" style="display: none; margin-bottom: 20px;">
+                    <div class="search-input-group">
+                        <i class="ph ph-magnifying-glass search-icon-inner"></i>
+                        <input type="text" id="gas-search-input" placeholder="Nombre o Ciudad..." 
+                            onkeyup="if(event.key === 'Enter') Tasas.buscarGasPorNombre()">
+                        <button onclick="Tasas.buscarGasPorNombre()" class="btn-search-action">BUSCAR</button>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Radio:</div>
+                        <select id="gas-radius-select" class="select-premium" onchange="Tasas.obtenerEstacionesCercanas(true)">
+                            <option value="20000">20 KM</option>
+                            <option value="50000">50 KM</option>
+                            <option value="100000">100 KM</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="nearby-gas-stations" style="margin-top: 15px; transition: all 0.3s ease;">
                     <div style="text-align: center; padding: 40px; color: var(--text-muted);">
                         <div class="loader-spinner" style="margin: 0 auto 15px; width: 30px; height: 30px; border-top-color: var(--accent-green);"></div>
-                        <div style="font-size: 13px; font-weight: 600;">Sincronizando con Cabimas...</div>
+                        <div style="font-size: 13px; font-weight: 600;">Buscando en el satélite...</div>
                     </div>
                 </div>
             </div>
