@@ -780,7 +780,7 @@ const Tasas = {
                     </div>
                 `;
             },
-            { timeout: 10000, enableHighAccuracy: true }
+            { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
         );
     },
 
@@ -873,10 +873,12 @@ const Tasas = {
         // Guardamos en caché local para el modo demo
         this.estacionesCercanasCache = estaciones;
 
+        const zoneLabel = estaciones.length > 0 ? estaciones[0].city : 'Tu Zona';
+
         container.innerHTML = `
             <div style="font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <i class="ph-duotone ph-gas-pump" style="color: var(--accent-green); font-size: 18px;"></i> Bombas Cercanas (Cabimas)
+                    <i class="ph-duotone ph-gas-pump" style="color: var(--accent-green); font-size: 18px;"></i> Bombas Cercanas (${zoneLabel})
                 </div>
                 <button onclick="Tasas.obtenerEstacionesCercanas(true)" style="background: none; border: none; cursor: pointer; color: var(--accent-green); display: flex; align-items: center; gap: 5px;">
                     <span id="update-indicator-gas" style="font-size: 9px; font-weight: 800;">RECARGAR</span>
