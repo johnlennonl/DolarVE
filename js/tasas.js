@@ -731,57 +731,97 @@ const Tasas = {
                 const lng = pos.coords.longitude;
                 
                 try {
-                    // Fetch real data from Supabase
-                    let estaciones = [];
-                    if (window.DolarVE.supabase) {
-                        const { data, error } = await window.DolarVE.supabase.from('gas_stations').select('*');
-                        if (!error && data) estaciones = data;
+                    // 1. Obtener Estaciones Reales desde OpenStreetMap (API Universal)
+                    let estacionesOSM = await this.fetchDesdeOSM(lat, lng);
+                    
+                    // 2. Obtener reportes de status desde Supabase para esas estaciones
+                    let reportesStatus = {};
+                    if (window.DolarVE.supabase && estacionesOSM.length > 0) {
+                        const osmIds = estacionesOSM.map(e => e.id);
+                        const { data, error } = await window.DolarVE.supabase
+                            .from('gas_stations')
+                            .select('id, status, last_updated, reports_count')
+                            .in('id', osmIds);
+                        
+                        if (!error && data) {
+                            data.forEach(r => { reportesStatus[r.id] = r; });
+                        }
                     }
 
-                    // Fallback to minimal data if supabase fails or table empty
-                    if (estaciones.length === 0) {
-                        estaciones = [
-                            { id: '1', name: 'E/S Chuao', latitude: 10.4851, longitude: -66.8372, city: 'Caracas', status: 'Operativa' },
-                            { id: '2', name: 'E/S El Cafetal', latitude: 10.4715, longitude: -66.8324, city: 'Caracas', status: 'Sin Cola' },
-                            { id: '3', name: 'E/S Las Mercedes', latitude: 10.4820, longitude: -66.8631, city: 'Caracas', status: 'Poca Cola' },
-                            // Cabimas (Tu ubicación local)
-                            { id: '4', name: 'E/S La Estancia', latitude: 10.3885, longitude: -71.4392, city: 'Cabimas', status: 'Operativa' },
-                            { id: '5', name: 'E/S Delicias', latitude: 10.3952, longitude: -71.4421, city: 'Cabimas', status: 'Sin Cola' },
-                            { id: '6', name: 'E/S El Amparo', latitude: 10.6695, longitude: -71.6548, city: 'Maracaibo', status: 'Poca Cola' }
-                        ];
-                    }
-
-                    const cercanas = estaciones.map(est => {
-                        const dist = this.calcularDistancia(lat, lng, est.latitude, est.longitude);
-                        return { ...est, distancia: dist };
+                    // 3. Fusionar datos (Mapa Global + Status Real-Time de DolarVE)
+                    const cercanas = estacionesOSM.map(est => {
+                        const dist = this.calcularDistancia(lat, lng, est.lat, est.lon);
+                        const statusData = reportesStatus[est.id] || {};
+                        return {
+                            id: est.id,
+                            name: est.tags.name || `E/S ${est.tags.operator || 'Sin Nombre'}`,
+                            city: est.tags["addr:city"] || 'Tu Zona',
+                            latitude: est.lat,
+                            longitude: est.lon,
+                            distancia: dist,
+                            status: statusData.status || 'Operativa',
+                            last_updated: statusData.last_updated || null,
+                            reports_count: statusData.reports_count || 0,
+                            source: 'OpenStreetMap'
+                        };
                     }).sort((a, b) => a.distancia - b.distancia);
 
-                    // --- Nueva Geocerca Profesional v7.9 ---
-                    // Si el usuario está muy lejos (>80km) de cualquier reporte,
-                    // mostramos el estado vacío en lugar de bombas de otras ciudades.
-                    const estacionesCercanasRealistas = cercanas.filter(e => e.distancia < 80);
-                    
-                    if (estacionesCercanasRealistas.length === 0) {
+                    if (cercanas.length === 0) {
                         this.mostrarEstadoVacioGasolina(container);
                     } else {
-                        this.renderizarEstaciones(estacionesCercanasRealistas.slice(0, 3));
+                        // Mostramos las 5 más cercanas (antes eran 3, ahora tenemos datos de sobra)
+                        this.renderizarEstaciones(cercanas.slice(0, 5));
                     }
                 } catch (e) {
-                    console.error('[DolarVE] Error fetching gas:', e);
+                    console.error('[DolarVE] Error fetch global gas:', e);
+                    this.mostrarErrorGas(container, "Error al conectar con el mapa global.");
                 }
             },
             (err) => {
-                const errorMsg = err.code === 1 ? 'Ubicación denegada. Actívala en ajustes.' : 'Error al obtener ubicación.';
-                container.innerHTML = `
-                    <div class="card" style="margin: 0; padding: 25px; text-align: center; background: rgba(255, 77, 77, 0.05); border: 1px dashed rgba(255, 77, 77, 0.2);">
-                        <i class="ph-duotone ph-map-pin-slash" style="font-size: 32px; color: var(--accent-red); margin-bottom: 15px;"></i>
-                        <div style="font-size: 13px; color: var(--text-main); font-weight: 700;">${errorMsg}</div>
-                        <button onclick="Tasas.obtenerEstacionesCercanas(true)" class="btn-primary" style="margin-top: 15px; background: var(--accent-red); width: 100%;">Reintentar</button>
-                    </div>
-                `;
+                this.mostrarErrorGas(container, err.code === 1 ? 'Ubicación denegada. Actívala en ajustes.' : 'Error al obtener ubicación.');
             },
             { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
         );
+    },
+
+    async fetchDesdeOSM(lat, lng, radius = 20000) {
+        const query = `
+            [out:json][timeout:25];
+            (
+                node["amenity"="fuel"](around:${radius}, ${lat}, ${lng});
+                way["amenity"="fuel"](around:${radius}, ${lat}, ${lng});
+                relation["amenity"="fuel"](around:${radius}, ${lat}, ${lng});
+            );
+            out center;
+        `;
+        const url = 'https://overpass-api.de/api/interpreter';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: `data=${encodeURIComponent(query)}`
+            });
+            if (!response.ok) throw new Error('API Overpass no disponible');
+            const data = await response.json();
+            
+            // Normalizar resultados (Overpass devuelve nodes/ways/relations)
+            return data.elements.map(el => {
+                const coords = el.type === 'node' ? { lat: el.lat, lon: el.lon } : { lat: el.center.lat, lon: el.center.lon };
+                return { ...el, ...coords };
+            });
+        } catch (e) {
+            console.warn('[DolarVE] OSM Fetch failed:', e);
+            return [];
+        }
+    },
+
+    mostrarErrorGas(container, mensaje) {
+        container.innerHTML = `
+            <div class="card" style="margin: 0; padding: 25px; text-align: center; background: rgba(255, 77, 77, 0.05); border: 1px dashed rgba(255, 77, 77, 0.2);">
+                <i class="ph-duotone ph-map-pin-slash" style="font-size: 32px; color: var(--accent-red); margin-bottom: 15px;"></i>
+                <div style="font-size: 13px; color: var(--text-main); font-weight: 700;">${mensaje}</div>
+                <button onclick="Tasas.obtenerEstacionesCercanas(true)" class="btn-primary" style="margin-top: 15px; background: var(--accent-red); width: 100%;">Reintentar</button>
+            </div>
+        `;
     },
 
     async reportarStatus(stationId, nuevoStatus) {
