@@ -126,36 +126,55 @@ const Interfaz = {
         try {
             console.log('[DolarVE] 🔔 Inicializando Push...');
             
-            // Registrar o recuperar el SW
-            const reg = await navigator.serviceWorker.register('/sw.js');
-            console.log('[DolarVE] SW registrado. Estado:', reg.active ? 'activo' : reg.installing ? 'instalando' : 'esperando');
-
-            // Obtener el worker (activo, esperando, o instalando)
-            let sw = reg.active || reg.waiting || reg.installing;
+            // Obtener el SW ya registrado (el que se registró en index.html)
+            let reg = await navigator.serviceWorker.getRegistration();
             
-            // Si no está activo, esperar a que lo esté
-            if (sw && sw.state !== 'activated') {
-                console.log('[DolarVE] Esperando activación del SW (estado actual:', sw.state + ')...');
-                await new Promise((resolve, reject) => {
-                    const timeout = setTimeout(() => {
-                        // Intentar usar el registro de todas formas
-                        resolve();
-                    }, 10000);
+            if (!reg) {
+                // Si no hay ninguno, registrar (misma URL que index.html)
+                console.log('[DolarVE] No hay SW registrado, creando...');
+                reg = await navigator.serviceWorker.register('/sw.js?v=11.0');
+            }
+
+            console.log('[DolarVE] SW encontrado. Activo:', !!reg.active);
+
+            // Si no está activo aún, esperar
+            if (!reg.active) {
+                console.log('[DolarVE] SW no activo todavía, esperando...');
+                await new Promise((resolve) => {
+                    const timeout = setTimeout(resolve, 10000);
                     
-                    sw.addEventListener('statechange', () => {
-                        console.log('[DolarVE] SW estado cambió a:', sw.state);
-                        if (sw.state === 'activated') {
+                    const checkWorker = reg.installing || reg.waiting;
+                    if (checkWorker) {
+                        checkWorker.addEventListener('statechange', () => {
+                            console.log('[DolarVE] SW estado:', checkWorker.state);
+                            if (checkWorker.state === 'activated') {
+                                clearTimeout(timeout);
+                                resolve();
+                            }
+                        });
+                    }
+                    
+                    // Fallback: revisar periódicamente
+                    const interval = setInterval(async () => {
+                        const check = await navigator.serviceWorker.getRegistration();
+                        if (check?.active) {
+                            clearInterval(interval);
                             clearTimeout(timeout);
                             resolve();
                         }
-                    });
+                    }, 500);
                     
-                    // Si ya está activo (por skipWaiting)
-                    if (sw.state === 'activated') {
-                        clearTimeout(timeout);
-                        resolve();
-                    }
+                    setTimeout(() => clearInterval(interval), 10000);
                 });
+                
+                // Obtener registro fresco
+                reg = await navigator.serviceWorker.getRegistration();
+            }
+
+            if (!reg || !reg.active) {
+                console.error('[DolarVE] SW no se pudo activar');
+                this.mostrarNotificacion('⚠️ Error: Recarga la página e intenta de nuevo');
+                return;
             }
 
             window.DolarVE.swRegistration = reg;
@@ -165,7 +184,7 @@ const Interfaz = {
             console.log('[DolarVE] ✅ Push inicializado. Suscrito:', !!suscripcion);
         } catch (e) {
             console.error('[DolarVE] Error al inicializar Push:', e);
-            this.mostrarNotificacion('⚠️ Error inicializando notificaciones: ' + e.message);
+            this.mostrarNotificacion('⚠️ Error: ' + e.message);
         }
     },
 
