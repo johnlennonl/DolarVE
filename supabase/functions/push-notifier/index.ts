@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // List of currencies to monitor
+    // Lista de monedas a vigilar
     const targets = [
       { pair: 'USD/VES', url: 'https://ve.dolarapi.com/v1/dolares/oficial', label: 'Dólar' },
       { pair: 'EUR/VES', url: 'https://ve.dolarapi.com/v1/euros/oficial', label: 'Euro' }
@@ -27,15 +27,31 @@ Deno.serve(async (req) => {
       Deno.env.get('VAPID_PRIVATE_KEY') ?? ''
     );
 
-    const { data: subs } = await supabase.from('push_subscriptions').select('subscription');
+    const { data: subs, error: subsError } = await supabase
+      .from('push_subscriptions')
+      .select('id, subscription, device_id');
+
+    if (subsError) {
+      console.error('Error fetching subscriptions:', subsError);
+      throw subsError;
+    }
+
+    console.log(`[push-notifier] Found ${subs?.length || 0} subscriptions`);
+
+    let notificationsSent = 0;
+    let subscriptionsCleaned = 0;
 
     for (const target of targets) {
       try {
         const response = await fetch(target.url);
-        if (!response.ok) continue;
+        if (!response.ok) {
+          console.warn(`[push-notifier] API ${target.pair} returned ${response.status}`);
+          continue;
+        }
         
         const data = await response.json();
         const currentPrice = data.promedio;
+        if (!currentPrice || currentPrice <= 0) continue;
 
         const { data: history } = await supabase
           .from('price_history')
@@ -45,35 +61,76 @@ Deno.serve(async (req) => {
 
         const lastPrice = history?.last_price || 0;
 
-        // Threshold check (more than 0.01 bolivars)
+        // Si el precio cambió más de 0.01 bs
         if (Math.abs(currentPrice - lastPrice) > 0.01) {
           const priceFormatted = currentPrice.toFixed(2);
+          console.log(`[push-notifier] ${target.pair}: ${lastPrice} → ${currentPrice} (cambio detectado)`);
 
-          const notifications = subs?.map((s) => 
-            webpush.sendNotification(s.subscription, JSON.stringify({
-              title: `📈 Alerta DolarVE: ${target.label}`,
-              body: `El ${target.label} oficial cambió a Bs. ${priceFormatted}`,
-              icon: 'https://dolarve.com/logo.png' // Ensure this is a valid public URL
-            })).catch(e => console.error(`Failed individual push for ${target.label}:`, e))
-          );
+          // Enviar a cada suscriptor
+          const expiredIds = [];
 
-          if (notifications) await Promise.all(notifications);
+          if (subs && subs.length > 0) {
+            for (const s of subs) {
+              try {
+                await webpush.sendNotification(
+                  s.subscription, 
+                  JSON.stringify({
+                    title: `📈 Alerta DolarVE: ${target.label}`,
+                    body: `El ${target.label} oficial cambió a Bs. ${priceFormatted}`,
+                    icon: '/logo.png',
+                    url: '/'
+                  })
+                );
+                notificationsSent++;
+              } catch (pushError) {
+                console.error(`[push-notifier] Error enviando push a ${s.device_id || s.id}:`, pushError.statusCode, pushError.body);
+                
+                // Si el endpoint expiró (410 Gone) o es inválido (404), limpiar
+                if (pushError.statusCode === 410 || pushError.statusCode === 404) {
+                  expiredIds.push(s.id);
+                }
+              }
+            }
+          }
+
+          // Limpiar suscripciones expiradas
+          if (expiredIds.length > 0) {
+            const { error: delError } = await supabase
+              .from('push_subscriptions')
+              .delete()
+              .in('id', expiredIds);
+            
+            if (!delError) {
+              subscriptionsCleaned = expiredIds.length;
+              console.log(`[push-notifier] Limpiadas ${expiredIds.length} suscripciones expiradas`);
+            }
+          }
+
+          // Actualizar precio en historial
           await supabase.from('price_history').upsert({ 
             pair: target.pair, 
             last_price: currentPrice, 
             updated_at: new Date().toISOString() 
           });
+        } else {
+          console.log(`[push-notifier] ${target.pair}: Sin cambio (${currentPrice})`);
         }
       } catch (innerErr) {
-        console.error(`Error processing ${target.pair}:`, innerErr);
+        console.error(`[push-notifier] Error processing ${target.pair}:`, innerErr);
       }
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ 
+      ok: true, 
+      sent: notificationsSent, 
+      cleaned: subscriptionsCleaned,
+      subscribers: subs?.length || 0
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
 
   } catch (err) {
+    console.error('[push-notifier] Fatal error:', err);
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" }

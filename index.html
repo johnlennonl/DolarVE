@@ -1610,17 +1610,22 @@
     <script src="js/noticias.js?v=11.0"></script>
     <script src="js/app.js?v=11.0"></script>
     <script>
-        // Force clear all old service workers and caches, then re-register
+        // Smart Service Worker Update (preserva suscripciones push)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                registrations.forEach(reg => reg.unregister());
-            }).then(() => {
-                return caches.keys();
-            }).then(cacheNames => {
-                return Promise.all(cacheNames.map(name => caches.delete(name)));
-            }).then(() => {
-                navigator.serviceWorker.register('sw.js?v=11.0');
-                console.log('[DolarVE] Service Worker refreshed successfully');
+            navigator.serviceWorker.register('sw.js?v=11.0').then(reg => {
+                console.log('[DolarVE] Service Worker registrado correctamente');
+                
+                // Limpiar solo caches antiguos (no el actual)
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        if (name !== 'dolarve-v11.0-cache') {
+                            caches.delete(name);
+                            console.log('[DolarVE] Cache antiguo eliminado:', name);
+                        }
+                    });
+                });
+            }).catch(err => {
+                console.error('[DolarVE] Error registrando SW:', err);
             });
         }
     </script>

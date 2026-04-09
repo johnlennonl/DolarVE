@@ -153,6 +153,16 @@ const Interfaz = {
         }
     },
 
+    // Genera o recupera un ID único para este dispositivo (para push sin login)
+    getDeviceId() {
+        let deviceId = localStorage.getItem('dolarve_device_id');
+        if (!deviceId) {
+            deviceId = 'device_' + crypto.randomUUID();
+            localStorage.setItem('dolarve_device_id', deviceId);
+        }
+        return deviceId;
+    },
+
     async suscribirUsuario() {
         const registro = window.DolarVE.swRegistration;
         if (!registro) return;
@@ -164,29 +174,46 @@ const Interfaz = {
                 applicationServerKey: applicationServerKey
             });
 
-            console.log('[DolarVE] Usuario suscrito:', suscripcion);
+            console.log('[DolarVE] Usuario suscrito:', JSON.stringify(suscripcion));
 
-            // Guardar en Supabase si el usuario está logueado
-            if (window.DolarVE.supabase && window.DolarVE.user) {
+            // Guardar en Supabase (funciona con o sin login)
+            if (window.DolarVE.supabase) {
                 try {
-                    await window.DolarVE.supabase.from('push_subscriptions').upsert({
-                        user_id: window.DolarVE.user.id,
+                    const usuario = window.DolarVE.usuario;
+                    const deviceId = this.getDeviceId();
+                    
+                    const payload = {
                         subscription: suscripcion,
-                        platform: 'pwa'
-                    });
-                } catch (e) { console.error('Error guardando suscripción:', e); }
+                        platform: 'pwa',
+                        device_id: deviceId,
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    // Si está logueado, asociar al user_id
+                    if (usuario) payload.user_id = usuario.id;
+
+                    // Upsert por device_id para evitar duplicados
+                    const { error } = await window.DolarVE.supabase
+                        .from('push_subscriptions')
+                        .upsert(payload, { onConflict: 'device_id' });
+                    
+                    if (error) throw error;
+                    console.log('[DolarVE] ✅ Suscripción guardada en Supabase');
+                } catch (e) { 
+                    console.error('[DolarVE] Error guardando suscripción:', e); 
+                }
             }
 
             window.DolarVE.suscritoPush = true;
             this.actualizarIconoCampana();
             this.mostrarNotificacion('✅ ¡Listo! Recibirás alertas de precios en este equipo');
 
-            // Simular notificación de bienvenida
+            // Notificación de bienvenida
             setTimeout(() => {
                 registro.showNotification('DolarVE 🔔', {
                     body: '¡Ya estás listo para recibir alertas en tiempo real!',
-                    icon: 'img/icons/icon-192x192.png',
-                    badge: 'img/icons/badge-96x96.png'
+                    icon: '/logo.png',
+                    badge: '/logo.png'
                 });
             }, 1000);
 
@@ -209,11 +236,12 @@ const Interfaz = {
             if (suscripcion) {
                 await suscripcion.unsubscribe();
                 
-                // Borrar de Supabase si aplica
-                if (window.DolarVE.supabase && window.DolarVE.user) {
+                // Borrar de Supabase por device_id
+                if (window.DolarVE.supabase) {
+                    const deviceId = this.getDeviceId();
                     await window.DolarVE.supabase.from('push_subscriptions')
                         .delete()
-                        .eq('user_id', window.DolarVE.user.id);
+                        .eq('device_id', deviceId);
                 }
             }
             
