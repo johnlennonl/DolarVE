@@ -1,22 +1,28 @@
-const CACHE_NAME = 'dolarve-v11.0-cache';
+const CACHE_NAME = 'dolarve-v11.1-cache';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/css/style.css?v=11.0',
-  '/js/app.js?v=11.0',
-  '/manifest.json',
   '/logo.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap'
+  '/manifest.json',
+  '/css/variables.css?v=11.0',
+  '/css/layout.css?v=11.0',
+  '/css/components.css?v=11.0',
+  '/js/configuracion.js?v=11.0',
+  '/js/interfaz.js?v=11.0',
+  '/js/app.js?v=11.0'
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting(); // Force the waiting service worker to become the active service worker.
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      // Cache individual: si uno falla, los demás siguen
+      return Promise.allSettled(
+        urlsToCache.map(url => 
+          cache.add(url).catch(err => console.warn('[SW] No se pudo cachear:', url, err.message))
+        )
+      );
+    })
   );
 });
 

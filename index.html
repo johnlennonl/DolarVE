@@ -1618,7 +1618,7 @@
                 // Limpiar solo caches antiguos (no el actual)
                 caches.keys().then(names => {
                     names.forEach(name => {
-                        if (name !== 'dolarve-v11.0-cache') {
+                        if (name !== 'dolarve-v11.1-cache') {
                             caches.delete(name);
                             console.log('[DolarVE] Cache antiguo eliminado:', name);
                         }
