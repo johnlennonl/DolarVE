@@ -112,44 +112,83 @@ const Interfaz = {
     VAPID_PUBLIC_KEY: 'BHSKdlZDseu4vvh53xG6BucMXIQ3YFqAu3Y46-we5r3rEIpBoRyeEQYzwwPffAzBZ2VZ2yAgHIQwBCKBntU78iE',
 
     async inicializarPush() {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-            console.warn('[DolarVE] El navegador no soporta Push Notifications');
+        if (!('serviceWorker' in navigator)) {
+            console.warn('[DolarVE] Service Worker no soportado');
+            return;
+        }
+        if (!('PushManager' in window)) {
+            console.warn('[DolarVE] Push API no soportada');
             return;
         }
         
         try {
-            const registro = await navigator.serviceWorker.ready;
-            window.DolarVE.swRegistration = registro;
-            const suscripcion = await registro.pushManager.getSubscription();
+            console.log('[DolarVE] 🔔 Inicializando Push...');
+            
+            // Asegurar que el SW esté registrado
+            let reg = await navigator.serviceWorker.getRegistration();
+            if (!reg) {
+                console.log('[DolarVE] Registrando Service Worker...');
+                reg = await navigator.serviceWorker.register('/sw.js');
+            }
+
+            // Esperar a que esté activo con timeout de 8 segundos
+            if (!reg.active) {
+                console.log('[DolarVE] Esperando activación del SW...');
+                await Promise.race([
+                    navigator.serviceWorker.ready,
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('SW timeout')), 8000))
+                ]);
+                reg = await navigator.serviceWorker.getRegistration();
+            }
+
+            window.DolarVE.swRegistration = reg;
+            const suscripcion = await reg.pushManager.getSubscription();
             window.DolarVE.suscritoPush = !!suscripcion;
             this.actualizarIconoCampana();
+            console.log('[DolarVE] ✅ Push inicializado. Suscrito:', !!suscripcion);
         } catch (e) {
             console.error('[DolarVE] Error al inicializar Push:', e);
         }
     },
 
     async alternarSuscripcion() {
-        if (!window.DolarVE.swRegistration) {
-            await this.inicializarPush();
-        }
+        console.log('[DolarVE] 🔔 Campana presionada...');
+        this.mostrarNotificacion('🔄 Configurando alertas...');
 
-        if (Notification.permission === 'denied') {
-            this.mostrarNotificacion('⚠️ Permiso denegado: Actívalo en los ajustes de tu navegador');
-            return;
-        }
+        try {
+            // Paso 1: Asegurar que el SW esté listo
+            if (!window.DolarVE.swRegistration) {
+                await this.inicializarPush();
+            }
 
-        // En iOS PWA, las notificaciones requieren que la app esté instalada
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-        if (isIOS && !isStandalone) {
-            this.mostrarNotificacion('📲 Instala DolarVE en tu pantalla de inicio para recibir alertas');
-            return;
-        }
+            if (!window.DolarVE.swRegistration) {
+                this.mostrarNotificacion('⚠️ Error: El servicio de notificaciones no está disponible. Recarga la página.');
+                return;
+            }
 
-        if (window.DolarVE.suscritoPush) {
-            await this.desuscribirUsuario();
-        } else {
-            await this.suscribirUsuario();
+            // Paso 2: Verificar permisos
+            if (Notification.permission === 'denied') {
+                this.mostrarNotificacion('⚠️ Permiso denegado: Actívalo en los ajustes de tu navegador');
+                return;
+            }
+
+            // Paso 3: Check iOS (requiere PWA instalada)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            if (isIOS && !isStandalone) {
+                this.mostrarNotificacion('📲 Instala DolarVE desde Safari → Compartir → Agregar a Pantalla de inicio');
+                return;
+            }
+
+            // Paso 4: Alternar suscripción
+            if (window.DolarVE.suscritoPush) {
+                await this.desuscribirUsuario();
+            } else {
+                await this.suscribirUsuario();
+            }
+        } catch (err) {
+            console.error('[DolarVE] Error en alternarSuscripcion:', err);
+            this.mostrarNotificacion('❌ Error: ' + (err.message || 'No se pudo configurar'));
         }
     },
 
