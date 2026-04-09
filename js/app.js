@@ -69,6 +69,41 @@ const Principal = {
         this.configurarEventosLegales();
     },
 
+    // Ejecuta una actualización total de datos forzada por el usuario
+    async ejecutarRefreshManual() {
+        const icon = document.getElementById('refresh-icon');
+        const btn = document.getElementById('manual-refresh-btn');
+        
+        if (icon && btn) {
+            icon.classList.add('ph-spinning');
+            btn.style.background = 'rgba(0, 208, 132, 0.15)';
+            btn.style.borderColor = 'var(--accent-green)';
+        }
+
+        Interfaz.mostrarNotificacion('🔄 Actualizando mercados en tiempo real...');
+
+        try {
+            // Disparamos actualizaciones en paralelo
+            await Promise.allSettled([
+                Divisas.obtenerDatosTasas(),
+                Cripto.obtenerPulseBinance(),
+                Bancos.obtenerTasasBancos(),
+                new Promise(resolve => setTimeout(resolve, 800)) // Mínimo de animación para UX
+            ]);
+
+            Interfaz.mostrarNotificacion('✅ ¡Datos actualizados con éxito!');
+        } catch (error) {
+            console.error('[DolarVE] Error en refresh manual:', error);
+            Interfaz.mostrarNotificacion('❌ Error al actualizar. Intenta luego.');
+        } finally {
+            if (icon && btn) {
+                icon.classList.remove('ph-spinning');
+                btn.style.background = 'rgba(120, 120, 120, 0.1)';
+                btn.style.borderColor = 'var(--card-border)';
+            }
+        }
+    },
+
     // Configura lo relacionado a Cookies y Términos
     configurarEventosLegales() {
         const btnAceptar = document.getElementById('accept-cookies-btn');
@@ -96,6 +131,15 @@ const Principal = {
             if (window.navigator.vibrate) window.navigator.vibrate(15);
             Interfaz.alternarSuscripcion();
         });
+
+        // --- REFRESH MANUAL ---
+        const refreshBtn = document.getElementById('manual-refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.ejecutarRefreshManual();
+                if (window.navigator.vibrate) window.navigator.vibrate([15, 30, 15]);
+            });
+        }
 
         const pushToggle = document.getElementById('push-notifications-toggle');
         if (pushToggle) {
