@@ -114,31 +114,48 @@ const Interfaz = {
     async inicializarPush() {
         if (!('serviceWorker' in navigator)) {
             console.warn('[DolarVE] Service Worker no soportado');
+            this.mostrarNotificacion('⚠️ Tu navegador no soporta notificaciones push');
             return;
         }
         if (!('PushManager' in window)) {
             console.warn('[DolarVE] Push API no soportada');
+            this.mostrarNotificacion('⚠️ Tu navegador no soporta notificaciones push');
             return;
         }
         
         try {
             console.log('[DolarVE] 🔔 Inicializando Push...');
             
-            // Asegurar que el SW esté registrado
-            let reg = await navigator.serviceWorker.getRegistration();
-            if (!reg) {
-                console.log('[DolarVE] Registrando Service Worker...');
-                reg = await navigator.serviceWorker.register('/sw.js');
-            }
+            // Registrar o recuperar el SW
+            const reg = await navigator.serviceWorker.register('/sw.js');
+            console.log('[DolarVE] SW registrado. Estado:', reg.active ? 'activo' : reg.installing ? 'instalando' : 'esperando');
 
-            // Esperar a que esté activo con timeout de 8 segundos
-            if (!reg.active) {
-                console.log('[DolarVE] Esperando activación del SW...');
-                await Promise.race([
-                    navigator.serviceWorker.ready,
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('SW timeout')), 8000))
-                ]);
-                reg = await navigator.serviceWorker.getRegistration();
+            // Obtener el worker (activo, esperando, o instalando)
+            let sw = reg.active || reg.waiting || reg.installing;
+            
+            // Si no está activo, esperar a que lo esté
+            if (sw && sw.state !== 'activated') {
+                console.log('[DolarVE] Esperando activación del SW (estado actual:', sw.state + ')...');
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        // Intentar usar el registro de todas formas
+                        resolve();
+                    }, 10000);
+                    
+                    sw.addEventListener('statechange', () => {
+                        console.log('[DolarVE] SW estado cambió a:', sw.state);
+                        if (sw.state === 'activated') {
+                            clearTimeout(timeout);
+                            resolve();
+                        }
+                    });
+                    
+                    // Si ya está activo (por skipWaiting)
+                    if (sw.state === 'activated') {
+                        clearTimeout(timeout);
+                        resolve();
+                    }
+                });
             }
 
             window.DolarVE.swRegistration = reg;
@@ -148,6 +165,7 @@ const Interfaz = {
             console.log('[DolarVE] ✅ Push inicializado. Suscrito:', !!suscripcion);
         } catch (e) {
             console.error('[DolarVE] Error al inicializar Push:', e);
+            this.mostrarNotificacion('⚠️ Error inicializando notificaciones: ' + e.message);
         }
     },
 
