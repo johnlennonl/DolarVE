@@ -32,20 +32,46 @@ const Divisas = {
             return prices.length % 2 !== 0 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
         };
 
+        // Detectar si estamos en producción (Vercel) o local
+        const isProduction = location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
+
         const intentos = [
-            // Intento 1: CriptoYa (Súper rápido y ya trae ambas puntas)
+            // Intento 1: Nuestro Proxy Serverless en Vercel (SIN CORS, máxima confiabilidad)
+            async () => {
+                if (!isProduction) throw new Error('Skip en local');
+                const resp = await this.fetchWithTimeout('/api/binance', { timeout: 6000 });
+                const d = await resp.json();
+                if (d && d.success && d.price > 0) {
+                    console.log(`[DolarVE] ✅ Binance via Proxy Serverless (${d.source}): ${d.price.toFixed(2)}`);
+                    return d.price;
+                }
+                throw new Error('Proxy returned no data');
+            },
+            // Intento 2: CriptoYa via allorigins (proxy CORS estable)
+            async () => {
+                const targetUrl = encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
+                const resp = await this.fetchWithTimeout(`https://api.allorigins.win/raw?url=${targetUrl}`, { timeout: 5000 });
+                const d = await resp.json();
+                if (d && d.ask > 0 && d.bid > 0) {
+                    const promedio = (parseFloat(d.ask) + parseFloat(d.bid)) / 2;
+                    console.log(`[DolarVE] ✅ Binance Mid-Market (CriptoYa/allorigins): ${promedio.toFixed(2)} [C:${d.ask} / V:${d.bid}]`);
+                    return promedio;
+                }
+                throw new Error('Incomplete data');
+            },
+            // Intento 3: CriptoYa via corsproxy.io (backup)
             async () => {
                 const url = 'https://corsproxy.io/?' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
                 const resp = await this.fetchWithTimeout(url, { timeout: 4000 });
                 const d = await resp.json();
                 if (d && d.ask > 0 && d.bid > 0) {
                     const promedio = (parseFloat(d.ask) + parseFloat(d.bid)) / 2;
-                    console.log(`[DolarVE] ✅ Binance Mid-Market (CriptoYa): ${promedio.toFixed(2)} [C:${d.ask} / V:${d.bid}]`);
+                    console.log(`[DolarVE] ✅ Binance Mid-Market (CriptoYa/corsproxy): ${promedio.toFixed(2)} [C:${d.ask} / V:${d.bid}]`);
                     return promedio;
                 }
                 throw new Error('Incomplete data');
             },
-            // Intento 2: Directo (Merchant Filter - Referencia Compra)
+            // Intento 4: Directo a Binance P2P (funciona en localhost, falla en producción por CORS)
             async () => {
                 const resp = await this.fetchWithTimeout('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
                     method: 'POST',
@@ -67,8 +93,18 @@ const Divisas = {
             try {
                 const res = await intento();
                 if (res) return res;
-            } catch (e) {}
+            } catch (e) {
+                console.warn('[DolarVE] Intento Binance falló:', e.message);
+            }
         }
+        
+        // Último recurso: usar cache
+        const cachedData = JSON.parse(localStorage.getItem('dolarve_offline_data') || '{}');
+        if (cachedData.binance > 0) {
+            console.log(`[DolarVE] ⚠️ Usando caché Binance: ${cachedData.binance}`);
+            return cachedData.binance;
+        }
+        
         return null;
     },
 
