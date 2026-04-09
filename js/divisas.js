@@ -6,157 +6,129 @@
 const Divisas = {
     referenciaRapidaMonto: 10,
 
+    async fetchWithTimeout(resource, options = {}) {
+        const { timeout = 5000 } = options;
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+            const response = await fetch(resource, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return response;
+        } catch (e) {
+            clearTimeout(id);
+            throw e;
+        }
+    },
+
+    async obtenerBinanceRealTime() {
+        console.log('[DolarVE] 🔍 Buscando Binance P2P en segundo plano...');
+        const intentos = [
+            // Intento 1: Directo
+            async () => {
+                const resp = await this.fetchWithTimeout('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        asset: 'USDT', fiat: 'VES', tradeType: 'BUY', page: 1, rows: 5, payTypes: [], publisherType: null
+                    }),
+                    timeout: 5000
+                });
+                const data = await resp.json();
+                if (data.data && data.data.length > 0) {
+                    const prices = data.data.map(ad => parseFloat(ad.adv.price));
+                    return prices.reduce((a, b) => a + b, 0) / prices.length;
+                }
+                throw new Error('No data');
+            },
+            // Intento 2: Proxy 1
+            async () => {
+                const url = 'https://corsproxy.io/?' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
+                const resp = await this.fetchWithTimeout(url, { timeout: 6000 });
+                const d = await resp.json();
+                if (d && d.bid > 0) return d.bid;
+                throw new Error('No data');
+            },
+            // Intento 3: Proxy 2
+            async () => {
+                const url = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
+                const resp = await this.fetchWithTimeout(url, { timeout: 7000 });
+                const d = await resp.json();
+                if (d && d.contents) {
+                    const p = JSON.parse(d.contents);
+                    if (p.bid > 0) return p.bid;
+                }
+                throw new Error('No data');
+            }
+        ];
+
+        for (const intento of intentos) {
+            try {
+                const res = await intento();
+                if (res) return res;
+            } catch (e) {}
+        }
+        return null;
+    },
+
     async obtenerDatosTasas() {
         if (!navigator.onLine) {
-            Interfaz.mostrarNotificacion('Modo Offline: Datos guardados');
             this.cargarDatosCache();
             return;
         }
 
-        let exito = false;
-        for (let intento = 1; intento <= 3; intento++) {
-            try {
-                // Función auxiliar para obtener Binance P2P en tiempo real
-                async function obtenerBinanceRealTime() {
-                    // Intento 1: API directa de Binance P2P (pública, POST)
-                    try {
-                        const resp = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                asset: 'USDT',
-                                fiat: 'VES',
-                                tradeType: 'BUY',
-                                page: 1,
-                                rows: 5,
-                                payTypes: [],
-                                publisherType: null
-                            })
-                        });
-                        if (resp.ok) {
-                            const data = await resp.json();
-                            if (data.data && data.data.length > 0) {
-                                // Promedio de los primeros 5 anuncios (precio BUY = lo que pagan)
-                                const prices = data.data.map(ad => parseFloat(ad.adv.price));
-                                const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
-                                console.log('%c[DolarVE] ✅ BINANCE DIRECTO: ' + avg.toFixed(2) + ' (de ' + prices.length + ' anuncios)', 'color: #00ff00; font-weight: bold;');
-                                return avg;
-                            }
-                        }
-                    } catch (e) { console.warn('[DolarVE] Binance directo falló:', e.message); }
+        const tasas = window.DolarVE.tasas;
+        console.log('[DolarVE] 🚀 Iniciando carga rápida...');
 
-                    // Intento 2: CriptoYa via proxy corsproxy.io
-                    try {
-                        const resp2 = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1'));
-                        if (resp2.ok) {
-                            const d = await resp2.json();
-                            if (d && d.bid > 0) {
-                                console.log('%c[DolarVE] ✅ BINANCE (CriptoYa proxy2): ' + d.bid, 'color: #00ff00;');
-                                return d.bid;
-                            }
-                        }
-                    } catch (e) {}
+        // 1. Carga rápida (Oficiales)
+        try {
+            const resultados = await Promise.allSettled([
+                this.fetchWithTimeout('https://ve.dolarapi.com/v1/dolares/oficial'),
+                this.fetchWithTimeout('https://ve.dolarapi.com/v1/euros/oficial'),
+                this.fetchWithTimeout('https://open.er-api.com/v6/latest/USD'),
+                this.fetchWithTimeout('https://dolarapi.com/v1/dolares/blue')
+            ]);
 
-                    // Intento 3: CriptoYa via AllOrigins
-                    try {
-                        const resp3 = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1'));
-                        if (resp3.ok) {
-                            const d3 = await resp3.json();
-                            if (d3 && d3.contents) {
-                                const parsed = JSON.parse(d3.contents);
-                                if (parsed.bid > 0) {
-                                    console.log('%c[DolarVE] ✅ BINANCE (AllOrigins): ' + parsed.bid, 'color: #00ff00;');
-                                    return parsed.bid;
-                                }
-                            }
-                        }
-                    } catch (e) {}
-
-                    return null; // Todas las fuentes fallaron
+            const safeJson = async (res) => {
+                if (res.status === 'fulfilled' && res.value.ok) {
+                    try { return await res.value.json(); } catch(e) { return null; }
                 }
+                return null;
+            };
 
-                // Fetch principal: BCV, EUR, Internacionales, Argentina + Binance en paralelo
-                const [resultados, binanceRT] = await Promise.all([
-                    Promise.allSettled([
-                        fetch('https://ve.dolarapi.com/v1/dolares/oficial'),       // [0] BCV
-                        fetch('https://ve.dolarapi.com/v1/euros/oficial'),          // [1] EUR
-                        fetch('https://open.er-api.com/v6/latest/USD'),             // [2] Internacionales
-                        fetch('https://dolarapi.com/v1/dolares/blue'),              // [3] Argentina Blue
-                        fetch('https://ve.dolarapi.com/v1/dolares/paralelo')        // [4] Fallback Binance
-                    ]),
-                    obtenerBinanceRealTime() // Corre en paralelo con todo lo demás
-                ]);
+            const usdData = await safeJson(resultados[0]);
+            const eurData = await safeJson(resultados[1]);
+            const copData = await safeJson(resultados[2]);
+            const arsData = await safeJson(resultados[3]);
 
-                const tasas = window.DolarVE.tasas;
-
-                const safeJson = async (res) => {
-                    if (res.status === 'fulfilled' && res.value.ok) {
-                        try { return await res.value.json(); } catch(e) { return null; }
-                    }
-                    return null;
-                };
-
-                const usdData = await safeJson(resultados[0]);
-                const eurData = await safeJson(resultados[1]);
-                const copData = await safeJson(resultados[2]);
-                const arsData = await safeJson(resultados[3]);
-                const fallbackBinance = await safeJson(resultados[4]);
-
-                let huboExitoParcial = false;
-
-                if (usdData) { tasas.usd = usdData.promedio; huboExitoParcial = true; }
-                if (eurData) { tasas.eur = eurData.promedio; huboExitoParcial = true; }
-                
-                // === BINANCE: Real-time (Única Fuente de Verdad) ===
-                if (binanceRT && binanceRT > 0) {
-                    tasas.binance = binanceRT;
-                    huboExitoParcial = true;
-                    // Guardamos el momento exacto de la actualización exitosa
-                    localStorage.setItem('dolarve_binance_updated_at', Date.now());
-                } else {
-                    // Si falla, mantenemos el último de Binance que tengamos en caché
-                    const cacheBinance = parseFloat(localStorage.getItem('dolarve_last_binance') || 0);
-                    if (cacheBinance > 0) {
-                        tasas.binance = cacheBinance;
-                        console.warn('[DolarVE] ⚠️ Binance falló, usando último caché real:', tasas.binance);
-                    }
-                }
-
-                if (arsData) { tasas.ars = (arsData.compra + arsData.venta) / 2; huboExitoParcial = true; }
-                if (copData && copData.rates) {
-                    tasas.cop = copData.rates.COP;
-                    tasas.brl = copData.rates.BRL;
-                    tasas.clp = copData.rates.CLP;
-                    huboExitoParcial = true;
-                }
-
-                if (!huboExitoParcial) throw new Error('Todos los endpoints fallaron');
-
-                this.actualizarVistasInicio();
-                localStorage.setItem('dolarve_offline_data', JSON.stringify(tasas));
-
-                if (typeof Calculadora !== 'undefined') Calculadora.actualizarPantalla();
-                
-                const ahora = new Date();
-                const horaStr = ahora.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true });
-                const updateEl = document.getElementById('last-update-usd');
-                if (updateEl) updateEl.innerText = `Actualizado: ${horaStr}`;
-
-                this.inicializarGraficoPrincipal();
-
-                exito = true;
-                console.log('[DolarVE] Tasas de Divisas actualizadas.');
-                break; 
-            } catch (e) {
-                console.error(`[DolarVE] Intento ${intento}/3 fallido en divisas:`, e);
-                if (intento < 3) await new Promise(r => setTimeout(r, 3000));
+            if (usdData) tasas.usd = usdData.promedio;
+            if (eurData) tasas.eur = eurData.promedio;
+            if (arsData) tasas.ars = (arsData.compra + arsData.venta) / 2;
+            if (copData && copData.rates) {
+                tasas.cop = copData.rates.COP;
+                tasas.brl = copData.rates.BRL;
+                tasas.clp = copData.rates.CLP;
             }
-        }
 
-        if (!exito) {
-            this.cargarDatosCache();
-            Interfaz.mostrarNotificacion('⚠️ Usando datos guardados (conexión inestable)');
-        }
+            this.actualizarVistasInicio();
+            localStorage.setItem('dolarve_offline_data', JSON.stringify(tasas));
+
+            // Actualizar hora
+            const updateEl = document.getElementById('last-update-usd');
+            if (updateEl) updateEl.innerText = `Actualizado: ${new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+
+        } catch (e) { console.error('[DolarVE] Error en carga rápida:', e); }
+
+        // 2. Carga background (Binance)
+        this.obtenerBinanceRealTime().then(binanceRT => {
+            if (binanceRT) {
+                tasas.binance = binanceRT;
+                localStorage.setItem('dolarve_binance_updated_at', Date.now());
+                localStorage.setItem('dolarve_offline_data', JSON.stringify(tasas));
+            }
+            this.actualizarVistasInicio();
+            if (window.Noticias) Noticias.generarAnalisisMercado();
+            this.inicializarGraficoPrincipal();
+        });
     },
 
     cargarDatosCache() {
