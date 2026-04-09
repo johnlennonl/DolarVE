@@ -21,7 +21,23 @@ const Divisas = {
     },
 
     async obtenerBinanceRealTime() {
-        console.log('[DolarVE] 🔍 Buscando Binance P2P en segundo plano...');
+        console.log('[DolarVE] 🔍 Buscando Binance P2P (Filtro Mediana)...');
+        
+        const formatearPrecios = (data) => {
+            if (!data || !data.length) return null;
+            // Extraemos precios y los ordenamos de menor a mayor
+            const prices = data.map(ad => parseFloat(ad.adv ? ad.adv.price : 0)).filter(p => p > 0);
+            if (prices.length === 0) return null;
+            prices.sort((a, b) => a - b);
+            
+            // Calculamos la Mediana (valor central)
+            const mid = Math.floor(prices.length / 2);
+            const median = prices.length % 2 !== 0 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
+            
+            console.log(`[DolarVE] 📊 Ads Binance: [${prices.join(', ')}] -> Mediana: ${median.toFixed(2)}`);
+            return median;
+        };
+
         const intentos = [
             // Intento 1: Directo
             async () => {
@@ -29,23 +45,20 @@ const Divisas = {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        asset: 'USDT', fiat: 'VES', tradeType: 'BUY', page: 1, rows: 5, payTypes: [], publisherType: null
+                        asset: 'USDT', fiat: 'VES', tradeType: 'BUY', page: 1, rows: 10, payTypes: [], publisherType: null
                     }),
                     timeout: 5000
                 });
-                const data = await resp.json();
-                if (data.data && data.data.length > 0) {
-                    const prices = data.data.map(ad => parseFloat(ad.adv.price));
-                    return prices.reduce((a, b) => a + b, 0) / prices.length;
-                }
-                throw new Error('No data');
+                const d = await resp.json();
+                return formatearPrecios(d.data);
             },
             // Intento 2: Proxy 1
             async () => {
                 const url = 'https://corsproxy.io/?' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
                 const resp = await this.fetchWithTimeout(url, { timeout: 6000 });
                 const d = await resp.json();
-                if (d && d.bid > 0) return d.bid;
+                // Simular estructura para formatearPrecios
+                if (d && d.bid > 0) return d.bid; 
                 throw new Error('No data');
             },
             // Intento 3: Proxy 2
