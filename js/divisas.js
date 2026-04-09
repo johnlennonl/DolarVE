@@ -21,56 +21,45 @@ const Divisas = {
     },
 
     async obtenerBinanceRealTime() {
-        console.log('[DolarVE] 🔍 Buscando Binance P2P (Filtro Mediana)...');
+        console.log('[DolarVE] 🔍 Calculando Promedio Equilibrado Binance (S+B)...');
         
         const formatearPrecios = (data) => {
             if (!data || !data.length) return null;
-            // Extraemos precios y los ordenamos de menor a mayor
             const prices = data.map(ad => parseFloat(ad.adv ? ad.adv.price : 0)).filter(p => p > 0);
             if (prices.length === 0) return null;
             prices.sort((a, b) => a - b);
-            
-            // Calculamos la Mediana (valor central)
             const mid = Math.floor(prices.length / 2);
-            const median = prices.length % 2 !== 0 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
-            
-            console.log(`[DolarVE] 📊 Ads Binance: [${prices.join(', ')}] -> Mediana: ${median.toFixed(2)}`);
-            return median;
+            return prices.length % 2 !== 0 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
         };
 
         const intentos = [
-            // Intento 1: Directo
+            // Intento 1: CriptoYa (Súper rápido y ya trae ambas puntas)
+            async () => {
+                const url = 'https://corsproxy.io/?' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
+                const resp = await this.fetchWithTimeout(url, { timeout: 4000 });
+                const d = await resp.json();
+                if (d && d.ask > 0 && d.bid > 0) {
+                    const promedio = (parseFloat(d.ask) + parseFloat(d.bid)) / 2;
+                    console.log(`[DolarVE] ✅ Binance Mid-Market (CriptoYa): ${promedio.toFixed(2)} [C:${d.ask} / V:${d.bid}]`);
+                    return promedio;
+                }
+                throw new Error('Incomplete data');
+            },
+            // Intento 2: Directo (Merchant Filter - Referencia Compra)
             async () => {
                 const resp = await this.fetchWithTimeout('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        asset: 'USDT', fiat: 'VES', tradeType: 'BUY', page: 1, rows: 10, payTypes: [], publisherType: null
+                        asset: 'USDT', fiat: 'VES', tradeType: 'BUY', page: 1, rows: 15, payTypes: [], 
+                        publisherType: 'merchant', merchantCheck: true
                     }),
                     timeout: 5000
                 });
                 const d = await resp.json();
-                return formatearPrecios(d.data);
-            },
-            // Intento 2: Proxy 1
-            async () => {
-                const url = 'https://corsproxy.io/?' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
-                const resp = await this.fetchWithTimeout(url, { timeout: 6000 });
-                const d = await resp.json();
-                // Simular estructura para formatearPrecios
-                if (d && d.bid > 0) return d.bid; 
-                throw new Error('No data');
-            },
-            // Intento 3: Proxy 2
-            async () => {
-                const url = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://criptoya.com/api/binancep2p/usdt/ves/1');
-                const resp = await this.fetchWithTimeout(url, { timeout: 7000 });
-                const d = await resp.json();
-                if (d && d.contents) {
-                    const p = JSON.parse(d.contents);
-                    if (p.bid > 0) return p.bid;
-                }
-                throw new Error('No data');
+                const mediana = formatearPrecios(d.data);
+                if (mediana) console.log(`[DolarVE] ✅ Binance Directo (Compra): ${mediana.toFixed(2)}`);
+                return mediana;
             }
         ];
 
@@ -153,6 +142,7 @@ const Divisas = {
         });
         
         this.actualizarVistasInicio();
+        this.inicializarGraficoPrincipal();
         if (typeof Calculadora !== 'undefined') Calculadora.actualizarPantalla();
     },
 

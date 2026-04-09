@@ -84,7 +84,7 @@ const Noticias = {
 
         if (brecha > 12) {
             titulo = "⚠️ Brecha Elevada";
-            analisis = `La diferencia entre el oficial y paralelo es del ${brecha.toFixed(2)}%. Se recomienda cautela.`;
+            analisis = `La diferencia entre el oficial y el USDT es del ${brecha.toFixed(2)}%. Se recomienda cautela.`;
             cardParent.classList.add('alert-high');
         } else if (brecha > 5) {
             titulo = "📊 Mercado Activo";
@@ -172,7 +172,7 @@ const Noticias = {
         timelineContainer.innerHTML = timelineNews.map((news, index) => {
             const tiempoRelativo = this.calcularTiempoRelativo(news.pubDate);
             const tituloLimpio = this.limpiarTexto(news.title);
-            
+
             // --- Inteligencia DolarVE: Detección de Impacto ---
             const esHot = /sube|baja|alza|dólar|bcv|inflación|récord|crisis|urgente/i.test(tituloLimpio);
             const esCrypto = news.fuenteApp === 'CoinTelegraph';
@@ -205,7 +205,7 @@ const Noticias = {
 
         // Contamos cuántas noticias "Hot" hay en las últimas 15
         const hotCount = this.items.slice(0, 15).filter(n => /sube|baja|alza|dólar|bcv|inflación|récord/i.test(n.title)).length;
-        
+
         let sentiment = "ESTABLE";
         if (hotCount > 5) sentiment = "TENSO ⚡";
         else if (hotCount > 2) sentiment = "ACTIVO 📊";
@@ -261,7 +261,7 @@ const Noticias = {
         if (diffMins < 60) return `Hace ${diffMins} min`;
         if (diffHoras < 24) return `Hace ${diffHoras} ${diffHoras === 1 ? 'hora' : 'horas'}`;
         if (diffDias < 7) return `Hace ${diffDias} ${diffDias === 1 ? 'día' : 'días'}`;
-        
+
         return fecha.toLocaleDateString('es-VE', { day: 'numeric', month: 'short' });
     },
 

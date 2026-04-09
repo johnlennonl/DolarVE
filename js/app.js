@@ -28,7 +28,7 @@ const Principal = {
 
         // 5. ¡A buscar los reales! Traemos las tasas de una vez
         Divisas.cargarDatosCache();
-        await Divisas.obtenerDatosTasas();
+        Divisas.obtenerDatosTasas();
         Cripto.obtenerPulseBinance();
         Cripto.cargarCriptos();
         Cripto.configurarModales();
