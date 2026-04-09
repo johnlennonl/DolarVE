@@ -107,14 +107,19 @@ const Divisas = {
                 if (usdData) { tasas.usd = usdData.promedio; huboExitoParcial = true; }
                 if (eurData) { tasas.eur = eurData.promedio; huboExitoParcial = true; }
                 
-                // === BINANCE: Real-time > Paralelo (fallback) ===
+                // === BINANCE: Real-time (Única Fuente de Verdad) ===
                 if (binanceRT && binanceRT > 0) {
                     tasas.binance = binanceRT;
                     huboExitoParcial = true;
-                } else if (fallbackBinance) {
-                    tasas.binance = fallbackBinance.promedio;
-                    huboExitoParcial = true;
-                    console.warn('[DolarVE] ⚠️ Binance: usando fallback paralelo:', tasas.binance);
+                    // Guardamos el momento exacto de la actualización exitosa
+                    localStorage.setItem('dolarve_binance_updated_at', Date.now());
+                } else {
+                    // Si falla, mantenemos el último de Binance que tengamos en caché
+                    const cacheBinance = parseFloat(localStorage.getItem('dolarve_last_binance') || 0);
+                    if (cacheBinance > 0) {
+                        tasas.binance = cacheBinance;
+                        console.warn('[DolarVE] ⚠️ Binance falló, usando último caché real:', tasas.binance);
+                    }
                 }
 
                 if (arsData) { tasas.ars = (arsData.compra + arsData.venta) / 2; huboExitoParcial = true; }
@@ -186,9 +191,38 @@ const Divisas = {
                 binanceTrendEl.style.display = 'block';
                 binanceTrendEl.style.color = diff > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
                 binanceTrendEl.innerHTML = `<i class="ph-duotone ph-caret-${diff > 0 ? 'up' : 'down'}"></i> ${sign}${diff.toFixed(2)} Bs`;
-            } else if (lastBinance === 0) {
-                // Primera vez, guardamos referencia
-                localStorage.setItem('dolarve_last_binance', tasas.binance);
+            }
+
+            // Actualizamos la referencia para la próxima comparación de tendencia
+            localStorage.setItem('dolarve_last_binance', tasas.binance);
+
+            // --- INDICADOR DE FRESCURA (TIEMPO) ---
+            const dotEl = document.getElementById('binance-dot');
+            const timeEl = document.getElementById('binance-time');
+            const ts = parseInt(localStorage.getItem('dolarve_binance_updated_at') || 0);
+
+            if (dotEl && timeEl && ts > 0) {
+                const diffMs = Date.now() - ts;
+                const diffMins = Math.floor(diffMs / 60000);
+                
+                let etiqueta = "Sincronizado";
+                let color = "#00D084"; // Verde (Live)
+                
+                if (diffMins < 1) etiqueta = "EN VIVO";
+                else if (diffMins < 60) etiqueta = `HACE ${diffMins} MIN`;
+                else if (diffMins < 1440) etiqueta = `HACE ${Math.floor(diffMins/60)} HORAS`;
+                else etiqueta = "DATOS ANTIGUOS";
+
+                // Colores de estado
+                if (diffMins > 120) color = "#ff4d4d"; // Rojo (>2h)
+                else if (diffMins > 15) color = "#f1c40f"; // Amarillo (>15m)
+
+                dotEl.style.background = color;
+                dotEl.style.boxShadow = `0 0 8px ${color}66`;
+                timeEl.innerText = etiqueta;
+            } else if (dotEl && timeEl) {
+                dotEl.style.background = "#94a3b8";
+                timeEl.innerText = "SIN DATOS";
             }
         }
             
