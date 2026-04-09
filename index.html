@@ -15,7 +15,15 @@
     <link rel="icon" type="image/png" href="logo.png">
 
     <title>DolarVE | Oficial & Cripto</title>
-    <link rel="stylesheet" href="css/style.css?v=11.0">
+    <link rel="stylesheet" href="css/variables.css?v=11.0">
+    <link rel="stylesheet" href="css/layout.css?v=11.0">
+    <link rel="stylesheet" href="css/components.css?v=11.0">
+    <link rel="stylesheet" href="css/hub.css?v=11.0">
+    <link rel="stylesheet" href="css/calculadora.css?v=11.0">
+    <link rel="stylesheet" href="css/divisas-cripto.css?v=11.0">
+    <link rel="stylesheet" href="css/modales.css?v=11.0">
+    <link rel="stylesheet" href="css/gasolina.css?v=11.0">
+    <link rel="stylesheet" href="css/cartera-extra.css?v=11.0">
     <link rel="stylesheet" href="css/cartera.css?v=7.0">
 
     <!-- Librerías Premium v5.4 Elite Pro -->
@@ -74,7 +82,8 @@
                         style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;">
                         <div
                             style="width: 36px; height: 36px; border-radius: 10px; background: rgba(0, 208, 132, 0.1); border: 1.5px solid var(--accent-green); display: flex; justify-content: center; align-items: center; overflow: hidden; box-shadow: 0 4px 15px rgba(0,208,132,0.15);">
-                            <img id="user-avatar-img" src="img/selfie.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="John">
+                            <img id="user-avatar-img" src="img/selfie.jpg"
+                                style="width: 100%; height: 100%; object-fit: cover; display: block;" alt="John">
                             <div id="user-avatar-placeholder" style="display: none;">
                                 <i class="ph-fill ph-user" style="color: var(--accent-green); font-size: 18px;"></i>
                             </div>
@@ -142,13 +151,16 @@
                     <div style="z-index: 1;">
                         <div
                             style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">
-                            Paralelo ($)</div>
-                        <div style="font-size: 32px; font-weight: 800; color: var(--text-main);" id="paralelo-price">---
+                            Binance USDT 🔶</div>
+                        <div style="font-size: 32px; font-weight: 800; color: var(--text-main);" id="paralelo-price">---</div>
+                        <div class="intl-trend" id="binance-trend" style="margin-top: 2px; font-size: 12px; font-weight: 700; display: none;">
+                            <i class="ph-duotone ph-caret-up"></i> 0.00 Bs
                         </div>
                     </div>
-                    <i class="ph-duotone ph-chart-line-up"
-                        style="position: absolute; right: 12px; top: 12px; font-size: 18px; color: #00D082; opacity: 0.5;"></i>
+                    <i class="ph-duotone ph-diamonds-four"
+                        style="position: absolute; right: 12px; top: 12px; font-size: 18px; color: #F3BA2F; opacity: 0.8;"></i>
                 </div>
+
                 <div class="intl-card" style="--country-color: #2575FC;">
                     <div style="z-index: 1;">
                         <div
@@ -431,109 +443,79 @@
                     <span class="header-subtitle">Divisas</span>
                     <h1>Calculadora</h1>
                 </div>
-                <div class="header-icon" style="display: flex; align-items: center; gap: 5px;">
-                    <button id="calc-mode-toggle"
-                        style="background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); color: var(--accent-green); padding: 8px 14px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                        <i class="ph-duotone ph-hand-coins" style="font-size: 14px;"></i>
-                        <span id="calc-mode-text">Comisiones</span>
-                    </button>
-                    <div id="swap-currency-btn" style="cursor: pointer; padding: 10px;">
+                <div class="header-icon">
+                    <button id="calc-swap-btn" class="calc-swap-btn">
                         <i class="ph-duotone ph-arrows-left-right"></i>
-                    </div>
+                        <span>Intercambiar</span>
+                    </button>
                 </div>
             </header>
 
-            <!-- Selector de Comisiones (Oculto por defecto) -->
-            <div id="commission-selector" class="rate-selector-wrapper" style="padding: 0 20px 20px; display: none;">
-                <div class="rate-selector-tray" style="grid-template-columns: repeat(4, 1fr);">
-                    <button class="rate-chip active" data-fee="paypal">
-                        <i class="ph-duotone ph-paypal-logo"></i>
-                        <span>PayPal</span>
-                    </button>
-                    <button class="rate-chip" data-fee="binance">
-                        <i class="ph-duotone ph-currency-btc"></i>
-                        <span>Binance</span>
-                    </button>
-                    <button class="rate-chip" data-fee="zelle">
-                        <i class="ph-duotone ph-lightning"></i>
-                        <span>Zelle</span>
-                    </button>
-                    <button class="rate-chip" data-fee="reserve">
-                        <i class="ph-duotone ph-circles-three"></i>
-                        <span>Reser</span>
-                    </button>
+
+
+            <!-- ÁREA DE ENTRADA PRO (CENTRALIZADA) -->
+            <div class="calc-input-wrapper">
+                <div class="calc-input-field">
+                    <label id="calc-input-label">Monto en Dólares ($)</label>
+                    <input type="number" id="calc-main-input" placeholder="0.00" inputmode="decimal">
+                </div>
+
+                <!-- Selector de Región (Filtro Maestro) -->
+                <div class="region-selector-wrapper">
+                    <button class="region-tab active" data-region="ve">VENEZUELA 🇻🇪</button>
+                    <button class="region-tab" data-region="int">INTERNACIONAL 🌎</button>
+                    <div id="region-indicator" class="region-indicator"></div>
                 </div>
             </div>
 
-            <!-- Selector de Tasa Premium -->
-            <div class="rate-selector-wrapper" style="padding: 0 20px 20px;">
-                <div class="rate-selector-tray">
-                    <div class="rate-indicator" id="rate-indicator"></div>
-                    <button class="rate-chip active" data-rate="bcv">
-                        <i class="ph-duotone ph-bank"></i>
-                        <span>BCV</span>
-                    </button>
-                    <button class="rate-chip" data-rate="paralelo">
-                        <i class="ph-duotone ph-chart-line-up"></i>
-                        <span>Para</span>
-                    </button>
-                    <button class="rate-chip" data-rate="eur">
-                        <i class="ph-duotone ph-currency-eur"></i>
-                        <span>Euro</span>
-                    </button>
-                    <button class="rate-chip" data-rate="cop">
-                        <i class="ph-duotone ph-globe"></i>
-                        <span>COP</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="calc-container">
-                <div class="calc-display">
-                    <div class="label" id="calc-from-label">MONTO USD</div>
-                    <div class="value" id="calc-from-value">1</div>
-                </div>
-                <div class="calc-display"
-                    style="background: rgba(0, 208, 132, 0.05); border-color: var(--accent-green);">
-                    <div class="label" id="calc-to-label" style="color: var(--accent-green)">RESULTADO VES</div>
-                    <div class="value" id="calc-to-value" style="color: var(--accent-green)">0.00</div>
-                </div>
-                <div class="calc-grid">
-                    <!-- Fila de Operadores Aritméticos -->
-                    <button class="calc-btn operator" data-val="+">+</button>
-                    <button class="calc-btn operator" data-val="-">-</button>
-                    <button class="calc-btn operator" data-val="*">×</button>
-                    <button class="calc-btn operator" data-val="/">÷</button>
-
-                    <button class="calc-btn">1</button>
-                    <button class="calc-btn">2</button>
-                    <button class="calc-btn">3</button>
-                    <button class="calc-btn operator" data-val="*">×</button>
-
-                    <button class="calc-btn">4</button>
-                    <button class="calc-btn">5</button>
-                    <button class="calc-btn">6</button>
-                    <button class="calc-btn operator" data-val="-">-</button>
-
-                    <button class="calc-btn">7</button>
-                    <button class="calc-btn">8</button>
-                    <button class="calc-btn">9</button>
-                    <button class="calc-btn operator" data-val="+">+</button>
-
-                    <button class="calc-btn">.</button>
-                    <button class="calc-btn">0</button>
-                    <button class="calc-btn danger-btn" data-val="DEL"><i class="ph ph-backspace"></i></button>
-                    <button class="calc-btn danger-btn" data-val="C">C</button>
-
-                    <div style="grid-column: span 4; display: flex; gap: 10px; margin-top: 5px;">
-                        <button class="calc-btn action" id="generate-receipt-btn"
-                            style="flex: 1; font-size: 14px; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i
-                                class="ph-duotone ph-receipt"></i> RECIBO</button>
-                        <button class="calc-btn action" id="generate-charge-btn"
-                            style="flex: 1; background: rgba(0, 208, 132, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 208, 132, 0.2); font-size: 14px; padding: 15px; box-shadow: 0 4px 10px rgba(0,208,132,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;"><i
-                                class="ph-duotone ph-hand-coins"></i> COBRAR</button>
+            <div class="calc-results-container">
+                <!-- GRID VENEZUELA (LIVE) -->
+                <div id="calc-results-ve" class="results-grid active">
+                    <!-- Se poblará con tarjetas de BCV, Paralelo, Euro -->
+                    <div class="rate-result-card" data-rate="bcv">
+                        <div class="card-rate-header">Oficial BCV</div>
+                        <div class="card-rate-val" id="res-bcv">0.00 Bs</div>
+                    </div>
+                    <div class="rate-result-card standout" data-rate="binance">
+                        <div class="card-rate-header">Binance USDT 🔶</div>
+                        <div class="card-rate-val" id="res-paralelo">0.00 Bs</div>
+                    </div>
+                    <div class="rate-result-card" data-rate="eur">
+                        <div class="card-rate-header">Euro Oficial</div>
+                        <div class="card-rate-val" id="res-eur">0.00 Bs</div>
                     </div>
                 </div>
+
+                <!-- GRID INTERNACIONAL (LIVE) -->
+                <div id="calc-results-int" class="results-grid">
+                    <!-- Se poblará con COP, ARS, BRL, CLP -->
+                    <div class="rate-result-card" data-rate="cop">
+                        <div class="card-rate-header">Colombia 🇨🇴</div>
+                        <div class="card-rate-val" id="res-cop">0.00</div>
+                    </div>
+                    <div class="rate-result-card" data-rate="ars">
+                        <div class="card-rate-header">Argentina 🇦🇷</div>
+                        <div class="card-rate-val" id="res-ars">0.00</div>
+                    </div>
+                    <div class="rate-result-card" data-rate="brl">
+                        <div class="card-rate-header">Brasil 🇧🇷</div>
+                        <div class="card-rate-val" id="res-brl">0.00</div>
+                    </div>
+                    <div class="rate-result-card" data-rate="clp">
+                        <div class="card-rate-header">Chile 🇨🇱</div>
+                        <div class="card-rate-val" id="res-clp">0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN (STIKY / FIXED FOOTER DENTRO DE SECTION) -->
+            <div class="calc-actions-footer">
+                <button class="calc-action-btn primary" id="generate-receipt-btn">
+                    <i class="ph-duotone ph-receipt"></i> GENERAR RECIBO
+                </button>
+                <button class="calc-action-btn secondary" id="generate-charge-btn">
+                    <i class="ph-duotone ph-hand-coins"></i> COBRAR
+                </button>
             </div>
         </section>
 
@@ -582,7 +564,8 @@
 
                         <div class="stat-group" style="border-color: #52637a;">
                             <div class="stat-label">Total USD ($0.50)</div>
-                            <div id="pump-total-usd" class="stat-value-big" style="font-size: 24px; opacity: 0.7;">10.00 USD</div>
+                            <div id="pump-total-usd" class="stat-value-big" style="font-size: 24px; opacity: 0.7;">10.00
+                                USD</div>
                         </div>
                     </div>
                 </div>
@@ -606,15 +589,17 @@
                 </div>
 
                 <!-- Gasolineras Cercanas v8.5.0 (API OSM) -->
-                <div class="card" style="margin-top: 25px; padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--card-bg);">
+                <div class="card"
+                    style="margin-top: 25px; padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--card-bg);">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <i class="ph-duotone ph-map-pin-line" style="font-size: 24px; color: var(--accent-green);"></i>
                         <div>
                             <div style="font-size: 14px; font-weight: 800; color: var(--text-main);">Surtidor Pro</div>
-                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">MAPA GLOBAL COOPERATIVO</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">MAPA GLOBAL
+                                COOPERATIVO</div>
                         </div>
                     </div>
-                    <button id="btn-toggle-search" onclick="Tasas.toggleSearchGas()" class="btn-glass-icon">
+                    <button id="btn-toggle-search" onclick="Gasolina.toggleSearchGas()" class="btn-glass-icon">
                         <i class="ph ph-magnifying-glass" style="font-size: 20px;"></i>
                     </button>
                 </div>
@@ -623,13 +608,16 @@
                 <div id="gas-search-container" class="search-panel" style="display: none; margin-bottom: 20px;">
                     <div class="search-input-group">
                         <i class="ph ph-magnifying-glass search-icon-inner"></i>
-                        <input type="text" id="gas-search-input" placeholder="Nombre o Ciudad..." 
-                            onkeyup="if(event.key === 'Enter') Tasas.buscarGasPorNombre()">
-                        <button onclick="Tasas.buscarGasPorNombre()" class="btn-search-action">BUSCAR</button>
+                        <input type="text" id="gas-search-input" placeholder="Nombre o Ciudad..."
+                            onkeyup="if(event.key === 'Enter') Gasolina.buscarGasPorNombre()">
+                        <button onclick="Gasolina.buscarGasPorNombre()" class="btn-search-action">BUSCAR</button>
                     </div>
                     <div style="margin-top: 15px; display: flex; align-items: center; justify-content: space-between;">
-                        <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Radio:</div>
-                        <select id="gas-radius-select" class="select-premium" onchange="Tasas.obtenerEstacionesCercanas(true)">
+                        <div
+                            style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">
+                            Radio:</div>
+                        <select id="gas-radius-select" class="select-premium"
+                            onchange="Gasolina.obtenerEstacionesCercanas(true)">
                             <option value="20000">20 KM</option>
                             <option value="50000">50 KM</option>
                             <option value="100000">100 KM</option>
@@ -639,7 +627,9 @@
 
                 <div id="nearby-gas-stations" style="margin-top: 15px; transition: all 0.3s ease;">
                     <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                        <div class="loader-spinner" style="margin: 0 auto 15px; width: 30px; height: 30px; border-top-color: var(--accent-green);"></div>
+                        <div class="loader-spinner"
+                            style="margin: 0 auto 15px; width: 30px; height: 30px; border-top-color: var(--accent-green);">
+                        </div>
                         <div style="font-size: 13px; font-weight: 600;">Buscando en el satélite...</div>
                     </div>
                 </div>
@@ -741,13 +731,26 @@
                         style="font-size: 14px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;">
                         Lo Último
                     </span>
-                    <a href="#" id="view-all-news" onclick="window.open('https://news.google.com/search?q=economia+venezuela', '_blank')">Ver todo <i class="ph ph-caret-right"></i></a>
+                    <a href="#" id="view-all-news"
+                        onclick="window.open('https://news.google.com/search?q=economia+venezuela', '_blank')">Ver todo
+                        <i class="ph ph-caret-right"></i></a>
                 </div>
 
                 <div id="news-feed" class="news-scroll">
                     <!-- Las noticias se cargarán con .news-item-elite -->
                     <div class="news-skeleton"></div>
                     <div class="news-skeleton"></div>
+                </div>
+
+                <!-- NUEVA SECCION: Market Pulse Timeline -->
+                <div class="news-timeline-wrapper">
+                    <div class="timeline-header">
+                        <span class="timeline-status">MERCADO LIVE</span>
+                        <h3>Pulso Reciente</h3>
+                    </div>
+                    <div id="news-timeline" class="news-timeline">
+                        <!-- Las noticias secundarias se cargarán aquí -->
+                    </div>
                 </div>
 
                 <div
@@ -892,13 +895,18 @@
 
         <!-- Pantalla Mi Cartera (v7.0 Modular) -->
         <section id="portfolio-screen" class="screen">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; padding: 40px; text-align: center;">
-                <div style="width: 80px; height: 80px; background: rgba(255, 184, 0, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; border: 1px solid rgba(255, 184, 0, 0.2);">
+            <div
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; padding: 40px; text-align: center;">
+                <div
+                    style="width: 80px; height: 80px; background: rgba(255, 184, 0, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; border: 1px solid rgba(255, 184, 0, 0.2);">
                     <i class="ph-duotone ph-lock" style="font-size: 40px; color: #FFB800;"></i>
                 </div>
                 <h2 style="font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 12px;">¡Muy Pronto!</h2>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 260px;">Estamos terminando de pulir tu nueva cartera digital. ¡Vuelve pronto para disfrutarla!</p>
-                <button onclick="Principal.navegar('home-screen')" style="margin-top: 30px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer;">Volver al Inicio</button>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 260px;">Estamos
+                    terminando de pulir tu nueva cartera digital. ¡Vuelve pronto para disfrutarla!</p>
+                <button onclick="Principal.navegar('home-screen')"
+                    style="margin-top: 30px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer;">Volver
+                    al Inicio</button>
             </div>
         </section>
 
@@ -954,24 +962,18 @@
     </div>
 
     <!-- Account Picker Bottom Sheet (for COBRAR - Global Overlay) -->
-    <div id="account-picker-overlay"
-        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--glass-overlay); z-index: 99998; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease;">
-        <div id="account-picker-sheet"
-            style="position: absolute; bottom: 0; left: 50%; width: 100%; max-width: 480px; background: var(--card-bg); border-radius: 30px 30px 0 0; padding: 20px 25px 30px; transform: translateX(-50%) translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); border-top: 1px solid rgba(255,255,255,0.1);">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div>
-                    <h3 style="font-size: 17px; font-weight: 800; color: var(--text-main); letter-spacing: -0.3px;">Selecciona una
-                        Cuenta</h3>
-                    <p style="font-size: 11px; color: var(--text-muted); font-weight: 500;">¿A qué cuenta deseas cobrar?
-                    </p>
+    <div id="account-picker-overlay" class="modal-overlay">
+        <div id="account-picker-sheet" class="modal-sheet">
+            <header class="modal-header">
+                <div class="modal-header-text">
+                    <h3 class="modal-title">Selecciona una Cuenta</h3>
+                    <p class="modal-subtitle">¿A qué cuenta deseas cobrar?</p>
                 </div>
-                <div id="close-account-picker"
-                    style="cursor: pointer; width: 34px; height: 34px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="ph-bold ph-x" style="font-size: 14px; color: #fff;"></i>
+                <div id="close-account-picker" class="modal-close-btn">
+                    <i class="ph-bold ph-x"></i>
                 </div>
             </header>
-            <div id="account-picker-list"
-                style="max-height: 40vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 20px);"></div>
+            <div id="account-picker-list" class="modal-scroll-list"></div>
         </div>
     </div>
 
@@ -1090,108 +1092,84 @@
 
     <!-- Receipt Template Wrapper (Hidden safely) -->
     <div style="position: absolute; left: -9999px; top: -9999px;">
-        <div id="receipt-template"
-            style="background: #0d0d0d; color: #fff; width: 350px; padding: 40px 30px; border-radius: 20px; font-family: 'Outfit', sans-serif; position: relative; overflow: hidden;">
-            <div
-                style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;">
+        <div class="receipt-card" id="receipt-template">
+            <div class="modal-header"
+                style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 25px;">
+                <img src="logo.png" style="width: 24px; height: 24px;" alt="Logo">
+                <span style="font-weight: 800; font-size: 18px; letter-spacing: 1px;">DOLARVE</span>
             </div>
 
-            <div style="position: relative; z-index: 1;">
-                <div
-                    style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px;">
-                    <img src="logo.png" style="width: 24px; height: 24px;" alt="Logo">
-                    <span style="font-weight: 700; font-size: 18px; letter-spacing: 1px;">DOLARVE</span>
-                </div>
+            <div class="capture-row">
+                <span class="capture-label">De</span>
+                <span class="capture-value" id="rec-from">---</span>
+            </div>
 
-                <h2
-                    style="font-size: 13px; text-transform: uppercase; color: #00D084; margin-bottom: 25px; letter-spacing: 1px; text-align: center;">
-                    Recibo de Conversión</h2>
+            <div class="capture-row">
+                <span class="capture-label">Tasa (<span id="rec-rate-name">BCV</span>)</span>
+                <span class="capture-value" id="rec-rate-val">---</span>
+            </div>
 
-                <div
-                    style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px;">
-                    <span style="font-size: 14px; color: rgba(255,255,255,0.6);">Monto Origen</span>
-                    <strong style="font-size: 16px; color: #fff;" id="rec-from">---</strong>
-                </div>
+            <div
+                style="margin-top: 25px; padding: 20px; border-radius: 16px; background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); text-align: center;">
+                <div class="capture-label" style="margin-bottom: 5px; color: var(--accent-green) !important;">Total a
+                    Pagar</div>
+                <div style="font-size: 32px; font-weight: 800; color: var(--accent-green);" id="rec-to">---</div>
+            </div>
 
-                <div
-                    style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px;">
-                    <span style="font-size: 14px; color: rgba(255,255,255,0.6);">Tasa (<span
-                            id="rec-rate-name">BCV</span>)</span>
-                    <strong style="font-size: 16px; color: #fff;" id="rec-rate-val">---</strong>
-                </div>
-
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 208, 132, 0.1); border: 1px solid rgba(0, 208, 132, 0.2); padding: 20px; border-radius: 12px; margin-bottom: 30px; margin-top: 25px;">
-                    <span style="font-size: 15px; font-weight: 600; color: #00D084;">Total a Pagar</span>
-                    <strong style="font-size: 24px; font-weight: 700; color: #00D084;" id="rec-to">---</strong>
-                </div>
-
-                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;"
-                    id="rec-date">Fecha</p>
-                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Descarga
-                    DolarVE y ten las tasas al instante.</p>
+            <p style="text-align: center; margin-top: 25px;" class="capture-label" id="rec-date">Fecha</p>
+            <div
+                style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                <p style="font-size: 11px; font-weight: 700; color: var(--accent-green); margin: 0;">🚀 Descarga DolarVE
+                    y ten las tasas al instante</p>
+                <p style="font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 1px;">
+                    DISPONIBLE PARA IOS Y ANDROID</p>
             </div>
         </div>
     </div>
 
     <!-- Pago Movil Template Wrapper (Hidden safely) -->
     <div style="position: absolute; left: -9999px; top: -9999px;">
-        <div id="charge-template"
-            style="background: #0d0d0d; color: #fff; width: 350px; padding: 40px 30px; border-radius: 20px; font-family: 'Outfit', sans-serif; position: relative; overflow: hidden;">
-            <div
-                style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(0, 208, 132, 0.25); filter: blur(40px); border-radius: 50%;">
+        <div class="charge-card" id="charge-template">
+            <div class="modal-header"
+                style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 25px;">
+                <img src="logo.png" style="width: 24px; height: 24px;" alt="Logo">
+                <span style="font-weight: 800; font-size: 18px; letter-spacing: 1px;">DOLARVE</span>
             </div>
 
-            <div style="position: relative; z-index: 1;">
-                <div
-                    style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 30px;">
-                    <img src="logo.png" style="width: 24px; height: 24px;" alt="Logo">
-                    <span style="font-weight: 700; font-size: 18px; letter-spacing: 1px;">DOLARVE</span>
+            <h2
+                style="font-size: 13px; text-transform: uppercase; color: var(--accent-green); margin-bottom: 20px; letter-spacing: 2px; text-align: center; font-weight: 800;">
+                Solicitud de Pago</h2>
+
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="capture-label">Monto a Pagar</div>
+                <div style="font-size: 42px; font-weight: 800; color: var(--accent-green);" id="charge-amount-val">---
                 </div>
+                <div class="capture-label" style="margin-top: 5px;">Ref: <span id="charge-rate-val">---</span></div>
+            </div>
 
-                <h2
-                    style="font-size: 14px; text-transform: uppercase; color: #00D084; margin-bottom: 15px; letter-spacing: 1px; text-align: center;">
-                    Solicitud de Pago</h2>
-
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 5px;">Monto Total a Pagar
-                    </div>
-                    <div style="font-size: 42px; font-weight: 700; color: #00D084; line-height: 1;"><span
-                            id="charge-amount-val">---</span> <span
-                            style="font-size: 16px; color: rgba(255,255,255,0.4);">Bs</span></div>
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px;">Referencia: <span
-                            id="charge-rate-val">---</span></div>
+            <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 16px;">
+                <div class="capture-row">
+                    <span class="capture-label">Banco</span>
+                    <span class="capture-value" id="charge-bank-val">---</span>
                 </div>
-
-                <div
-                    style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 14px; margin-bottom: 25px;">
-                    <div
-                        style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; letter-spacing: 1px;">
-                        Datos del Beneficiario</div>
-
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i class="ph-duotone ph-bank"
-                                style="width: 16px;"></i> Banco</span>
-                        <strong style="font-size: 13px; color: #fff;" id="charge-bank-val"
-                            style="text-align: right; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">---</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i
-                                class="ph-duotone ph-device-mobile" style="width: 16px;"></i> Teléfono</span>
-                        <strong style="font-size: 13px; color: #fff;" id="charge-phone-val">---</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-size: 13px; color: rgba(255,255,255,0.6);"><i
-                                class="ph-duotone ph-identification-card" style="width: 16px;"></i>
-                            Identificación</span>
-                        <strong style="font-size: 13px; color: #fff;" id="charge-id-val">---</strong>
-                    </div>
+                <div class="capture-row">
+                    <span class="capture-label">Teléfono</span>
+                    <span class="capture-value" id="charge-phone-val">---</span>
                 </div>
+                <div class="capture-row" style="border-bottom: none;">
+                    <span class="capture-label">Cédula / RIF</span>
+                    <span class="capture-value" id="charge-id-val">---</span>
+                </div>
+            </div>
 
-                <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;"
-                    id="charge-date-val">Fecha</p>
-                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Generado
-                    con DolarVE</p>
+            <p style="text-align: center; margin-top: 25px;" class="capture-label" id="charge-date-val">Fecha</p>
+            <div
+                style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                <p style="font-size: 11px; font-weight: 700; color: var(--accent-green); margin: 0;">🚀 Descarga DolarVE
+                    y ten las tasas al instante</p>
+                <p style="font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 1px;">
+                    DISPONIBLE PARA IOS Y ANDROID</p>
             </div>
         </div>
     </div>
@@ -1277,7 +1255,8 @@
                     <h2 id="profile-display-name"
                         style="font-size: 20px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px;">---
                     </h2>
-                    <p id="profile-display-email" style="font-size: 13px; color: var(--text-main); opacity: 0.75; font-weight: 500;">---</p>
+                    <p id="profile-display-email"
+                        style="font-size: 13px; color: var(--text-main); opacity: 0.75; font-weight: 500;">---</p>
                 </div>
 
                 <!-- User Info Card -->
@@ -1285,14 +1264,18 @@
                     style="background: var(--nav-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 15px; margin-bottom: 15px;">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="font-size: 12px; color: var(--text-main); opacity: 0.75; font-weight: 500;"><i class="ph-duotone ph-calendar"
+                        <span style="font-size: 12px; color: var(--text-main); opacity: 0.75; font-weight: 500;"><i
+                                class="ph-duotone ph-calendar"
                                 style="width: 16px; margin-right: 5px;"></i>Nacimiento</span>
-                        <span id="profile-dob" style="font-size: 13px; font-weight: 600; color: var(--text-main);">---</span>
+                        <span id="profile-dob"
+                            style="font-size: 13px; font-weight: 600; color: var(--text-main);">---</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; color: var(--text-main); opacity: 0.75; font-weight: 500;"><i class="ph-duotone ph-clock"
-                                style="width: 16px; margin-right: 5px;"></i>Miembro desde</span>
-                        <span id="profile-created" style="font-size: 13px; font-weight: 600; color: var(--text-main);">---</span>
+                        <span style="font-size: 12px; color: var(--text-main); opacity: 0.75; font-weight: 500;"><i
+                                class="ph-duotone ph-clock" style="width: 16px; margin-right: 5px;"></i>Miembro
+                            desde</span>
+                        <span id="profile-created"
+                            style="font-size: 13px; font-weight: 600; color: var(--text-main);">---</span>
                     </div>
                 </div>
 
@@ -1569,7 +1552,8 @@
                         <div class="update-icon blue"><i class="ph-duotone ph-map-pin"></i></div>
                         <div class="update-text">
                             <strong>¡Gasolineras Cercanas! ⛽</strong>
-                            <span>Detección por GPS para sugerirte las estaciones de servicio más próximas y abrir ruta en mapas.</span>
+                            <span>Detección por GPS para sugerirte las estaciones de servicio más próximas y abrir ruta
+                                en mapas.</span>
                         </div>
                     </div>
 
@@ -1577,7 +1561,8 @@
                         <div class="update-icon green"><i class="ph-duotone ph-circles-three-plus"></i></div>
                         <div class="update-text">
                             <strong>Liquid Glow Loader 💎</strong>
-                            <span>Experiencia premium desde el primer segundo con el nuevo cargador inteligente adaptativo.</span>
+                            <span>Experiencia premium desde el primer segundo con el nuevo cargador inteligente
+                                adaptativo.</span>
                         </div>
                     </div>
 
@@ -1585,7 +1570,8 @@
                         <div class="update-icon green"><i class="ph-duotone ph-lightning"></i></div>
                         <div class="update-text">
                             <strong>Live Feed Persistente</strong>
-                            <span>Corrección total en la visibilidad de noticias. ¡Información fluida en cada navegación!</span>
+                            <span>Corrección total en la visibilidad de noticias. ¡Información fluida en cada
+                                navegación!</span>
                         </div>
                     </div>
                 </div>
@@ -1605,10 +1591,14 @@
     <script src="js/configuracion.js?v=11.0"></script>
     <script src="js/interfaz.js?v=11.0"></script>
     <script src="js/autenticacion.js?v=11.0"></script>
-    <script src="js/tasas.js?v=11.0"></script>
+    <script src="js/divisas.js?v=11.0"></script>
+    <script src="js/cripto.js?v=11.0"></script>
+    <script src="js/bancos.js?v=11.0"></script>
+    <script src="js/gasolina.js?v=11.0"></script>
     <script src="js/calculadora.js?v=11.0"></script>
     <script src="js/cuentas.js?v=11.0"></script>
     <script src="js/cartera.js?v=11.0"></script>
+    <script src="js/noticias.js?v=11.0"></script>
     <script src="js/app.js?v=11.0"></script>
     <script>
         // Force clear all old service workers and caches, then re-register
@@ -1631,6 +1621,61 @@
             <div class="cv-loader-spinner"
                 style="font-size: 32px; color: var(--accent-green); animation: cv-spin-infinity 1s linear infinite;">
                 <i class="ph-duotone ph-circle-notch"></i>
+            </div>
+        </div>
+    </div>
+    <!-- Daily Rates Capture Template (ESTÁTICO) -->
+    <div style="position: absolute; left: -9999px; top: -9999px;">
+        <div class="receipt-card dark" id="rates-capture-template">
+            <div
+                style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 35px; padding-top: 10px;">
+                <img src="logo.png" style="width: 32px; height: 32px;" alt="Logo">
+                <span style="font-weight: 800; font-size: 22px; letter-spacing: 2px; color: #fff;">DOLARVE</span>
+            </div>
+
+            <h2
+                style="font-size: 14px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 25px; letter-spacing: 3px; text-align: center; font-weight: 700;">
+                Tasas del Día 🇻🇪</h2>
+
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Oficial -->
+                <div
+                    style="background: rgba(0, 208, 132, 0.05); border: 1px solid rgba(0, 208, 132, 0.1); padding: 20px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="capture-label" style="color: #00D084 !important;">Oficial BCV</div>
+                        <div style="font-size: 24px; font-weight: 800; color: #00D084;" id="cap-bcv-val">---</div>
+                    </div>
+                    <i class="ph-duotone ph-bank" style="font-size: 28px; color: #00D084; opacity: 0.5;"></i>
+                </div>
+
+                <!-- Binance -->
+                <div
+                    style="background: rgba(243, 186, 47, 0.05); border: 1px solid rgba(243, 186, 47, 0.1); padding: 20px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="capture-label" style="color: #F3BA2F !important;">Binance USDT</div>
+                        <div style="font-size: 24px; font-weight: 800; color: #F3BA2F;" id="cap-binance-val">---</div>
+                    </div>
+                    <i class="ph-duotone ph-diamonds-four" style="font-size: 28px; color: #F3BA2F; opacity: 0.5;"></i>
+                </div>
+
+                <!-- Euro -->
+                <div
+                    style="background: rgba(37, 117, 252, 0.05); border: 1px solid rgba(37, 117, 252, 0.1); padding: 20px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="capture-label" style="color: #2575FC !important;">Euro Oficial</div>
+                        <div style="font-size: 24px; font-weight: 800; color: #2575FC;" id="cap-euro-val">---</div>
+                    </div>
+                    <i class="ph-duotone ph-currency-eur" style="font-size: 28px; color: #2575FC; opacity: 0.5;"></i>
+                </div>
+            </div>
+
+            <p style="text-align: center; margin-top: 35px;" class="capture-label" id="cap-date">Fecha</p>
+            <div
+                style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                <p style="font-size: 12px; font-weight: 700; color: var(--accent-green); margin: 0;">🚀 Descarga DolarVE
+                    y ten las tasas al instante</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 1px;">
+                    DISPONIBLE PARA IOS Y ANDROID</p>
             </div>
         </div>
     </div>

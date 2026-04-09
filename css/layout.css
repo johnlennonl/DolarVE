@@ -1,0 +1,115 @@
+
+.app-container {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px) + 30px);
+}
+
+/* Header Styles */
+header {
+    padding-top: calc(env(safe-area-inset-top, 44px) + 24px);
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.header-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+/* Bottom Navigation Styles */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    height: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px));
+    background: rgba(11, 14, 20, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+    z-index: 1000;
+}
+
+
+.nav-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+}
+
+.nav-item:active {
+    transform: scale(0.9);
+}
+
+.nav-item.active {
+    color: var(--accent-green);
+    background: rgba(0, 208, 132, 0.08);
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    width: 5px;
+    height: 5px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-green);
+}
+
+.nav-item i {
+    font-size: 26px;
+    transition: transform 0.3s ease;
+}
+
+
+/* Screen Management */
+.screen {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

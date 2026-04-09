@@ -1,0 +1,426 @@
+/* DolarAPI - Live Dashboard Calculator v4.2 (Theme Aware) */
+
+.calc-input-wrapper {
+    padding: 0 20px;
+    margin-bottom: 25px;
+}
+
+.calc-input-field {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background var(--transition), border var(--transition);
+}
+
+.calc-input-field label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.calc-input-field input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--text-main);
+    width: 100%;
+    font-family: var(--font-main);
+    letter-spacing: -1px;
+}
+
+/* Selector de Región (Nacional / Internacional) */
+.region-selector-wrapper {
+    position: relative;
+    display: flex;
+    background: var(--bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    margin-top: 15px;
+    padding: 4px;
+    overflow: hidden;
+}
+
+.region-tab {
+    flex: 1;
+    z-index: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 0;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.region-tab.active {
+    color: var(--accent-green);
+}
+
+.region-indicator {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    height: calc(100% - 8px);
+    width: calc(50% - 4px);
+    background: rgba(var(--accent-green-rgb), 0.1); /* Fallback to standard if needed */
+    background: color-mix(in srgb, var(--accent-green), transparent 85%);
+    border: 1px solid color-mix(in srgb, var(--accent-green), transparent 70%);
+    border-radius: 12px;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Grillas de Resultados */
+.calc-results-container {
+    padding: 0 20px 100px 20px;
+}
+
+.results-grid {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    animation: slideUp 0.4s ease forwards;
+}
+
+.results-grid.active {
+    display: flex;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.rate-result-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+body.light-theme .rate-result-card {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.rate-result-card.standout {
+    background: color-mix(in srgb, var(--accent-green), transparent 96%);
+    border-color: color-mix(in srgb, var(--accent-green), transparent 80%);
+}
+
+.rate-result-card.selected {
+    border-color: var(--accent-green);
+    background: color-mix(in srgb, var(--accent-green), transparent 92%);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent-green), transparent 90%);
+}
+
+.card-rate-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.card-rate-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+}
+
+.standout .card-rate-val {
+    color: var(--accent-green);
+}
+
+/* Acento específico para Binance */
+.rate-result-card[data-rate="binance"] {
+    border-color: rgba(243, 186, 47, 0.4);
+    background: rgba(243, 186, 47, 0.03);
+}
+
+.rate-result-card[data-rate="binance"] .card-rate-header {
+    color: #F3BA2F;
+}
+
+.rate-result-card[data-rate="binance"] .card-rate-val {
+    color: #F3BA2F;
+}
+
+/* Selección forzada para todas las tarjetas incluyendo Binance */
+.rate-result-card.selected {
+    border-color: var(--accent-green) !important;
+    background: color-mix(in srgb, var(--accent-green), transparent 92%) !important;
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent-green), transparent 90%) !important;
+}
+
+.rate-result-card.selected .card-rate-val,
+.rate-result-card.selected .card-rate-header {
+    color: var(--accent-green) !important;
+}
+
+/* Barra de Acciones Fija (Theme Aware) */
+.calc-actions-footer {
+    position: fixed;
+    bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px) + 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 500px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 2000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+body.light-theme .calc-actions-footer {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.calc-action-btn {
+    flex: 1;
+    border: none;
+    border-radius: 16px;
+    padding: 14px 0;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.calc-action-btn.primary {
+    background: var(--text-main);
+    color: var(--bg-color);
+}
+
+.calc-action-btn.secondary {
+    background: color-mix(in srgb, var(--accent-green), transparent 90%);
+    color: var(--accent-green);
+    border: 1px solid color-mix(in srgb, var(--accent-green), transparent 85%);
+}
+
+.calc-swap-btn {
+    background: color-mix(in srgb, var(--accent-green), transparent 92%);
+    border: 1px solid color-mix(in srgb, var(--accent-green), transparent 85%);
+    color: var(--accent-green);
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.calc-swap-btn:active {
+    transform: scale(0.95);
+}
+
+.calc-action-btn:active {
+    transform: scale(0.96);
+}
+
+/* --- Account Picker (Pago Móvil) Styles --- */
+.picker-account-btn {
+    width: 100%;
+    background: var(--bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.picker-bank-logo {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+}
+
+.picker-bank-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.picker-bank-logo i {
+    font-size: 20px;
+    color: var(--accent-green);
+}
+
+.picker-account-content {
+    flex: 1;
+}
+
+
+.picker-account-btn:active {
+    transform: scale(0.98);
+    background: var(--card-bg);
+}
+
+.picker-account-btn .acc-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.picker-account-btn .acc-bank {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* --- Modal de Previsualización de Captura --- */
+#receipt-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 10000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+#receipt-preview-img {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    margin-bottom: 25px;
+    object-fit: contain; /* Asegura que no se deforme ni deje espacios */
+}
+
+/* --- Modal Global Styles (Theme Aware) --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--glass-overlay);
+    z-index: 99998;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border-radius: 30px 30px 0 0;
+    padding: 20px 25px 30px;
+    transform: translateX(-50%) translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    border-top: 1px solid var(--card-border);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+}
+
+.modal-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.modal-close-btn {
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    background: color-mix(in srgb, var(--text-muted), transparent 90%);
+    border: 1px solid var(--card-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+}
+
+.modal-scroll-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+/* --- Capture Templates (Siempre Oscuras por Estética Premium) --- */
+.receipt-card, .charge-card {
+    background: #0d0d0d !important;
+    color: #ffffff !important;
+    width: 350px !important;      /* ANCHO FIJO PARA EVITAR ESPACIO LATERAL */
+    padding: 50px 30px 40px !important; /* MÁS PADDING ARRIBA PARA EL LOGO */
+    border-radius: 28px;
+    font-family: 'Outfit', sans-serif;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    margin: 0;
+    box-sizing: border-box;       /* Crucial para que el padding no estire el ancho */
+}
+
+.capture-label { color: rgba(255,255,255,0.5) !important; font-size: 11px; }
+.capture-value { color: #ffffff !important; font-weight: 700; }
+.capture-row { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 14px 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.08); 
+}
+
+/* Borramos selectores de .light para capturas */

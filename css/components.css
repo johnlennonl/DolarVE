@@ -1,0 +1,120 @@
+/* Card Components */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 10px 20px;
+    transition: transform 0.2s ease;
+}
+
+.card:active {
+    transform: scale(0.98);
+}
+
+.card-title {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.trend-up {
+    color: var(--accent-green);
+}
+
+.trend-down {
+    color: var(--accent-red);
+}
+
+/* Chart Placeholder */
+.chart-mini {
+    height: 60px;
+    width: 100%;
+    margin: 10px 0;
+    background: linear-gradient(180deg, rgba(0, 208, 132, 0.1) 0%, transparent 100%);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* Utilities */
+.btn-primary {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    width: 100%;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.grid-2 .card {
+    margin: 0;
+}
+
+
+/* Settings Styles */
+.settings-list {
+    padding: 0 20px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.toggle-switch {
+    width: 50px;
+    height: 26px;
+    background: #2D333B;
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.toggle-switch.on {
+    background: var(--accent-green);
+}
+
+.toggle-circle {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: var(--transition);
+}
+
+.toggle-switch.on .toggle-circle {
+    left: 27px;
+}
+

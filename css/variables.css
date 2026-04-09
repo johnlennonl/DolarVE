@@ -1,0 +1,68 @@
+/* Design System for DolarVE */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+:root {
+    --bg-color: #000000;
+    --card-bg: #161B22;
+    --card-border: rgba(255, 255, 255, 0.05);
+    --text-main: #FFFFFF;
+    --text-muted: #8B949E;
+    --accent-green: #00D084;
+    --accent-blue: #3E8BFF;
+    --accent-red: #FF4D4D;
+    --font-main: 'Outfit', sans-serif;
+    --nav-height: 70px;
+    --safe-area-bottom: 20px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --glass-bg: rgba(25, 30, 35, 0.65);
+    --glass-overlay: rgba(0, 0, 0, 0.65);
+}
+
+body.light-theme {
+    /* Sistema de Fondos Elegantes (Apple Gray & Pure White) */
+    --bg-color: #F2F2F7;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(60, 60, 67, 0.15); /* Bordes sutiles y elegantes */
+    
+    /* Textos Alta Legibilidad */
+    --text-main: #000000;
+    --text-muted: #8E8E93;
+    
+    /* Acentos System (Mate y Sofisticados, eliminando brillo) */
+    --accent-green: #34C759; /* Apple System Green */
+    --accent-blue: #007AFF; /* Apple System Blue */
+    --accent-red: #FF3B30; /* Apple System Red */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-overlay: rgba(0, 0, 0, 0.25);
+}
+
+/* Efecto de Elevación Premium para Tarjetas en Modo Claro */
+body.light-theme .card,
+body.light-theme .intl-card,
+body.light-theme .hub-item {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+body.light-theme .bottom-nav {
+    background: rgba(255, 255, 255, 0.95);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    line-height: 1.5;
+    overflow-x: hidden;
+    user-select: none;
+    transition: background-color var(--transition), color var(--transition);
+}

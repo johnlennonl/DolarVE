@@ -1,0 +1,1224 @@
+/* Crypto List */
+.crypto-list {
+    padding: 0 20px;
+}
+
+.crypto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.crypto-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.crypto-icon {
+    width: 40px;
+    height: 40px;
+    background: #2D333B;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.crypto-name div:first-child {
+    font-weight: 600;
+}
+
+.crypto-name div:last-child {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.crypto-price {
+    text-align: right;
+}
+
+.crypto-price div:first-child {
+    font-weight: 600;
+}
+
+.crypto-price div:last-child {
+    font-size: 12px;
+}
+
+/* Market Stats Widgets */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 0 20px;
+}
+
+.stats-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stats-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 5px 0;
+}
+
+.sentiment-bar {
+    height: 8px;
+    background: #2D333B;
+    border-radius: 4px;
+    margin: 10px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.sentiment-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-red), var(--accent-green));
+    width: 50%;
+    transition: width 1s ease;
+}
+
+
+/* --- Crypto Terminal UI (Brutal Refined) --- */
+.crypto-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 20px 120px;
+}
+
+.crypto-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.crypto-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 40px;
+    background: var(--coin-color, var(--accent-green));
+    border-radius: 0 4px 4px 0;
+    opacity: 0.8;
+}
+
+.crypto-card::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, var(--coin-color, transparent) 0%, transparent 70%);
+    opacity: 0.1;
+    filter: blur(20px);
+    pointer-events: none;
+}
+
+.crypto-card:active {
+    transform: scale(0.97);
+}
+
+.crypto-card:hover {
+    border-color: var(--coin-color, var(--card-border));
+}
+
+.crypto-card .coin-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.crypto-card .coin-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+}
+
+.crypto-card .coin-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-main);
+}
+
+.crypto-card .coin-symbol {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.crypto-card .coin-price {
+    text-align: right;
+}
+
+.crypto-card .price-val {
+    font-weight: 800;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.crypto-card .change-val {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* --- Mercado Internacional (Brutal Style) --- */
+.intl-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+
+
+.intl-card:active {
+    transform: scale(0.97);
+}
+
+.intl-card .country-flag {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 24px;
+    height: 16px;
+    border-radius: 3px;
+    object-fit: cover;
+    opacity: 0.9;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.intl-card .intl-ref {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'Outfit';
+    font-weight: 500;
+}
+
+.intl-card .intl-trend {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+#crypto-search {
+    width: 100%;
+    background: var(--nav-bg);
+    border: 1px solid var(--card-border);
+    padding: 18px 24px;
+    border-radius: 18px;
+    color: #fff;
+    font-family: 'Outfit';
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+}
+
+#crypto-search:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 4px rgba(0, 208, 132, 0.05);
+}
+/* Pulsing Notification Hint */
+.pulse-dot {
+    display: block !important;
+    animation: pulse-red 2s infinite !important;
+}
+
+@keyframes pulse-red {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 77, 77, 0); }
+}
+
+
+/* --- DolarVE Insights & News Feed --- */
+.insight-card {
+    background: rgba(0, 208, 132, 0.05);
+    border: 1px solid rgba(0, 208, 132, 0.15);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.insight-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--accent-green);
+    color: #000;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0, 208, 132, 0.3);
+}
+
+.insight-text h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+
+.insight-text p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.news-header a {
+    font-size: 11px;
+    color: var(--accent-green);
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.news-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.news-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.news-item {
+    flex: 0 0 280px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 12px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.2s ease;
+}
+
+.news-item:active {
+    transform: scale(0.98);
+}
+
+.news-tag {
+    font-size: 9px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    padding: 3px 8px;
+    border-radius: 6px;
+    align-self: flex-start;
+}
+
+.news-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-main);
+    line-clamp: 2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-meta {
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Skeletons */
+.news-skeleton {
+    flex: 0 0 280px;
+    height: 100px;
+    background: linear-gradient(90deg, var(--card-bg) 25%, rgba(255,255,255,0.05) 50%, var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 16px;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+
+/* --- Insights & News Feed Section (Elite v3.0) --- */
+.insights-screen-section {
+    padding-bottom: 40px;
+    animation: slideUpFade 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative Glow Blobs */
+.insights-screen-section::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    right: -20%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(0, 208, 132, 0.08) 0%, transparent 70%);
+    filter: blur(60px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.insight-card-elite {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 25px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.insight-card-elite::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* Dynamic State: High Alert */
+.insight-card-elite.alert-high {
+    border: 1px solid rgba(255, 77, 77, 0.4);
+    background: linear-gradient(135deg, rgba(255, 77, 77, 0.08) 0%, var(--card-bg) 100%);
+    box-shadow: 0 10px 40px rgba(255, 77, 77, 0.1);
+}
+
+.insight-card-elite.alert-high .insight-icon {
+    background: rgba(255, 77, 77, 0.1);
+    color: #ff4d4d;
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 77, 77, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+}
+
+.insight-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 208, 132, 0.1);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--accent-green);
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.insight-text h4 {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+}
+
+.insight-text p {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.5;
+    letter-spacing: -0.2px;
+}
+
+.sentiment-row-elite {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+}
+
+.gauge-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.gauge-label {
+    font-size: 10px;
+    font-weight: 900;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gauge-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gauge-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.gauge-fill {
+    height: 100%;
+    background: var(--accent-green);
+    box-shadow: 0 0 10px var(--accent-green);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding: 0 5px;
+}
+
+.news-scroll {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 10px 5px 20px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.news-scroll::-webkit-scrollbar { display: none; }
+
+.news-item-elite {
+    flex: 0 0 300px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 22px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.news-item-elite::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-green), transparent);
+    opacity: 0.8;
+}
+
+.news-item-elite:active {
+    transform: translateY(-5px) scale(0.98);
+    border-color: var(--accent-green);
+}
+
+.news-pill {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--accent-green);
+    background: rgba(0, 208, 132, 0.08);
+    padding: 5px 12px;
+    border-radius: 100px;
+    align-self: flex-start;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.news-title-elite {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: var(--text-main);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+
+.news-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--card-border);
+}
+
+.news-source {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.news-date {
+    font-size: 10px;
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+/* Skeletons */
+.news-skeleton {
+    min-width: 280px;
+    height: 160px;
+    background: linear-gradient(90deg, var(--card-bg) 25%, #1d232c 50%, var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+}
+
+@keyframes skeletonLoading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translate3d(0, 20px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* --- Market News Ticker (Marquee) --- */
+.ticker-container {
+    padding: 0 20px;
+    margin-bottom: 20px;
+    animation: slideUpFade 0.8s ease forwards;
+    animation-delay: 0.1s;
+    opacity: 0;
+}
+
+.ticker-wrapper {
+    background: rgba(120, 120, 120, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.ticker-label {
+    background: var(--accent-green);
+    color: #000;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+    margin-right: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(0, 208, 130, 0.3);
+}
+
+.ticker-content {
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+    animation: ticker-scroll 35s linear infinite;
+    padding-right: 50px;
+}
+
+.ticker-item {
+    color: var(--text-main);
+    font-size: 13px;
+    font-weight: 500;
+    margin-right: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.ticker-item:hover {
+    color: var(--accent-green);
+}
+
+.ticker-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    opacity: 0.4;
+}
+
+@keyframes ticker-scroll {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+}
+
+
+/* --- Crypto Pulse Cards --- */
+.pulse-card {
+    min-width: 140px;
+    background: rgba(22, 27, 34, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.pulse-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--pulse-color);
+    box-shadow: 0 0 10px var(--pulse-color);
+}
+
+.pulse-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pulse-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 130px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    border-left: 2px solid var(--pulse-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.pulse-card:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.pulse-icon {
+    font-size: 20px;
+    color: var(--pulse-color);
+    filter: drop-shadow(0 0 5px var(--pulse-color));
+}
+
+.pulse-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.pulse-ticker {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pulse-value {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-top: 2px;
+}
+
+#home-crypto-pulse::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- Crypto Marquee Animado --- */
+.pulse-marquee {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 10px 0;
+}
+
+.pulse-track {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+    animation: crypto-scroll 40s linear infinite;
+}
+
+.pulse-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes crypto-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* --- Mini Calculadora Cripto --- */
+.mini-calc-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px 15px;
+    margin-top: 5px;
+}
+
+.calc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.calc-status {
+    background: rgba(0, 208, 132, 0.1);
+    color: var(--accent-green);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 8px;
+}
+
+.calc-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-group {
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 5px;
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.input-group input {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    width: 60px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 5px;
+    outline: none;
+}
+
+.input-group select {
+    background: none;
+    border: none;
+    color: var(--accent-green);
+    font-size: 11px;
+    font-weight: 800;
+    outline: none;
+    cursor: pointer;
+}
+
+.calc-arrow {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.calc-result {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#home-crypto-res-usd {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+/* --- Pizarra Bancaria --- */
+.banks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.bank-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 18px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.bank-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.bank-card:active {
+    transform: scale(0.96);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.bank-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bank-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--accent-green);
+}
+
+.bank-name {
+    font-size: 10px;
+    font-weight: 900;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bank-rates {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bank-rate-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rate-label {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.rate-value {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.2px;
+}
+
+/* Colores Corporativos */
+/* --- Efectos de Marca (Brand Glows) --- */
+.bank-banesco { border-left: 3px solid #00a651; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.05); }
+.bank-mercantil { border-left: 3px solid #004b8d; box-shadow: 0 4px 15px rgba(0, 75, 141, 0.05); }
+.bank-provincial { border-left: 3px solid #0066b3; box-shadow: 0 4px 15px rgba(0, 102, 179, 0.05); }
+.bank-bdv { border-left: 3px solid #e74c3c; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.05); }
+.bank-bnc { border-left: 3px solid #2c3e50; box-shadow: 0 4px 15px rgba(44, 62, 80, 0.05); }
+.bank-bancaribe { border-left: 3px solid #f1c40f; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.05); }
+.bank-exterior { border-left: 3px solid #c0392b; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.05); }
+.bank-bancamiga { border-left: 3px solid #8e44ad; box-shadow: 0 4px 15px rgba(142, 68, 173, 0.05); }
+
+.bank-banesco .bank-logo { background: rgba(0, 166, 81, 0.1); color: #00a651; }
+.bank-mercantil .bank-logo { background: rgba(0, 75, 141, 0.1); color: #004b8d; }
+.bank-provincial .bank-logo { background: rgba(0, 102, 179, 0.1); color: #0066b3; }
+.bank-bdv .bank-logo { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+.bank-bnc .bank-logo { background: rgba(44, 62, 80, 0.1); color: #2c3e50; }
+.bank-bancaribe .bank-logo { background: rgba(241, 196, 15, 0.1); color: #f1c40f; }
+.bank-exterior .bank-logo { background: rgba(192, 57, 43, 0.1); color: #c0392b; }
+.bank-bancamiga .bank-logo { background: rgba(142, 68, 173, 0.1); color: #8e44ad; }
+
+/* --- Market Pulse Timeline (New Section) --- */
+.news-timeline-wrapper {
+    margin-top: 35px;
+    padding: 0 5px;
+}
+
+.timeline-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.timeline-status {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent-green);
+    background: rgba(0, 208, 132, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    animation: flash-green 2s infinite;
+}
+
+@keyframes flash-green {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.timeline-header h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.news-timeline {
+    position: relative;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.news-timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent-green), var(--card-border), transparent);
+    opacity: 0.3;
+}
+
+.timeline-item {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: slideInTimeline 0.5s ease backwards;
+    animation-delay: calc(var(--item-index) * 0.08s);
+}
+
+@keyframes slideInTimeline {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -20px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    z-index: 2;
+    border: 2px solid var(--bg-color);
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.timeline-content {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 16px;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+}
+
+.timeline-item:hover .timeline-content {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--card-border);
+    transform: translateX(5px);
+}
+
+.timeline-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.timeline-source {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.timeline-time {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.timeline-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-main);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* --- Smart Intelligence Badges --- */
+.timeline-status-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.badge-live {
+    font-size: 8px;
+    font-weight: 800;
+    color: #fff;
+    background: #00D084;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.badge-hot {
+    font-size: 8px;
+    font-weight: 800;
+    color: #fff;
+    background: #FF4D4D;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+}
+
+.badge-crypto {
+    font-size: 8px;
+    font-weight: 800;
+    color: #000;
+    background: #F7931A;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.hot-news .timeline-content {
+    border-color: rgba(255, 77, 77, 0.3) !important;
+    background: rgba(255, 77, 77, 0.03) !important;
+}
+
+.hot-news .timeline-marker {
+    box-shadow: 0 0 15px #FF4D4D !important;
+    background: #FF4D4D !important;
+}
+
+.timeline-empty {
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+    padding: 20px;
+}
+

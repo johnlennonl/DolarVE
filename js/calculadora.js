@@ -1,327 +1,275 @@
-// ==========================================
-// Módulo de Calculadora y Recibos - DolarVE
-// Aquí es donde sucede la magia de las cuentas.
-// Convertimos bolívares a dólares (y viceversa) y generamos recibos.
-// ==========================================
+/**
+ * DolarVE - Dashboard de Conversión Live v4.2
+ * Soporte Binance USDT, Bidireccional, Internacional y Temas Adaptativos.
+ */
 
 const Calculadora = {
-    // Función estrella: Actualiza la pantalla de la calculadora
-    actualizarPantalla() {
-        const config = window.DolarVE.config;
-        const tasas = window.DolarVE.tasas;
-        
-        // 1. EVALUACIÓN ARITMÉTICA SEGURA
-        const montoLimpio = this.evaluarExpresion(config.calc);
-        
-        if (config.modo === 'comisiones') {
-            this.renderizarModoComisiones(montoLimpio);
-            return;
-        }
-        
-        let tasaActiva = 0;
-        let nombreMoneda = '';
+    montoBase: 0,
+    regionActiva: 've', 
+    tasaSeleccionada: 'binance',
+    modoInverso: false, // false: $/Moneda -> Bs/LATAM, true: Bs -> $
 
-        if (config.base === 'bcv') { tasaActiva = tasas.usd; nombreMoneda = 'USD (BCV)'; }
-        if (config.base === 'paralelo') { tasaActiva = tasas.paralelo; nombreMoneda = 'USD (Paralelo)'; }
-        if (config.base === 'eur') { tasaActiva = tasas.eur; nombreMoneda = 'EUR'; }
-        if (config.base === 'cop') { tasaActiva = tasas.cop || 3900; nombreMoneda = 'PESO COP'; }
+    init() {
+        console.log('[DolarVE] Inicializando Dashboard de Calculadora v4.2...');
+        this.vincularEventos();
+        this.cargarEstado();
+        this.actualizar();
+    },
 
-        const fromValue = document.getElementById('calc-from-value');
-        const toValue = document.getElementById('calc-to-value');
-        const fromLabel = document.getElementById('calc-from-label');
-        const toLabel = document.getElementById('calc-to-label');
-
-        if (!fromValue || !toValue) return;
-
-        // Mostramos lo que el usuario escribe (La expresión o el número)
-        fromValue.innerText = config.calc;
-
-        // Calculamos el resultado usando el monto ya EVALUADO
-        let resultado = config.direccion ? (montoLimpio * tasaActiva) : (montoLimpio / tasaActiva);
-        
-        toValue.innerText = resultado.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-        // Ajustamos las etiquetas según la moneda
-        if (config.base === 'cop') {
-            if (fromLabel) fromLabel.innerText = config.direccion ? "MONTO USD" : "MONTO COP";
-            if (toLabel) toLabel.innerText = config.direccion ? "RESULTADO COP" : "RESULTADO USD";
-            const chargeBtn = document.getElementById('generate-charge-btn');
-            if (chargeBtn) chargeBtn.style.display = 'none';
-        } else {
-            const labelMoneda = config.base === 'eur' ? 'EUR' : 'USD';
-            if (fromLabel) fromLabel.innerText = config.direccion ? `MONTO ${labelMoneda}` : "MONTO VES";
-            if (toLabel) toLabel.innerText = config.direccion ? "RESULTADO VES" : `RESULTADO ${labelMoneda}`;
-            const chargeBtn = document.getElementById('generate-charge-btn');
-            if (chargeBtn) chargeBtn.style.display = 'flex';
+    vincularEventos() {
+        const input = document.getElementById('calc-main-input');
+        if (input) {
+            input.addEventListener('input', (e) => {
+                this.montoBase = parseFloat(e.target.value) || 0;
+                this.actualizar();
+            });
         }
 
-        // --- MANEJO DEL INDICADOR DESLIZANTE ---
-        const chips = document.querySelectorAll('.rate-chip');
-        chips.forEach(c => c.classList.remove('active'));
-        
-        const chipActivo = document.querySelector(`.rate-chip[data-rate="${config.base}"]`);
-        const indicador = document.getElementById('rate-indicator');
-        
-        if (chipActivo && indicador) {
-            chipActivo.classList.add('active');
-            // Calculamos posición
-            const rect = chipActivo.getBoundingClientRect();
-            const parentRect = chipActivo.parentElement.getBoundingClientRect();
-            indicador.style.width = `${rect.width - 10}px`;
-            indicador.style.left = `${rect.left - parentRect.left}px`;
-        }
+        document.getElementById('calc-swap-btn')?.addEventListener('click', () => this.toggleModo());
 
-        this.guardarEstado();
-    },
+        const tabs = document.querySelectorAll('.region-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.cambiarRegion(tab.dataset.region);
+            });
+        });
 
-    // Evaluador aritmético simple y seguro (sin usar eval)
-    evaluarExpresion(expr) {
-        try {
-            // Limpiamos caracteres raros pero permitimos operadores básicos
-            const f = new Function('return ' + expr.replace(/[^-()\d/*+.]/g, ''));
-            const res = f();
-            return isFinite(res) ? res : 0;
-        } catch (e) {
-            // Si el usuario está a media operación (ej: "10+"), devolvemos lo anterior parseable
-            const match = expr.match(/^[\d.]+/);
-            return match ? parseFloat(match[0]) : 0;
-        }
-    },
+        const cards = document.querySelectorAll('.rate-result-card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                this.seleccionarTasa(card.dataset.rate);
+            });
+        });
 
-    // Guarda lo que el usuario tenía escrito en la calculadora
-    guardarEstado() {
-        const config = window.DolarVE.config;
-        localStorage.setItem('dolarve_base', config.base);
-        localStorage.setItem('dolarve_direction', config.direccion);
-        localStorage.setItem('dolarve_calc', config.calc);
-    },
-
-    // Cambia entre BS -> USD o USD -> BS
-    cambiarDireccion() {
-        window.DolarVE.config.direccion = !window.DolarVE.config.direccion;
-        this.actualizarPantalla();
-        if (window.navigator.vibrate) window.navigator.vibrate(15);
-    },
-
-    alternarModo() {
-        const config = window.DolarVE.config;
-        config.modo = config.modo === 'monedas' ? 'comisiones' : 'monedas';
-        
-        const commEl = document.getElementById('commission-selector');
-        const rateEl = document.querySelector('.rate-selector-wrapper:not(#commission-selector)');
-        const modeText = document.getElementById('calc-mode-text');
-        
-        if (config.modo === 'comisiones') {
-            if (commEl) commEl.style.display = 'block';
-            if (rateEl) rateEl.style.display = 'none';
-            if (modeText) modeText.innerText = "Conversor";
-        } else {
-            if (commEl) commEl.style.display = 'none';
-            if (rateEl) rateEl.style.display = 'block';
-            if (modeText) modeText.innerText = "Comisiones";
-        }
-        
-        this.actualizarPantalla();
-    },
-
-    renderizarModoComisiones(monto) {
-        const config = window.DolarVE.config;
-        const tasas = window.DolarVE.tasas;
-        const fromValue = document.getElementById('calc-from-value');
-        const toValue = document.getElementById('calc-to-value');
-        const fromLabel = document.getElementById('calc-from-label');
-        const toLabel = document.getElementById('calc-to-label');
-
-        const fees = {
-            'paypal': { fixed: 0.30, pct: 0.054 }, // 5.4% + 0.30
-            'binance': { fixed: 0, pct: 0.01 },    // Simulado 1% spread
-            'zelle': { fixed: 0, pct: 0 },         // 0%
-            'reserve': { fixed: 0, pct: 0.02 }     // 2%
-        };
-
-        const currentFee = fees[config.feeType || 'paypal'];
-        
-        // Si queremos RECIBIR $monto, tenemos que ENVIAR $enviar
-        // Formula: (monto + fixed) / (1 - pct)
-        const aEnviar = (monto + currentFee.fixed) / (1 - currentFee.pct);
-        const totalVes = aEnviar * (tasas.paralelo || 38.5);
-
-        if (fromValue) fromValue.innerText = config.calc;
-        if (toValue) toValue.innerText = aEnviar.toLocaleString('en-US', { minimumFractionDigits: 2 });
-        
-        if (fromLabel) fromLabel.innerText = `QUIERO RECIBIR USD (${config.feeType.toUpperCase()})`;
-        if (toLabel) toLabel.innerText = "DEBES ENVIAR USD";
-
-        // Añadimos info de Bolívares en el footer del resultado
-        const existingInfo = document.getElementById('ves-conversion-info');
-        if (existingInfo) existingInfo.remove();
-
-        const info = document.createElement('div');
-        info.id = 'ves-conversion-info';
-        info.style = "font-size: 11px; margin-top: 5px; opacity: 0.8;";
-        info.innerHTML = `<i class="ph ph-info"></i> Equivalente: <strong>${totalVes.toLocaleString('es-VE')} Bs</strong> (Tasa Paralela)`;
-        toValue.parentElement.appendChild(info);
-    },
-
-    // Cambia la moneda base (USD, EUR, COP)
-    cambiarBase(moneda) {
-        window.DolarVE.config.base = moneda;
-        this.actualizarPantalla();
-        if (window.navigator.vibrate) window.navigator.vibrate(15);
-    },
-
-    // Función para añadir números y operadores desde los botones
-    presionarTecla(tecla) {
-        let actual = window.DolarVE.config.calc;
-        const operadores = ['+', '-', '*', '/'];
-
-        if (tecla === 'C') {
-            actual = "0";
-        } else if (tecla === 'DEL') {
-            actual = actual.length > 1 ? actual.slice(0, -1) : "0";
-        } else if (operadores.includes(tecla)) {
-            // No permitir dos operadores seguidos
-            const ultimo = actual.slice(-1);
-            if (operadores.includes(ultimo)) {
-                actual = actual.slice(0, -1) + tecla;
-            } else {
-                actual += tecla;
+        document.getElementById('generate-receipt-btn')?.addEventListener('click', () => this.generarRecibo());
+        document.getElementById('generate-charge-btn')?.addEventListener('click', () => {
+            if (this.regionActiva === 've') {
+                this.mostrarSelectorCuenta((cuenta) => this.generarSolicitudCobro(cuenta));
             }
-        } else if (tecla === '.') {
-            // Lógica simple para el punto (solo uno por número)
-            const partes = actual.split(/[\+\-\*\/]/);
-            const ultimaParte = partes[partes.length - 1];
-            if (!ultimaParte.includes('.')) actual += '.';
-        } else {
-            if (actual === "0") actual = tecla;
-            else actual += tecla;
+        });
+
+        document.getElementById('close-account-picker')?.addEventListener('click', () => this.ocultarSelectorCuenta());
+        document.getElementById('account-picker-overlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'account-picker-overlay') this.ocultarSelectorCuenta();
+        });
+    },
+
+    toggleModo() {
+        this.modoInverso = !this.modoInverso;
+        const label = document.getElementById('calc-input-label');
+        if (label) {
+            label.innerText = this.modoInverso ? 'Monto en Bolívares (Bs.)' : 'Monto en Dólares ($)';
         }
+        if (window.navigator.vibrate) window.navigator.vibrate(20);
+        this.actualizar();
+    },
+
+    cargarEstado() {
+        this.regionActiva = localStorage.getItem('dolarve_calc_region') || 've';
+        const lastMonto = localStorage.getItem('dolarve_calc_monto');
+        if (lastMonto) {
+            this.montoBase = parseFloat(lastMonto);
+            const input = document.getElementById('calc-main-input');
+            if (input) input.value = this.montoBase;
+        }
+        this.cambiarRegion(this.regionActiva, false);
+    },
+
+    cambiarRegion(region, animar = true) {
+        this.regionActiva = region;
+        localStorage.setItem('dolarve_calc_region', region);
+
+        const tabs = document.querySelectorAll('.region-tab');
+        const indicator = document.getElementById('region-indicator');
         
-        window.DolarVE.config.calc = actual;
-        this.actualizarPantalla();
+        tabs.forEach(t => {
+            t.classList.toggle('active', t.dataset.region === region);
+            if (t.dataset.region === region && indicator) {
+                const index = region === 've' ? 0 : 1;
+                indicator.style.transform = `translateX(${index * 100}%)`;
+            }
+        });
+
+        document.getElementById('calc-results-ve').classList.toggle('active', region === 've');
+        document.getElementById('calc-results-int').classList.toggle('active', region === 'int');
+
+        // REQUERIMIENTO: Ocultar botón Cobrar en Internacional
+        const chargeBtn = document.getElementById('generate-charge-btn');
+        if (chargeBtn) {
+            chargeBtn.style.display = region === 'int' ? 'none' : 'flex';
+        }
+
+        if (region === 've') this.tasaSeleccionada = 'binance';
+        else this.tasaSeleccionada = 'cop';
+        
+        this.actualizar();
+    },
+
+    seleccionarTasa(tasa) {
+        this.tasaSeleccionada = tasa;
+        this.actualizar();
         if (window.navigator.vibrate) window.navigator.vibrate(10);
     },
 
-    // Generar la imagen del recibo usando html2canvas
-    async generarRecibo() {
-        const config = window.DolarVE.config;
+    actualizar() {
         const tasas = window.DolarVE.tasas;
-        
-        let nombreTasa = '';
-        let tasaActiva = 0;
-        if (config.base === 'bcv') { tasaActiva = tasas.usd; nombreTasa = 'BCV Oficial'; }
-        if (config.base === 'paralelo') { tasaActiva = tasas.paralelo; nombreTasa = 'Paralelo'; }
-        if (config.base === 'eur') { tasaActiva = tasas.eur; nombreTasa = 'Euro'; }
+        const monto = this.montoBase;
+        localStorage.setItem('dolarve_calc_monto', monto);
 
-        const montoLimpio = this.evaluarExpresion(config.calc);
-        const resultado = config.direccion ? (montoLimpio * tasaActiva) : (montoLimpio / tasaActiva);
+        const calcular = (valorTasa) => {
+            if (valorTasa <= 0) return 0;
+            return this.modoInverso ? (monto / valorTasa) : (monto * valorTasa);
+        };
 
-        const tickerDesde = config.direccion ? (config.base === 'eur' ? '€' : '$') : 'Bs.';
-        const tickerHacia = config.direccion ? 'Bs.' : (config.base === 'eur' ? '€' : '$');
+        const formato = (val, locale = 'es-VE', digits = 2, suffix = '') => {
+            return `${val.toLocaleString(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })} ${suffix}`;
+        };
 
-        // Llenamos la plantilla invisible antes de la foto
-        document.getElementById('rec-from').innerText = `${montoLimpio.toLocaleString('en-US')} ${tickerDesde}`;
-        document.getElementById('rec-to').innerText = `${resultado.toLocaleString('es-VE')} ${tickerHacia}`;
+        const suffixVE = this.modoInverso ? '$' : 'Bs';
+
+        if (this.regionActiva === 've') {
+            document.getElementById('res-bcv').innerText = formato(calcular(tasas.usd), 'es-VE', 2, suffixVE);
+            document.getElementById('res-paralelo').innerText = formato(calcular(tasas.binance), 'es-VE', 2, suffixVE);
+            document.getElementById('res-eur').innerText = formato(calcular(tasas.eur), 'es-VE', 2, suffixVE);
+        } 
+        else {
+            document.getElementById('res-cop').innerText = formato(monto * (tasas.cop || 0), 'es-CO', 0, 'COP');
+            document.getElementById('res-ars').innerText = formato(monto * (tasas.ars || 0), 'es-AR', 0, 'ARS');
+            document.getElementById('res-brl').innerText = formato(monto * (tasas.brl || 0), 'pt-BR', 2, 'BRL');
+            document.getElementById('res-clp').innerText = formato(monto * (tasas.clp || 0), 'es-CL', 0, 'CLP');
+        }
+
+        document.querySelectorAll('.rate-result-card').forEach(card => {
+            card.classList.toggle('selected', card.dataset.rate === this.tasaSeleccionada);
+        });
+    },
+
+    async generarRecibo() {
+        if (this.montoBase <= 0) {
+            Interfaz.mostrarNotificacion('⚠️ Ingresa un monto primero');
+            return;
+        }
+
+        const tasas = window.DolarVE.tasas;
+        let nombreTasa = 'Tasa';
+        let tasaValor = 0;
+        let locale = 'es-VE';
+
+        switch(this.tasaSeleccionada) {
+            case 'bcv': nombreTasa = 'BCV Oficial'; tasaValor = tasas.usd; break;
+            case 'binance': nombreTasa = 'Binance P2P 🔶'; tasaValor = tasas.binance; break;
+            case 'eur': nombreTasa = 'Euro Oficial'; tasaValor = tasas.eur; break;
+            case 'cop': nombreTasa = 'Colombia 🇨🇴'; tasaValor = tasas.cop; locale = 'es-CO'; break;
+            case 'ars': nombreTasa = 'Argentina 🇦🇷'; tasaValor = tasas.ars; locale = 'es-AR'; break;
+            case 'brl': nombreTasa = 'Brasil 🇧🇷'; tasaValor = tasas.brl; locale = 'pt-BR'; break;
+            case 'clp': nombreTasa = 'Chile 🇨🇱'; tasaValor = tasas.clp; locale = 'es-CL'; break;
+        }
+
+        const resultado = this.modoInverso ? (this.montoBase / tasaValor) : (this.montoBase * tasaValor);
+        const tickerDesde = this.modoInverso ? 'Bs.' : '$';
+        const tickerHacia = this.modoInverso ? '$' : (this.regionActiva === 've' ? 'Bs.' : this.tasaSeleccionada.toUpperCase());
+
+        // Llenar plantilla
+        document.getElementById('rec-from').innerText = `${this.montoBase.toLocaleString(this.modoInverso ? 'es-VE' : 'en-US')} ${tickerDesde}`;
+        document.getElementById('rec-to').innerText = `${resultado.toLocaleString(locale, { maximumFractionDigits: 2 })} ${tickerHacia}`;
         document.getElementById('rec-rate-name').innerText = nombreTasa;
-        document.getElementById('rec-rate-val').innerText = `${tasaActiva.toLocaleString('es-VE')} Bs`;
+        document.getElementById('rec-rate-val').innerText = `${tasaValor.toLocaleString(locale)} ${this.regionActiva === 've' ? 'Bs' : ''}`;
         document.getElementById('rec-date').innerText = new Date().toLocaleString('es-VE');
 
         Interfaz.mostrarNotificacion("Generando recibo... 📸");
 
+        // REQUERIMIENTO: Captura adaptativa al tema
         setTimeout(async () => {
             const plantilla = document.getElementById('receipt-template');
             if (!plantilla) return;
             
-            try {
-                const canvas = await html2canvas(plantilla, {
-                    backgroundColor: '#0d0d0d',
-                    scale: 2,
-                    width: 350
-                });
+            // FORZAR SIEMPRE OSCURO PARA CAPTURAS (Petición del usuario)
+            plantilla.className = `receipt-card dark`;
 
+            try {
+                const canvas = await html2canvas(plantilla, { 
+                    backgroundColor: '#0d0d0d', 
+                    scale: 3, 
+                    width: 350,
+                    logging: false,
+                    useCORS: true
+                });
                 const imgData = canvas.toDataURL('image/png');
                 window.DolarVE.ultimoRecibo = imgData;
-
                 const overlay = document.getElementById('receipt-modal-overlay');
                 const imgEl = document.getElementById('receipt-preview-img');
-
-                if (overlay && imgEl) {
-                    imgEl.src = imgData;
-                    overlay.style.display = 'flex';
-                    overlay.offsetHeight;
-                    overlay.style.opacity = '1';
-                }
-            } catch (e) {
-                console.error('[DolarVE] Error creando recibo:', e);
-            }
+                if (overlay && imgEl) { imgEl.src = imgData; overlay.style.display = 'flex'; overlay.offsetHeight; overlay.style.opacity = '1'; }
+            } catch (e) { console.error(e); }
         }, 100);
     },
 
-    // Para cuando el usuario tiene varias cuentas de Pago Móvil
+    async generarSolicitudCobro(cuenta) {
+        if (this.montoBase <= 0) return;
+        const tasas = window.DolarVE.tasas;
+        let tasaValor = 0;
+        let nombreTasa = '';
+        if (this.tasaSeleccionada === 'bcv') { tasaValor = tasas.usd; nombreTasa = 'Oficial BCV'; }
+        else if (this.tasaSeleccionada === 'eur') { tasaValor = tasas.eur; nombreTasa = 'Euro Oficial'; }
+        else { tasaValor = tasas.binance; nombreTasa = 'Binance P2P'; }
+
+        const montoBs = this.modoInverso ? this.montoBase : (this.montoBase * tasaValor);
+
+        document.getElementById('charge-amount-val').innerText = montoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 });
+        document.getElementById('charge-rate-val').innerText = nombreTasa;
+        document.getElementById('charge-bank-val').innerText = cuenta.banco_nombre;
+        document.getElementById('charge-phone-val').innerText = `${cuenta.prefijo_tel}-${cuenta.numero_tel}`;
+        document.getElementById('charge-id-val').innerText = `${cuenta.tipo_documento}${cuenta.numero_documento}`;
+        document.getElementById('charge-date-val').innerText = `Fecha: ${new Date().toLocaleDateString('es-VE')}`;
+
+        Interfaz.mostrarNotificacion('Generando Solicitud... 💸');
+
+        setTimeout(async () => {
+            const template = document.getElementById('charge-template');
+            if (!template) return;
+            template.className = `charge-card dark`;
+
+            try {
+                const canvas = await html2canvas(template, { 
+                    backgroundColor: '#0d0d0d', 
+                    scale: 3, 
+                    width: 350 
+                });
+                const imgData = canvas.toDataURL('image/png');
+                window.DolarVE.ultimoRecibo = imgData;
+                const overlay = document.getElementById('receipt-modal-overlay');
+                const imgEl = document.getElementById('receipt-preview-img');
+                if (overlay && imgEl) { imgEl.src = imgData; overlay.style.display = 'flex'; overlay.offsetHeight; overlay.style.opacity = '1'; }
+            } catch (e) { console.error(e); }
+        }, 100);
+    },
+
     mostrarSelectorCuenta(callback) {
         const overlay = document.getElementById('account-picker-overlay');
         const listado = document.getElementById('account-picker-list');
         const sheet = document.getElementById('account-picker-sheet');
-        const btnCerrar = document.getElementById('close-account-picker');
-        
         if (!overlay || !listado) return;
-
-        // Listener para cerrar
-        if (btnCerrar) {
-            btnCerrar.onclick = () => this.ocultarSelectorCuenta();
-        }
-
-        // Necesitamos las cuentas que estén cargadas
         const cuentas = window.DolarVE.cuentas || [];
+        if (cuentas.length === 0) { Interfaz.mostrarNotificacion('⚠️ Agrega una cuenta en Ajustes'); return; }
         
-        if (cuentas.length === 0) {
-            Interfaz.mostrarNotificacion('⚠️ Agrega una cuenta en Ajustes primero');
-            return;
-        }
-
         listado.innerHTML = cuentas.map((acc, i) => {
-            const banco = (acc.banco_nombre || acc.banco || "").toUpperCase();
-            let brandClass = '';
-            if (banco.includes('BANESCO')) brandClass = 'bank-banesco';
-            else if (banco.includes('MERCANTIL')) brandClass = 'bank-mercantil';
-            else if (banco.includes('VENEZUELA')) brandClass = 'bank-bdv';
-            else if (banco.includes('PROVINCIAL')) brandClass = 'bank-provincial';
-            else if (banco.includes('BNC') || banco.includes('NACIONAL DE CREDITO')) brandClass = 'bank-bnc';
-            else if (banco.includes('BANCAMIGA')) brandClass = 'bank-bancamiga';
-            else if (banco.includes('BANCARIBE')) brandClass = 'bank-bancaribe';
-            else if (banco.includes('EXTERIOR')) brandClass = 'bank-exterior';
-
-            const logo = window.Cuentas ? window.Cuentas.getBankIcon(banco) : null;
-            const logoHtml = logo 
-                ? `<img src="${logo}" class="picker-bank-icon">`
-                : `<i class="ph-duotone ph-bank" style="font-size: 20px; color: var(--accent-green);"></i>`;
-
+            const bancoStr = acc.banco_nombre || acc.banco || "";
+            const logoUrl = window.Cuentas ? window.Cuentas.getBankIcon(bancoStr) : null;
+            const logoHtml = logoUrl ? `<img src="${logoUrl}" class="picker-bank-img">` : `<i class="ph-duotone ph-bank"></i>`;
             return `
-                <button data-idx="${i}" class="picker-account-btn ${brandClass}">
-                    <div class="picker-account-logo">
-                        ${logoHtml}
-                    </div>
+                <button data-idx="${i}" class="picker-account-btn">
+                    <div class="picker-bank-logo">${logoHtml}</div>
                     <div class="picker-account-content">
                         <div class="acc-label">${acc.etiqueta || 'Cuenta Personal'}</div>
-                        <div class="acc-bank">${acc.banco_nombre || acc.banco}</div>
+                        <div class="acc-bank">${bancoStr}</div>
                     </div>
-                    <i class="ph-duotone ph-caret-right picker-arrow"></i>
                 </button>
             `;
         }).join('');
 
         listado.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const idx = parseInt(btn.dataset.idx);
-                this.ocultarSelectorCuenta();
-                callback(cuentas[idx]);
-            });
+            btn.addEventListener('click', () => { this.ocultarSelectorCuenta(); callback(cuentas[parseInt(btn.dataset.idx)]); });
         });
-
-        overlay.style.display = 'block';
-        overlay.onclick = (e) => { if (e.target === overlay) this.ocultarSelectorCuenta(); };
-        overlay.offsetHeight;
-        overlay.style.opacity = '1';
+        overlay.style.display = 'block'; overlay.offsetHeight; overlay.style.opacity = '1';
         if (sheet) sheet.style.transform = 'translateX(-50%) translateY(0)';
     },
 
@@ -333,33 +281,35 @@ const Calculadora = {
         setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 300);
     },
 
-    // Generar imagen de la tasa diaria (Daily Rate Share)
+    actualizarPantalla() { this.actualizar(); },
+
     async generarImagenCompartir() {
-        const tasas = window.DolarVE.tasas;
-        
-        const bcvVal = tasas.usd ? tasas.usd.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '---';
-        const eurVal = tasas.eur ? `${tasas.eur.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs` : '--- Bs';
+        if (!window.DolarVE.tasas) return;
+        const { usd, binance, eur } = window.DolarVE.tasas;
 
-        document.getElementById('share-bcv-val').innerText = bcvVal;
-        document.getElementById('share-eur-val').innerText = eurVal;
-        document.getElementById('share-date-val').innerText = `Actualizado: Hoy, ${new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' })}`;
+        // Poblar template
+        document.getElementById('cap-bcv-val').innerText = `${usd.toFixed(2)} Bs`;
+        document.getElementById('cap-binance-val').innerText = `${binance.toFixed(2)} Bs`;
+        document.getElementById('cap-euro-val').innerText = `${eur.toFixed(2)} Bs`;
+        document.getElementById('cap-date').innerText = `Actualizado: ${new Date().toLocaleDateString('es-VE')} ${new Date().toLocaleTimeString('es-VE', {hour: '2-digit', minute:'2-digit'})}`;
 
-        Interfaz.mostrarNotificacion("Generando imagen para compartir... 🎥");
+        Interfaz.mostrarNotificacion('Preparando Resumen... 📊');
 
         setTimeout(async () => {
-            const template = document.getElementById('daily-rate-template');
+            const template = document.getElementById('rates-capture-template');
             if (!template) return;
-            
-            try {
-                const canvas = await html2canvas(template, {
-                    backgroundColor: '#0d0d0d',
-                    scale: 2,
-                    width: 350
-                });
+            template.className = `receipt-card dark`;
 
+            try {
+                const canvas = await html2canvas(template, { 
+                    backgroundColor: '#0d0d0d', 
+                    scale: 3, 
+                    width: 350,
+                    windowWidth: 350
+                });
                 const imgData = canvas.toDataURL('image/png');
                 window.DolarVE.ultimoRecibo = imgData;
-
+                
                 const overlay = document.getElementById('receipt-modal-overlay');
                 const imgEl = document.getElementById('receipt-preview-img');
                 if (overlay && imgEl) {
@@ -369,61 +319,11 @@ const Calculadora = {
                     overlay.style.opacity = '1';
                 }
             } catch (e) {
-                console.error('[DolarVE] Error compartiendo tasa:', e);
-            }
-        }, 100);
-    },
-
-    // Generar imagen de cobro con Pago Móvil
-    async generarSolicitudCobro(cuenta) {
-        const config = window.DolarVE.config;
-        const tasas = window.DolarVE.tasas;
-        
-        let nombreTasa = '';
-        let tasaActiva = 0;
-        if (config.base === 'bcv') { tasaActiva = tasas.usd; nombreTasa = 'Oficial BCV'; }
-        if (config.base === 'paralelo') { tasaActiva = tasas.paralelo; nombreTasa = 'Paralelo'; }
-        if (config.base === 'eur') { tasaActiva = tasas.eur; nombreTasa = 'Euro Oficial'; }
-
-        const montoLimpio = this.evaluarExpresion(config.calc);
-        const montoBs = config.direccion ? (montoLimpio * tasaActiva) : montoLimpio;
-
-        document.getElementById('charge-amount-val').innerText = montoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 });
-        document.getElementById('charge-rate-val').innerText = nombreTasa;
-        document.getElementById('charge-bank-val').innerText = cuenta.banco_nombre;
-        document.getElementById('charge-phone-val').innerText = `${cuenta.prefijo_tel}-${cuenta.numero_tel}`;
-        document.getElementById('charge-id-val').innerText = `${cuenta.tipo_documento}${cuenta.numero_documento}`;
-        document.getElementById('charge-date-val').innerText = `Fecha: ${new Date().toLocaleDateString('es-VE')}`;
-
-        Interfaz.mostrarNotificacion('Generando Solicitud de Pago... 💸');
-
-        setTimeout(async () => {
-            const template = document.getElementById('charge-template');
-            if (!template) return;
-            
-            try {
-                const canvas = await html2canvas(template, {
-                    backgroundColor: '#0d0d0d',
-                    scale: 2,
-                    width: 350
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                window.DolarVE.ultimoRecibo = imgData;
-
-                const overlay = document.getElementById('receipt-modal-overlay');
-                const imgEl = document.getElementById('receipt-preview-img');
-                if (overlay && imgEl) {
-                    imgEl.src = imgData;
-                    overlay.style.display = 'flex';
-                    overlay.offsetHeight;
-                    overlay.style.opacity = '1';
-                }
-            } catch (e) {
-                console.error('[DolarVE] Error generando cobro:', e);
+                console.error('[DolarVE] Error capturando diarias:', e);
             }
         }, 100);
     }
 };
 
+document.addEventListener('DOMContentLoaded', () => Calculadora.init());
 window.Calculadora = Calculadora;

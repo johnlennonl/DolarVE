@@ -1,0 +1,543 @@
+/* --- Surtidor & Grid Styling --- */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+#pm-add-form {
+    display: flex;
+    flex-direction: column;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+}
+
+#pm-add-form.show {
+    max-height: 800px;
+    opacity: 1;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    padding: 25px;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+.pump-type-btn.active {
+    background: var(--accent-green) !important;
+    color: #000 !important;
+}
+
+#pump-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #2D333B;
+    height: 8px;
+    border-radius: 4px;
+}
+
+#pump-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--accent-green, #00D084);
+    border: 3px solid #000;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 208, 132, 0.4);
+    margin-top: -8px; /* Centers thumb over the track */
+}
+
+#save-pm-btn:active, #cancel-pm-btn:active {
+    transform: scale(0.96);
+}
+
+#save-pm-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 5px 15px rgba(0, 208, 132, 0.3);
+}
+
+
+/* --- Nearby Gas Stations v7.7.0 --- */
+/* --- Surtidor Galón Digital Pro v13.0 (Liquid Evolution) --- */
+.gas-gallon-card {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 40px !important;
+    padding: 25px 20px !important;
+    display: flex; /* Cambiado de grid a flex para mejor control responsive */
+    gap: 20px;
+    align-items: center;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.06) !important;
+    overflow: hidden;
+    position: relative;
+    min-height: 250px;
+}
+
+.gallon-visual-wrapper {
+    position: relative;
+    width: 100px; /* Reducido para dar más espacio a los números */
+    height: 180px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 20px 20px 35px 35px;
+    border: 3px solid rgba(0,0,0,0.08);
+    overflow: hidden;
+    flex-shrink: 0; /* Evita que el galón se encoja */
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.05), 0 20px 40px rgba(0,0,0,0.04);
+}
+
+body.dark-theme .gallon-visual-wrapper {
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(255,255,255,0.08);
+}
+
+.fuel-liquid-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20%; /* Controlado por JS */
+    background: linear-gradient(to top, #f39c12, #f1c40f); /* Color Ámbar/Gasolina Premium */
+    transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.2);
+}
+
+/* Efecto de Olas (Waves) */
+.fuel-wave {
+    position: absolute;
+    top: -15px;
+    left: 0;
+    width: 200%;
+    height: 20px;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1000 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 50 Q 250 0 500 50 T 1000 50 V 100 H 0 Z" fill="%23f1c40f"/></svg>');
+    background-size: 50% 100%;
+    animation: fuel-wave-move 3s infinite linear;
+}
+
+@keyframes fuel-wave-move {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Burbujas divertidas */
+.fuel-bubbles {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -10px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: bubble-up 3s infinite ease-in;
+}
+
+@keyframes bubble-up {
+    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { transform: translateY(-150px) scale(1.2); opacity: 0; }
+}
+
+.digital-stats-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1; /* Ocupa el resto del espacio */
+    min-width: 0; /* Importante para que el contenido no desborde con flex */
+}
+
+.stat-group {
+    border-left: 3px solid var(--accent-green);
+    padding-left: 12px;
+    min-width: 0;
+}
+
+.stat-label {
+    font-size: 9px; /* Un poco más pequeño */
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-value-big {
+    font-size: 32px; /* Reducido de 38px */
+    font-weight: 900;
+    color: var(--text-main);
+    line-height: 1.1;
+    font-family: 'Outfit', sans-serif;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; /* Evita que el 'Bs' se baje a la siguiente línea */
+    word-break: keep-all; 
+}
+
+/* Caso especial para Bolívares que suelen ser números largos */
+#pump-total-ves {
+    font-size: 26px; /* Reducido un poco más para evitar desbordes */
+    color: var(--accent-blue);
+    letter-spacing: -0.5px; /* Comprimir un poco si es necesario */
+}
+
+.stat-value-small {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-green);
+    font-family: 'Outfit', sans-serif;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Botones de Selección Rápida Estilo Cápsula Glass */
+.quick-amt-btn {
+    padding: 12px 10px !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 16px !important;
+    color: var(--text-main) !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: 'Outfit', sans-serif !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important;
+}
+
+body.dark-theme .quick-amt-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.quick-amt-btn:hover, .quick-amt-btn:active {
+    background: var(--accent-green) !important;
+    color: white !important;
+    border-color: transparent !important;
+    transform: scale(1.08);
+    box-shadow: 0 10px 20px rgba(0, 208, 132, 0.2) !important;
+}
+
+/* Slider Personalizado Premium */
+.premium-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 12px !important;
+    border-radius: 30px !important;
+    background: rgba(0,0,0,0.05) !important;
+    outline: none;
+    transition: 0.3s;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+body.dark-theme .premium-slider {
+    background: rgba(255,255,255,0.08) !important;
+}
+
+.premium-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    background: var(--accent-green);
+    border: 4px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 208, 132, 0.4);
+    transition: all 0.2s ease;
+}
+
+.premium-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 8px 20px rgba(0, 208, 132, 0.6);
+}
+
+.premium-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-green);
+    border: 4px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 208, 132, 0.4);
+}
+
+.slider-hint {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent-green);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    animation: hintBounce 2s infinite;
+}
+
+@keyframes hintBounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+.no-stations-card {
+    background: var(--card-bg) !important;
+    border: 1px dashed var(--card-border) !important;
+    border-radius: 24px !important;
+    padding: 40px 25px !important;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+}
+
+.no-stations-icon {
+    font-size: 40px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.no-stations-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.no-stations-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+/* --- Buscador de Gasolina Pro (Glassmorphism) --- */
+.btn-glass-icon {
+    background: var(--card-border);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-glass-icon:hover {
+    background: var(--accent-green);
+    color: white;
+    transform: scale(1.1);
+}
+
+.search-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input-group {
+    position: relative;
+    display: flex;
+    gap: 8px;
+}
+
+.search-icon-inner {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+#gas-search-input {
+    flex: 1;
+    background: var(--card-border);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 12px 12px 40px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+}
+
+.btn-search-action {
+    background: var(--text-main);
+    color: var(--card-bg);
+    border: none;
+    border-radius: 12px;
+    padding: 0 15px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.select-premium {
+    background: var(--card-border);
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-main);
+    outline: none;
+    cursor: pointer;
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 380px) {
+    .gas-gallon-card {
+        flex-direction: column;
+        padding: 20px !important;
+        text-align: center;
+    }
+    .gallon-visual-wrapper {
+        width: 80px;
+        height: 120px;
+    }
+    .stat-group {
+        border-left: none;
+        border-bottom: 1px solid var(--card-border);
+        padding: 5px 0;
+    }
+}
+
+/* --- Nearby Gas Stations Premium --- */
+.gas-station-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 22px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* Sombra más definida */
+    position: relative;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+body.light-theme .gas-station-card {
+    background: #ffffff; /* Fondo sólido en light para contraste total */
+    border: 1px solid #e1e4e8;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
+
+.gas-station-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-green);
+}
+
+.gas-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.gas-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+}
+
+.gas-city {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.gas-status-badge {
+    font-size: 10px;
+    font-weight: 900;
+    padding: 6px 12px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-free { background: rgba(0, 208, 132, 0.1); color: #00D084; border: 1px solid rgba(0, 208, 132, 0.15); }
+.status-low { background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.15); }
+.status-high { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.15); }
+.status-operative { background: rgba(52, 152, 219, 0.1); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.15); } /* Azul Operativo */
+.status-closed { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); } /* Rojo Cerrado */
+
+.gas-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid var(--card-border);
+    margin-top: 5px;
+}
+
+.gas-distance {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.gas-update-time {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Acciones de Reporte */
+.gas-report-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.report-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.report-btn i { font-size: 16px; }
+
+.report-btn:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
+.report-btn.active { border-color: var(--accent-green); background: rgba(0, 208, 132, 0.05); color: var(--accent-green); }
+
