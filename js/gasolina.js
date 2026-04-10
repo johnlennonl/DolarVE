@@ -81,94 +81,6 @@ const Gasolina = {
         );
     },
 
-    toggleSearchGas() {
-        const panel = document.getElementById('gas-search-container');
-        if (panel) {
-            const isHidden = panel.style.display === 'none';
-            panel.style.display = isHidden ? 'block' : 'none';
-            if (isHidden) {
-                setTimeout(() => document.getElementById('gas-search-input').focus(), 100);
-            }
-        }
-    },
-
-    buscarGasPorNombre() {
-        const input = document.getElementById('gas-search-input');
-        const queryRaw = input.value.trim();
-        
-        if (!queryRaw) {
-            this.obtenerEstacionesCercanas(true);
-            return;
-        }
-
-        const queryLimpia = queryRaw
-            .replace(/^(E\/S|E\.S\.|Estacion de Servicio|Estacion|Gasolinera)\s+/i, '')
-            .trim();
-
-        const container = document.getElementById('nearby-gas-stations');
-        container.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                <div class="loader-spinner" style="margin: 0 auto 15px; width: 30px; height: 30px; border-top-color: var(--accent-green);"></div>
-                <div style="font-size: 13px; font-weight: 600;">Buscando "${queryLimpia}"...</div>
-                <div style="font-size: 10px; margin-top: 8px;">Conectando con servidores globales...</div>
-            </div>
-        `;
-
-        const osmQuery = `
-            [out:json][timeout:30];
-            (
-                nwr["amenity"="fuel"]["name"~"${queryLimpia}",i];
-                nwr["amenity"="fuel"]["operator"~"${queryLimpia}",i];
-                nwr["amenity"="fuel"]["brand"~"${queryLimpia}",i];
-            );
-            out center;
-        `;
-        
-        this.fetchConRespaldo(osmQuery).then(async data => {
-            if (!data || !data.elements) throw new Error('Sin datos');
-            
-            let userLat = 10.48, userLng = -66.90;
-            try {
-                const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
-                userLat = pos.coords.latitude;
-                userLng = pos.coords.longitude;
-            } catch(e) {}
-
-            const estaciones = data.elements.map(el => {
-                const coords = el.type === 'node' ? { lat: el.lat, lon: el.lon } : { lat: el.center.lat, lon: el.center.lon };
-                const distForSearch = this.calcularDistancia(userLat, userLng, coords.lat, coords.lon);
-                
-                return {
-                    id: el.id,
-                    name: el.tags.name || el.tags.operator || el.tags.brand || `E/S Sin Nombre`,
-                    city: el.tags["addr:city"] || el.tags["addr:state"] || 'Venezuela',
-                    latitude: coords.lat,
-                    longitude: coords.lon,
-                    distancia: distForSearch,
-                    status: 'Operativa',
-                    reports_count: 0,
-                    source: 'Búsqueda Global'
-                };
-            }).sort((a, b) => a.distancia - b.distancia);
-
-            if (estaciones.length === 0) {
-                container.innerHTML = `
-                    <div class="no-stations-card">
-                        <i class="ph-duotone ph-magnifying-glass no-stations-icon"></i>
-                        <div class="no-stations-title">No hay resultados</div>
-                        <div class="no-stations-text">No encontramos "${queryRaw}". Prueba solo con el nombre principal.</div>
-                        <button onclick="Gasolina.obtenerEstacionesCercanas(true)" class="btn-primary" style="padding: 10px 20px;">Ver Cercanas</button>
-                    </div>
-                `;
-            } else {
-                this.renderizarEstaciones(estaciones);
-            }
-        }).catch(e => {
-            console.error('Search failed:', e);
-            this.mostrarErrorGas(container, "Los servidores del mapa están saturados. Reintenta en unos segundos.");
-        });
-    },
-
     async fetchDesdeOSM(lat, lng, radius = 20000) {
         const query = `
             [out:json][timeout:30];
@@ -223,39 +135,6 @@ const Gasolina = {
         `;
     },
 
-    async reportarStatus(stationId, nuevoStatus) {
-        if (window.navigator.vibrate) window.navigator.vibrate(20);
-        Interfaz.mostrarNotificacion(`📡 Reportando: ${nuevoStatus}...`);
-
-        try {
-            if (window.DolarVE.supabase) {
-                const { error } = await window.DolarVE.supabase
-                    .from('gas_stations')
-                    .update({ status: nuevoStatus, last_updated: new Date().toISOString() })
-                    .eq('id', stationId);
-
-                if (error) throw error;
-                Interfaz.mostrarNotificacion('✅ ¡Reporte enviado con éxito!');
-            } else {
-                this.actualizarCacheReporte(stationId, nuevoStatus);
-                Interfaz.mostrarNotificacion('⚠️ Reporte local (Modo Demo)');
-            }
-            this.obtenerEstacionesCercanas(true);
-        } catch (e) {
-            console.error('[DolarVE] Error reporte:', e);
-            Interfaz.mostrarNotificacion('❌ Fallo al reportar. Verifica tu DB.');
-            this.actualizarCacheReporte(stationId, nuevoStatus);
-        }
-    },
-
-    actualizarCacheReporte(stationId, nuevoStatus) {
-        this.estacionesCercanasCache = (this.estacionesCercanasCache || []).map(est => {
-            if (est.id === stationId) return { ...est, status: nuevoStatus, last_updated: new Date().toISOString() };
-            return est;
-        });
-        this.renderizarEstaciones(this.estacionesCercanasCache);
-    },
-
     calcularDistancia(lat1, lon1, lat2, lon2) {
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -287,12 +166,8 @@ const Gasolina = {
                 <i class="ph-duotone ph-map-pin-line no-stations-icon"></i>
                 <div class="no-stations-title">No hay bombas cerca</div>
                 <div class="no-stations-text">
-                    No hemos detectado aportes en tu zona (radio 80km). <br>
-                    <strong>¡Sé el primero en reportar tu estación local!</strong>
+                    No hemos detectado estaciones en tu zona (radio 80km).
                 </div>
-                <button onclick="Interfaz.mostrarModalAportar()" class="btn-primary" style="padding: 12px 25px; border-radius: 14px;">
-                    Reportar Estación
-                </button>
             </div>
         `;
     },
@@ -339,22 +214,6 @@ const Gasolina = {
                             </div>
                         </div>
 
-                        ${numReports > 0 ? `<div style="font-size: 9px; color: var(--accent-green); font-weight: 800; margin-top: -5px; opacity: 0.8; letter-spacing: 0.5px;">⭐ ${numReports} reportes de la comunidad</div>` : ''}
-
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-top: 10px; opacity: 0.8; display: flex; align-items: center; gap: 5px;">
-                            <i class="ph-duotone ph-megaphone"></i> Reportar Estado Ahora:
-                        </div>
-                        <div class="gas-report-actions" style="margin-top: 8px;">
-                            <button class="report-btn ${est.status === 'Sin Cola' ? 'active' : ''}" onclick="Gasolina.reportarStatus('${est.id}', 'Sin Cola')">
-                                <i class="ph-duotone ph-check-circle"></i> Sin Cola
-                            </button>
-                            <button class="report-btn ${est.status === 'Poca Cola' ? 'active' : ''}" onclick="Gasolina.reportarStatus('${est.id}', 'Poca Cola')">
-                                <i class="ph-duotone ph-clock"></i> Poca
-                            </button>
-                            <button class="report-btn ${est.status === 'Mucha Cola' ? 'active' : ''}" onclick="Gasolina.reportarStatus('${est.id}', 'Mucha Cola')">
-                                <i class="ph-duotone ph-warning-diamond"></i> Mucha
-                            </button>
-                        </div>
 
                         <div class="gas-card-footer" style="border-top: 1px dashed var(--card-border); padding-top: 12px; margin-top: 5px;">
                             <div class="gas-distance" style="color: var(--accent-blue);">
