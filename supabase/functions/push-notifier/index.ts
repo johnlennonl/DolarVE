@@ -15,10 +15,34 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Lista de monedas a vigilar
+    // Lista de monedas a vigilar con lógica de extracción de precios personalizada
     const targets = [
-      { pair: 'USD/VES', url: 'https://ve.dolarapi.com/v1/dolares/oficial', label: 'Dólar' },
-      { pair: 'EUR/VES', url: 'https://ve.dolarapi.com/v1/euros/oficial', label: 'Euro' }
+      { 
+        pair: 'USD/VES', 
+        url: 'https://ve.dolarapi.com/v1/dolares/oficial', 
+        label: 'Dólar BCV',
+        icon: '💵',
+        getPrice: (data: any) => data.promedio
+      },
+      { 
+        pair: 'EUR/VES', 
+        url: 'https://ve.dolarapi.com/v1/euros/oficial', 
+        label: 'Euro Oficial',
+        icon: '💶',
+        getPrice: (data: any) => data.promedio
+      },
+      {
+        pair: 'USDT/VES',
+        url: 'https://criptoya.com/api/binancep2p/usdt/ves/1',
+        label: 'Binance P2P',
+        icon: '🔶',
+        getPrice: (data: any) => {
+           if (data && data.ask > 0 && data.bid > 0) {
+              return (parseFloat(data.ask) + parseFloat(data.bid)) / 2;
+           }
+           return null;
+        }
+      }
     ];
 
     webpush.setVapidDetails(
@@ -50,7 +74,8 @@ Deno.serve(async (req) => {
         }
         
         const data = await response.json();
-        const currentPrice = data.promedio;
+        const currentPrice = target.getPrice(data);
+        
         if (!currentPrice || currentPrice <= 0) continue;
 
         const { data: history } = await supabase
@@ -61,12 +86,28 @@ Deno.serve(async (req) => {
 
         const lastPrice = history?.last_price || 0;
 
-        // Si el precio cambió más de 0.01 bs
-        if (Math.abs(currentPrice - lastPrice) > 0.01) {
+        // Si el precio cambió más de 0.05 bs (margen para evitar spam por centavitos en binance)
+        const diff = Math.abs(currentPrice - lastPrice);
+        if (diff > 0.05) {
           const priceFormatted = currentPrice.toFixed(2);
-          console.log(`[push-notifier] ${target.pair}: ${lastPrice} → ${currentPrice} (cambio detectado)`);
+          const oldPriceFormatted = lastPrice.toFixed(2);
+          
+          let title = '';
+          let actionText = '';
+          
+          if (lastPrice === 0) {
+             title = `🔔 ${target.icon} Actualización de ${target.label}`;
+             actionText = `La tasa actual es de Bs. ${priceFormatted}`;
+          } else if (currentPrice > lastPrice) {
+             title = `🚀 ${target.icon} ¡Subió el ${target.label}!`;
+             actionText = `Pasó de ${oldPriceFormatted} a Bs. ${priceFormatted} (📈 +${diff.toFixed(2)})`;
+          } else {
+             title = `📉 ${target.icon} ¡Bajó el ${target.label}!`;
+             actionText = `Bajó de ${oldPriceFormatted} a Bs. ${priceFormatted} (🔻 -${diff.toFixed(2)})`;
+          }
 
-          // Enviar a cada suscriptor
+          console.log(`[push-notifier] ${target.pair}: ${lastPrice} → ${currentPrice} (Notificando)`);
+
           const expiredIds = [];
 
           if (subs && subs.length > 0) {
@@ -75,17 +116,15 @@ Deno.serve(async (req) => {
                 await webpush.sendNotification(
                   s.subscription, 
                   JSON.stringify({
-                    title: `📈 Alerta DolarVE: ${target.label}`,
-                    body: `El ${target.label} oficial cambió a Bs. ${priceFormatted}`,
+                    title: title,
+                    body: `${actionText}\n\nToca para abrir DolarVE y ver todos los detalles.`,
                     icon: '/logo.png',
                     url: '/'
                   })
                 );
                 notificationsSent++;
               } catch (pushError) {
-                console.error(`[push-notifier] Error enviando push a ${s.device_id || s.id}:`, pushError.statusCode, pushError.body);
-                
-                // Si el endpoint expiró (410 Gone) o es inválido (404), limpiar
+                console.error(`[push-notifier] Error enviando push a ${s.device_id || s.id}:`, pushError.statusCode);
                 if (pushError.statusCode === 410 || pushError.statusCode === 404) {
                   expiredIds.push(s.id);
                 }
@@ -93,7 +132,6 @@ Deno.serve(async (req) => {
             }
           }
 
-          // Limpiar suscripciones expiradas
           if (expiredIds.length > 0) {
             const { error: delError } = await supabase
               .from('push_subscriptions')
@@ -101,8 +139,7 @@ Deno.serve(async (req) => {
               .in('id', expiredIds);
             
             if (!delError) {
-              subscriptionsCleaned = expiredIds.length;
-              console.log(`[push-notifier] Limpiadas ${expiredIds.length} suscripciones expiradas`);
+              subscriptionsCleaned += expiredIds.length;
             }
           }
 
@@ -113,7 +150,7 @@ Deno.serve(async (req) => {
             updated_at: new Date().toISOString() 
           });
         } else {
-          console.log(`[push-notifier] ${target.pair}: Sin cambio (${currentPrice})`);
+          console.log(`[push-notifier] ${target.pair}: Sin cambio relevante (${currentPrice})`);
         }
       } catch (innerErr) {
         console.error(`[push-notifier] Error processing ${target.pair}:`, innerErr);
