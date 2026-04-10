@@ -597,16 +597,20 @@
                     </div>
                 </div>
 
-                <!-- Gasolineras Cercanas v8.5.0 (API OSM) -->
-                <div class="card"
-                    style="margin-top: 25px; padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--card-bg);">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="ph-duotone ph-map-pin-line" style="font-size: 24px; color: var(--accent-green);"></i>
-                        <div>
-                            <div style="font-size: 14px; font-weight: 800; color: var(--text-main);">Surtidor Pro</div>
-                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">MAPA GLOBAL
-                                COOPERATIVO</div>
+                <!-- Gasolineras Cercanas v9.0 (Redesign Premium) -->
+                <div class="gas-nearby-header">
+                    <div class="gas-nearby-header-left">
+                        <div class="gas-nearby-icon-wrap">
+                            <i class="ph-duotone ph-map-pin-line"></i>
                         </div>
+                        <div>
+                            <div class="gas-nearby-title">Surtidor Pro</div>
+                            <div class="gas-nearby-subtitle">MAPA GLOBAL COOPERATIVO</div>
+                        </div>
+                    </div>
+                    <button onclick="Gasolina.obtenerEstacionesCercanas(true)" class="gas-nearby-refresh-btn">
+                        <i class="ph ph-arrows-clockwise"></i>
+                    </button>
                 </div>
 
                 <div id="nearby-gas-stations" style="margin-top: 15px; transition: all 0.3s ease;">

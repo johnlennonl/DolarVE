@@ -33,34 +33,26 @@ const Gasolina = {
                 try {
                     const radius = document.getElementById('gas-radius-select')?.value || 20000;
                     let estacionesOSM = await this.fetchDesdeOSM(lat, lng, radius);
-                    let reportesStatus = {};
 
-                    if (window.DolarVE.supabase && estacionesOSM.length > 0) {
-                        const osmIds = estacionesOSM.map(e => e.id);
-                        const { data, error } = await window.DolarVE.supabase
-                            .from('gas_stations')
-                            .select('id, status, last_updated, reports_count')
-                            .in('id', osmIds);
-                        
-                        if (!error && data) {
-                            data.forEach(r => { reportesStatus[r.id] = r; });
-                        }
-                    }
+                    // Obtener nombre de la zona del usuario via geocodificación inversa
+                    let zonaNombre = 'Venezuela';
+                    try {
+                        const geoResp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10&accept-language=es`);
+                        const geoData = await geoResp.json();
+                        zonaNombre = geoData.address?.city || geoData.address?.town || geoData.address?.state || geoData.address?.county || 'Venezuela';
+                    } catch(e) { console.warn('[DolarVE] Geocoding fallback'); }
 
                     const cercanas = estacionesOSM.map(est => {
                         const dist = this.calcularDistancia(lat, lng, est.lat, est.lon);
-                        const statusData = reportesStatus[est.id] || {};
+                        // Intentar múltiples tags de OSM para la ciudad
+                        const ciudad = est.tags["addr:city"] || est.tags["addr:municipality"] || est.tags["addr:state"] || est.tags["is_in:city"] || est.tags["is_in:state"] || zonaNombre;
                         return {
                             id: est.id,
-                            name: est.tags.name || `E/S ${est.tags.operator || 'Sin Nombre'}`,
-                            city: est.tags["addr:city"] || 'Tu Zona',
+                            name: est.tags.name || `E/S ${est.tags.operator || est.tags.brand || 'Sin Nombre'}`,
+                            city: ciudad,
                             latitude: est.lat,
                             longitude: est.lon,
-                            distancia: dist,
-                            status: statusData.status || 'Operativa',
-                            last_updated: statusData.last_updated || null,
-                            reports_count: statusData.reports_count || 0,
-                            source: 'OpenStreetMap'
+                            distancia: dist
                         };
                     }).sort((a, b) => a.distancia - b.distancia);
 
@@ -177,57 +169,38 @@ const Gasolina = {
         if (!container) return;
 
         this.estacionesCercanasCache = estaciones;
-        const zoneLabel = estaciones.length > 0 ? estaciones[0].city : 'Tu Zona';
 
         container.innerHTML = `
-            <div style="font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <i class="ph-duotone ph-gas-pump" style="color: var(--accent-green); font-size: 18px;"></i> Bombas Cercanas (${zoneLabel})
-                </div>
-                <button onclick="Gasolina.obtenerEstacionesCercanas(true)" style="background: none; border: none; cursor: pointer; color: var(--accent-green); display: flex; align-items: center; gap: 5px;">
-                    <span id="update-indicator-gas" style="font-size: 9px; font-weight: 800;">RECARGAR</span>
-                    <i class="ph ph-arrows-clockwise" style="font-size: 14px;"></i>
-                </button>
-            </div>
             <div class="gas-list" style="display: flex; flex-direction: column; gap: 12px;">
-                ${estaciones.map(est => {
-                    let statusClass = 'status-operative';
-                    if (est.status === 'Sin Cola') statusClass = 'status-free';
-                    if (est.status === 'Poca Cola') statusClass = 'status-low';
-                    if (est.status === 'Mucha Cola') statusClass = 'status-high';
-                    if (est.status === 'Cerrada') statusClass = 'status-closed';
-                    if (est.status === 'Operativa') statusClass = 'status-operative';
+                ${estaciones.map((est, idx) => {
+                    const distText = est.distancia < 1 
+                        ? `${(est.distancia * 1000).toFixed(0)}m` 
+                        : `${est.distancia.toFixed(1)}km`;
 
-                    const lastUpd = est.last_updated ? new Date(est.last_updated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '---';
-                    const numReports = est.reports_count || 0;
-                    
                     return `
-                    <div class="gas-station-card">
-                        <div class="gas-card-header" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${est.latitude || est.lat},${est.longitude || est.lng}', '_blank')">
-                            <div>
+                    <div class="gas-station-card" style="animation: fadeInUp 0.4s ease ${idx * 0.05}s both;">
+                        <div class="gas-card-header" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${est.latitude || est.lat},${est.longitude || est.lng}', '_blank')">
+                            <div style="flex: 1; min-width: 0;">
                                 <div class="gas-name">${est.name || est.nombre}</div>
-                                <div class="gas-city">${est.city || est.ciudad} • <span style="color: var(--accent-blue)">A ${est.distancia.toFixed(1)} km</span></div>
-                                <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; opacity: 0.7;">📍 ${est.source || 'Mapa Local'}</div>
+                                <div class="gas-city">${est.city || est.ciudad || 'Venezuela'}</div>
                             </div>
-                            <div class="gas-status-badge ${statusClass}">
-                                ${est.status}
+                            <div class="gas-distance-pill">
+                                <i class="ph ph-navigation-arrow"></i> ${distText}
                             </div>
                         </div>
 
-
-                        <div class="gas-card-footer" style="border-top: 1px dashed var(--card-border); padding-top: 12px; margin-top: 5px;">
-                            <div class="gas-distance" style="color: var(--accent-blue);">
-                                <i class="ph ph-map-trifold"></i> Guíame con GPS
+                        <div class="gas-card-footer">
+                            <div class="gas-distance" onclick="event.stopPropagation(); window.open('https://www.google.com/maps/dir/?api=1&destination=${est.latitude || est.lat},${est.longitude || est.lng}', '_blank')">
+                                <i class="ph ph-navigation-arrow"></i> Navegar con GPS
                             </div>
-                            <div class="gas-update-time">Visto hoy: ${lastUpd}</div>
+                            <div class="gas-update-time">
+                                <i class="ph ph-map-pin"></i> ${est.city}
+                            </div>
                         </div>
                     </div>
                 `}).join('')}
             </div>
         `;
-
-        const indicator = document.getElementById('update-indicator-gas');
-        if (indicator) indicator.innerText = 'CARGADO';
     },
 
     refrescarSurtidor() {
