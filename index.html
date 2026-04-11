@@ -73,8 +73,10 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <!-- Botón de Refresh Manual -->
-                    <div id="manual-refresh-btn" style="cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; background: rgba(120, 120, 120, 0.1); border-radius: 8px; border: 1px solid var(--card-border); transition: all 0.3s ease;">
-                        <i class="ph-duotone ph-arrows-clockwise" id="refresh-icon" style="color: var(--text-main); font-size: 20px;"></i>
+                    <div id="manual-refresh-btn"
+                        style="cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; background: rgba(120, 120, 120, 0.1); border-radius: 8px; border: 1px solid var(--card-border); transition: all 0.3s ease;">
+                        <i class="ph-duotone ph-arrows-clockwise" id="refresh-icon"
+                            style="color: var(--text-main); font-size: 20px;"></i>
                     </div>
 
                     <div id="push-bell-btn" style="cursor: pointer; position: relative; padding: 5px;">
@@ -155,15 +157,22 @@
                 <div class="intl-card" style="--country-color: #00D082;">
                     <div style="z-index: 1;">
                         <div
-                            style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">
-                            Binance USDT 🔶</div>
-                        <div style="font-size: 32px; font-weight: 800; color: var(--text-main);" id="paralelo-price">---</div>
-                        <div class="intl-trend" id="binance-trend" style="margin-top: 2px; font-size: 12px; font-weight: 700; display: none;">
+                            style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center;">
+                            <img src="img/ico/binance.png" class="currency-icon">
+                            Binance USDT
+                        </div>
+                        <div style="font-size: 32px; font-weight: 800; color: var(--text-main);" id="paralelo-price">---
+                        </div>
+                        <div class="intl-trend" id="binance-trend"
+                            style="margin-top: 2px; font-size: 12px; font-weight: 700; display: none;">
                             <i class="ph-duotone ph-caret-up"></i> 0.00 Bs
                         </div>
-                        <div id="binance-freshness" style="display: flex; align-items: center; gap: 4px; margin-top: 5px; opacity: 0.8;">
-                            <span id="binance-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
-                            <span id="binance-time" style="font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.3px;">Sincronizando...</span>
+                        <div id="binance-freshness"
+                            style="display: flex; align-items: center; gap: 4px; margin-top: 5px; opacity: 0.8;">
+                            <span id="binance-dot"
+                                style="width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
+                            <span id="binance-time"
+                                style="font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.3px;">Sincronizando...</span>
                         </div>
                     </div>
                     <i class="ph-duotone ph-diamonds-four"
@@ -489,7 +498,10 @@
                         <div class="card-rate-val" id="res-bcv">0.00 Bs</div>
                     </div>
                     <div class="rate-result-card standout" data-rate="binance">
-                        <div class="card-rate-header">Binance USDT 🔶</div>
+                        <div class="card-rate-header" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <img src="img/ico/binance.png" class="currency-icon" style="margin-right:0; width:14px; height:14px;">
+                            Binance USDT
+                        </div>
                         <div class="card-rate-val" id="res-paralelo">0.00 Bs</div>
                     </div>
                     <div class="rate-result-card" data-rate="eur">
@@ -1596,7 +1608,7 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js?v=11.0').then(reg => {
                 console.log('[DolarVE] Service Worker registrado correctamente');
-                
+
                 // Limpiar solo caches antiguos (no el actual)
                 caches.keys().then(names => {
                     names.forEach(name => {

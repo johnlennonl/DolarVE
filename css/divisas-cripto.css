@@ -1377,4 +1377,14 @@ body.light-theme .future-rate-item {
     font-weight: 700;
     cursor: pointer;
 }
+
+.currency-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 5px;
+    border-radius: 4px;
+}
+
 

@@ -157,7 +157,7 @@ const Calculadora = {
 
         switch(this.tasaSeleccionada) {
             case 'bcv': nombreTasa = 'BCV Oficial'; tasaValor = tasas.usd; break;
-            case 'binance': nombreTasa = 'Binance P2P 🔶'; tasaValor = tasas.binance; break;
+            case 'binance': nombreTasa = 'Binance P2P'; tasaValor = tasas.binance; break;
             case 'eur': nombreTasa = 'Euro Oficial'; tasaValor = tasas.eur; break;
             case 'cop': nombreTasa = 'Colombia 🇨🇴'; tasaValor = tasas.cop; locale = 'es-CO'; break;
             case 'ars': nombreTasa = 'Argentina 🇦🇷'; tasaValor = tasas.ars; locale = 'es-AR'; break;
