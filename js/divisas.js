@@ -108,6 +108,22 @@ const Divisas = {
         return null;
     },
 
+    extraerTasasBcvApiTech(html) {
+        try {
+            // Buscamos el objeto window.__BCV_INITIAL_RATES en el HTML
+            const usdMatch = html.match(/usd:\s*([\d.]+)/);
+            const eurMatch = html.match(/eur:\s*([\d.]+)/);
+            
+            if (usdMatch && eurMatch) {
+                return {
+                    usd: parseFloat(usdMatch[1]),
+                    eur: parseFloat(eurMatch[1])
+                };
+            }
+        } catch (e) { console.error('[DolarVE] Error parseando bcvapi.tech:', e); }
+        return null;
+    },
+
     async obtenerDatosTasas() {
         if (!navigator.onLine) {
             this.cargarDatosCache();
@@ -119,11 +135,16 @@ const Divisas = {
 
         // 1. Carga rápida (Oficiales)
         try {
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.bcvapi.tech/');
             const resultados = await Promise.allSettled([
                 this.fetchWithTimeout('https://ve.dolarapi.com/v1/dolares/oficial'),
                 this.fetchWithTimeout('https://ve.dolarapi.com/v1/euros/oficial'),
                 this.fetchWithTimeout('https://open.er-api.com/v6/latest/USD'),
-                this.fetchWithTimeout('https://dolarapi.com/v1/dolares/blue')
+                this.fetchWithTimeout('https://dolarapi.com/v1/dolares/blue'),
+                this.fetchWithTimeout('https://api.dolarvzla.com/public/bcv/exchange-rate', {
+                    headers: { 'x-dolarvzla-key': 'bfd67474afa0e6ca2c6155b617fd148c272e2796ade1a4f8277f6098588bcf5e' }
+                }), // API DolarVZLA (USD + EUR exactos)
+                this.fetchWithTimeout(proxyUrl, { timeout: 8000 }) // Scraping bcvapi.tech (Sin Key)
             ]);
 
             const safeJson = async (res) => {
@@ -137,9 +158,48 @@ const Divisas = {
             const eurData = await safeJson(resultados[1]);
             const copData = await safeJson(resultados[2]);
             const arsData = await safeJson(resultados[3]);
+            const vzlaData = await safeJson(resultados[4]);
+            
+            // Procesar bcvapi.tech (Scraping)
+            let bcvTechData = null;
+            if (resultados[5].status === 'fulfilled' && resultados[5].value.ok) {
+                const html = await resultados[5].value.text();
+                bcvTechData = this.extraerTasasBcvApiTech(html);
+            }
 
-            if (usdData) tasas.usd = usdData.promedio;
-            if (eurData) tasas.eur = eurData.promedio;
+            if (usdData) {
+                tasas.usd_normal = usdData.promedio;
+                tasas.usd = tasas.usd_normal;
+            }
+            if (eurData) {
+                tasas.eur_normal = eurData.promedio;
+                tasas.eur = tasas.eur_normal; 
+            }
+            
+            // --- DETECCIÓN DE TASA FUTURA (DolarVZLA + bcvapi.tech Fallback) ---
+            window.DolarVE.hayTasaFutura = false;
+            
+            // Prioridad 1: bcvapi.tech (Sin key, estable)
+            if (bcvTechData && tasas.usd_normal) {
+                 if (Math.abs(bcvTechData.usd - tasas.usd_normal) > 0.05) {
+                    window.DolarVE.hayTasaFutura = true;
+                    tasas.usd_futuro = bcvTechData.usd;
+                    tasas.eur_futuro = bcvTechData.eur;
+                    console.log(`[DolarVE] ⚡ Tasa Futura detectada (bcvapi.tech): USD ${tasas.usd_futuro} | EUR ${tasas.eur_futuro}`);
+                 }
+            }
+            
+            // Prioridad 2: DolarVZLA (Si bcvapi falló o si da data distinta)
+            if (!window.DolarVE.hayTasaFutura && vzlaData && vzlaData.current && tasas.usd_normal) {
+                const futureUsd = vzlaData.current.usd;
+                if (Math.abs(futureUsd - tasas.usd_normal) > 0.05) {
+                    window.DolarVE.hayTasaFutura = true;
+                    tasas.usd_futuro = futureUsd;
+                    tasas.eur_futuro = vzlaData.current.eur;
+                    console.log(`[DolarVE] ⚡ Tasa Futura detectada (DolarVZLA): USD ${tasas.usd_futuro} | EUR ${tasas.eur_futuro}`);
+                }
+            }
+            
             if (arsData) tasas.ars = (arsData.compra + arsData.venta) / 2;
             if (copData && copData.rates) {
                 tasas.cop = copData.rates.COP;
@@ -147,12 +207,16 @@ const Divisas = {
                 tasas.clp = copData.rates.CLP;
             }
 
+            window.DolarVE.modoFuturoActivo = false;
+
             this.actualizarVistasInicio();
             localStorage.setItem('dolarve_offline_data', JSON.stringify(tasas));
 
             // Actualizar hora
             const updateEl = document.getElementById('last-update-usd');
             if (updateEl) updateEl.innerText = `Actualizado: ${new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+            
+            this.evaluarBannerFuturo();
 
         } catch (e) { console.error('[DolarVE] Error en carga rápida:', e); }
 
@@ -180,6 +244,104 @@ const Divisas = {
         this.actualizarVistasInicio();
         this.inicializarGraficoPrincipal();
         if (typeof Calculadora !== 'undefined') Calculadora.actualizarPantalla();
+    },
+
+    toggleTasaFutura(activar, animate = true) {
+        const tasas = window.DolarVE.tasas;
+        window.DolarVE.modoFuturoActivo = activar;
+        
+        if (activar) {
+            tasas.usd = tasas.usd_futuro;
+            if (tasas.eur_futuro) tasas.eur = tasas.eur_futuro;
+        } else {
+            tasas.usd = tasas.usd_normal;
+            tasas.eur = tasas.eur_normal;
+        }
+        
+        this.actualizarVistasInicio();
+        if (typeof Calculadora !== 'undefined') Calculadora.actualizarPantalla();
+        if (typeof Gasolina !== 'undefined') Gasolina.refrescarSurtidor();
+        
+        // Disparar Alerta Glass
+        if (animate && window.Interfaz) {
+            const day = new Date().getDay();
+            const destName = (day === 5 || day === 6 || day === 0) ? "del Lunes" : "de Mañana";
+            if (activar) {
+                Interfaz.mostrarNotificacion(`✅ Modo Tasa ${destName} Activado`);
+            } else {
+                Interfaz.mostrarNotificacion('🔄 Restaurado a Modo Normal');
+            }
+        }
+        
+        const bannerContainer = document.getElementById('future-banner-container');
+        if (bannerContainer) {
+            if (activar) {
+                bannerContainer.innerHTML = `
+                    <div class="future-rate-active-strip">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="ph-fill ph-check-circle" style="color: var(--accent-green);"></i>
+                            <span>Modo Futuro Activado</span>
+                        </div>
+                        <button onclick="Divisas.toggleTasaFutura(false)" class="btn-future-restore">Volver</button>
+                    </div>
+                `;
+                document.getElementById('usd-bcv-price').closest('.card').classList.add('future-active-card');
+            } else {
+                document.getElementById('usd-bcv-price').closest('.card').classList.remove('future-active-card');
+                this.evaluarBannerFuturo(); // re-render the banner
+            }
+        }
+    },
+
+    evaluarBannerFuturo() {
+        const bannerContainer = document.getElementById('future-banner-container');
+        if (!bannerContainer) return;
+        
+        if (!window.DolarVE.hayTasaFutura) {
+            bannerContainer.innerHTML = '';
+            return;
+        }
+        
+        if (window.DolarVE.modoFuturoActivo) return; // Ya está activo
+        
+        const day = new Date().getDay();
+        const destDay = (day === 5 || day === 6 || day === 0) ? "del Lunes" : "Mañana";
+        
+        const diffUsd = window.DolarVE.tasas.usd_futuro - window.DolarVE.tasas.usd_normal;
+        const trendIcon = diffUsd > 0 ? '📈' : '📉';
+        const sign = diffUsd > 0 ? '+' : '';
+        
+        const diffEur = window.DolarVE.tasas.eur_futuro ? (window.DolarVE.tasas.eur_futuro - window.DolarVE.tasas.eur_normal) : 0;
+        const trendEur = diffEur > 0 ? '📈' : '📉';
+        const signEur = diffEur > 0 ? '+' : '';
+        
+        const eurBlock = window.DolarVE.tasas.eur_futuro ? `
+            <div class="future-rate-item">
+                <div class="fr-label">🇪🇺 Euro BCV</div>
+                <div class="fr-value">${window.DolarVE.tasas.eur_futuro.toFixed(2)}</div>
+                <div class="fr-trend ${diffEur > 0 ? 'up' : 'down'}">${trendEur} ${signEur}${diffEur.toFixed(2)} Bs</div>
+            </div>` : '';
+        
+        bannerContainer.innerHTML = `
+            <div class="future-rate-teaser" onclick="this.nextElementSibling.classList.toggle('show')">
+                <i class="ph-duotone ph-lightning" style="color: #f1c40f;"></i>
+                <span>Nueva Tasa ${destDay} Disponible</span>
+                <i class="ph ph-caret-down" style="margin-left: auto;"></i>
+            </div>
+            <div class="future-rate-dropdown">
+                <div class="future-rate-grid">
+                    <div class="future-rate-item">
+                        <div class="fr-label">🇺🇸 Dólar BCV</div>
+                        <div class="fr-value">${window.DolarVE.tasas.usd_futuro.toFixed(2)}</div>
+                        <div class="fr-trend ${diffUsd > 0 ? 'up' : 'down'}">${trendIcon} ${sign}${diffUsd.toFixed(2)} Bs</div>
+                    </div>
+                    ${eurBlock}
+                </div>
+                <button onclick="Divisas.toggleTasaFutura(true)" class="btn-activate-future">
+                    <i class="ph-bold ph-rocket-launch"></i> Activar Modo ${destDay.replace('del ', '')}
+                </button>
+            </div>
+        `;
     },
 
     actualizarVistasInicio() {

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolarVE | Master Admin POC</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap">
+    <style>
+        :root {
+            /* Dark Mode (Default) */
+            --bg: #0f172a;
+            --container-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --input-bg: rgba(0, 0, 0, 0.2);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --accent: #00f2fe;
+            --accent-bg: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                /* Light Mode (Premium White) */
+                --bg: #f1f5f9;
+                --container-bg: rgba(255, 255, 255, 0.8);
+                --glass-border: rgba(0, 0, 0, 0.05);
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --input-bg: #ffffff;
+                --card-bg: rgba(0, 0, 0, 0.02);
+                --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--container-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 30px;
+            background: var(--accent-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .rate-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .value { font-size: 2.2rem; font-weight: 600; margin-bottom: 20px; letter-spacing: -1px; }
+
+        input {
+            flex: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        button {
+            background: var(--accent-bg);
+            border: none;
+            padding: 14px 24px;
+            border-radius: 14px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+        }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4); }
+        button:active { transform: scale(0.96); }
+
+        #status {
+            margin-top: 25px;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .success { color: #059669; background: rgba(16, 185, 129, 0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Control de Tasas 👑</h1>
+        
+        <div id="rates-container">
+            <!-- Cargando... -->
+            <p style="text-align:center">Conectando con Supabase...</p>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+            <h3 style="text-align: center; margin-bottom: 15px; font-weight: 400;">Robot de Auto-Sincronización 🤖</h3>
+            <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 15px; text-align: center;">
+                Haz clic para que el robot busque la tasa en bcvapi.tech y la guarde solo.
+            </p>
+            <button onclick="ejecutarRobot()" id="btn-robot" style="background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);">
+                🚀 ¡Sincronizar ahora!
+            </button>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Credenciales extraídas de tu App
+        const SUPABASE_URL = 'https://urbyglfugcvzryuvivzf.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_FpTWpApM4-NPkkt_bYNilg_etUs_wtL';
+        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function cargarTasas() {
+            const { data, error } = await sbClient
+                .from('global_rates')
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) {
+                document.getElementById('rates-container').innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+                return;
+            }
+
+            let html = '';
+            data.forEach(rate => {
+                html += `
+                    <div class="rate-card">
+                        <div class="label">${rate.label} (${rate.symbol})</div>
+                        <div class="value" id="val-${rate.symbol}">${rate.price.toFixed(2)}</div>
+                        <div style="display:flex; gap:10px;">
+                            <input type="number" step="0.01" id="input-${rate.symbol}" value="${rate.price}" placeholder="Nuevo precio">
+                            <button onclick="actualizarTasa('${rate.symbol}')" style="width: auto; padding: 10px 20px;">Actualizar</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('rates-container').innerHTML = html;
+        }
+
+        async function ejecutarRobot() {
+            const btn = document.getElementById('btn-robot');
+            const statusEl = document.getElementById('status');
+            const originalText = btn.innerText;
+            
+            btn.disabled = true;
+            btn.innerText = '🤖 Buscando tasas...';
+            statusEl.innerText = 'Consultando bcvapi.tech vía proxy...';
+
+            try {
+                // 1. Scraping vía AllOrigins (Igual que en la App)
+                const url = encodeURIComponent('https://www.bcvapi.tech/');
+                const resp = await fetch(`https://api.allorigins.win/raw?url=${url}`);
+                const html = await resp.text();
+
+                // 2. Extraer números
+                const usdMatch = html.match(/usd:\s*([\d.]+)/);
+                const eurMatch = html.match(/eur:\s*([\d.]+)/);
+
+                if (!usdMatch || !eurMatch) throw new Error('No se pudieron extraer los datos del HTML');
+
+                const futureUsd = parseFloat(usdMatch[1]);
+                const futureEur = parseFloat(eurMatch[1]);
+
+                statusEl.innerText = `✅ Encontrado: USD ${futureUsd} | EUR ${futureEur}. Guardando...`;
+
+                // 3. Guardar en Supabase
+                const updates = [
+                    sbClient.from('global_rates').update({ price: futureUsd, updated_at: new Date() }).eq('symbol', 'USD'),
+                    sbClient.from('global_rates').update({ price: futureEur, updated_at: new Date() }).eq('symbol', 'EUR')
+                ];
+
+                await Promise.all(updates);
+
+                statusEl.className = 'success';
+                statusEl.innerText = '✨ ¡Robot terminó con éxito! Base de datos actualizada.';
+                cargarTasas(); // Refrescar vista
+
+            } catch (e) {
+                console.error(e);
+                statusEl.innerText = '❌ Error del Robot: ' + e.message;
+                statusEl.style.color = '#ff4757';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        async function actualizarTasa(symbol) {
+            const nuevoPrecio = parseFloat(document.getElementById(`input-${symbol}`).value);
+            const statusEl = document.getElementById('status');
+            
+            statusEl.className = '';
+            statusEl.innerText = 'Guardando en la nube...';
+
+            const { error } = await sbClient
+                .from('global_rates')
+                .update({ price: nuevoPrecio, updated_at: new Date() })
+                .eq('symbol', symbol);
+
+            if (error) {
+                statusEl.innerText = '❌ Error: ' + error.message;
+                statusEl.style.color = 'red';
+            } else {
+                statusEl.innerText = '✅ ¡Tasa actualizada con éxito!';
+                statusEl.className = 'success';
+                document.getElementById(`val-${symbol}`).innerText = nuevoPrecio.toFixed(2);
+                setTimeout(() => statusEl.innerText = '', 3000);
+            }
+        }
+
+        // Cargar al inicio
+        cargarTasas();
+    </script>
+</body>
+</html>
