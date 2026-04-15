@@ -20,7 +20,8 @@ const Calculadora = {
         const input = document.getElementById('calc-main-input');
         if (input) {
             input.addEventListener('input', (e) => {
-                this.montoBase = parseFloat(e.target.value) || 0;
+                const rawValue = e.target.value.replace(',', '.');
+                this.montoBase = parseFloat(rawValue) || 0;
                 this.actualizar();
             });
         }

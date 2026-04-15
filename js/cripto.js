@@ -273,7 +273,8 @@ const Cripto = {
 
         const updateCalc = () => {
             const sym = select.value + "USDT";
-            const amt = parseFloat(amtInput.value) || 0;
+            const rawValue = amtInput.value.replace(',', '.');
+            const amt = parseFloat(rawValue) || 0;
             const rates = window.DolarVE.tasas;
             
             let priceUsd = 1; 
