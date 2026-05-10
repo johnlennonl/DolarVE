@@ -61,7 +61,14 @@ const Autenticacion = {
             // Llenamos la ficha del perfil
             document.getElementById('profile-display-name').innerText = `${fName} ${lName}`.trim() || 'Usuario';
             document.getElementById('profile-display-email').innerText = user.email;
-            document.getElementById('profile-dob').innerText = dob ? new Date(dob).toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' }) : 'No definida';
+            // Parsear DOB en hora local para evitar el desfase de zona horaria (UTC-4)
+            let dobFormatted = 'No definida';
+            if (dob) {
+                const [year, month, day] = dob.split('-');
+                dobFormatted = new Date(year, month - 1, day).toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            
+            document.getElementById('profile-dob').innerText = dobFormatted;
             document.getElementById('profile-created').innerText = new Date(user.created_at).toLocaleDateString('es-VE', { day: 'numeric', month: 'short', year: 'numeric' });
 
             const profAvatarImg = document.getElementById('profile-avatar-img');
