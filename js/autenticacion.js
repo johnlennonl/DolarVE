@@ -140,14 +140,19 @@ const Autenticacion = {
         }
     },
 
-    // Función para manejar el envío del formulario (Entrar o Registrarse)
     async procesarFormulario(datos) {
         const { email, password, nombre, apellido, fechaNacimiento, esRegistro } = datos;
         const authBtn = document.getElementById('auth-action-btn');
-        const loading = document.getElementById('auth-loading');
+        const authBtnText = document.getElementById('auth-action-text');
+        const originalText = authBtnText ? authBtnText.innerText : (esRegistro ? 'Regístrate' : 'Entrar');
 
-        if (authBtn) authBtn.style.display = 'none';
-        if (loading) loading.style.display = 'flex';
+        if (authBtn) {
+            authBtn.disabled = true;
+            authBtn.style.opacity = '0.7';
+            if (authBtnText) {
+                authBtnText.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Cargando...';
+            }
+        }
 
         try {
             if (esRegistro) {
@@ -168,7 +173,15 @@ const Autenticacion = {
                     Interfaz.mostrarNotificacion('¡Bienvenido! Registro exitoso.');
                     document.getElementById('close-auth-modal').click();
                 } else {
-                    Interfaz.mostrarNotificacion('¡Registro exitoso! Revisa tu correo.');
+                    // Mostrar vista de verificación
+                    const loginView = document.getElementById('auth-login-view');
+                    const verifyView = document.getElementById('auth-verify-view');
+                    if (loginView && verifyView) {
+                        loginView.style.display = 'none';
+                        verifyView.style.display = 'block';
+                    } else {
+                        Interfaz.mostrarNotificacion('¡Registro exitoso! Revisa tu correo.');
+                    }
                 }
             } else {
                 const { data, error } = await window.DolarVE.supabase.auth.signInWithPassword({ email, password });
@@ -180,7 +193,50 @@ const Autenticacion = {
             console.error('[DolarVE] Error de Auth:', err);
             Interfaz.mostrarNotificacion('Error: ' + err.message);
         } finally {
-            if (authBtn) authBtn.style.display = 'block';
+            if (authBtn) {
+                authBtn.disabled = false;
+                authBtn.style.opacity = '1';
+                if (authBtnText) {
+                    authBtnText.innerHTML = originalText;
+                }
+            }
+        }
+    },
+
+    // Actualiza los datos básicos del perfil (v7.7.5)
+    async actualizarPerfil(datos) {
+        const { nombre, apellido, fechaNacimiento } = datos;
+        const saveBtn = document.getElementById('save-profile-btn');
+        const loading = document.getElementById('edit-loading');
+
+        if (saveBtn) saveBtn.style.display = 'none';
+        if (loading) loading.style.display = 'flex';
+
+        try {
+            const { data, error } = await window.DolarVE.supabase.auth.updateUser({
+                data: {
+                    first_name: nombre,
+                    last_name: apellido,
+                    dob: fechaNacimiento
+                }
+            });
+
+            if (error) throw error;
+
+            Interfaz.mostrarNotificacion('✅ ¡Perfil actualizado correctamente!');
+            
+            // Regresamos a la vista de perfil
+            document.getElementById('auth-edit-view').style.display = 'none';
+            document.getElementById('auth-profile-view').style.display = 'block';
+            
+            // Refrescamos la UI con los nuevos datos
+            this.actualizarInterfazUsuario(data.user);
+
+        } catch (err) {
+            console.error('[DolarVE] Error actualizando perfil:', err);
+            Interfaz.mostrarNotificacion('❌ Error: ' + err.message);
+        } finally {
+            if (saveBtn) saveBtn.style.display = 'block';
             if (loading) loading.style.display = 'none';
         }
     }

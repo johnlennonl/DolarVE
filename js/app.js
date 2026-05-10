@@ -266,16 +266,22 @@ const Principal = {
 
                 if (esRegistro) {
                     titulo.innerText = "Crear Cuenta";
-                    accionBtn.innerText = "Regístrate";
+                    accionBtn.querySelector('#auth-action-text').innerText = "Regístrate";
                     toggleTexto.innerText = "¿Ya tienes cuenta?";
                     toggleBtn.innerText = "Inicia Sesión";
                     if (camposRegistro) camposRegistro.style.display = 'flex';
+                    // Hacer campos requeridos
+                    document.getElementById('auth-firstname').required = true;
+                    document.getElementById('auth-lastname').required = true;
                 } else {
                     titulo.innerText = "Iniciar Sesión";
-                    accionBtn.innerText = "Entrar";
+                    accionBtn.querySelector('#auth-action-text').innerText = "Entrar";
                     toggleTexto.innerText = "¿No tienes cuenta?";
                     toggleBtn.innerText = "Regístrate";
                     if (camposRegistro) camposRegistro.style.display = 'none';
+                    // Quitar requeridos para que no bloqueen el login
+                    document.getElementById('auth-firstname').required = false;
+                    document.getElementById('auth-lastname').required = false;
                 }
             });
         }
@@ -295,6 +301,48 @@ const Principal = {
 
                 // Llamamos a la función maestra unificada
                 Autenticacion.procesarFormulario(datos);
+            });
+        }
+
+        // --- EDICIÓN DE PERFIL ---
+        const btnEditarPerfil = document.getElementById('auth-edit-btn');
+        const btnCancelarEdit = document.getElementById('cancel-edit-btn');
+        const formEditarPerfil = document.getElementById('edit-profile-form');
+
+        if (btnEditarPerfil) {
+            btnEditarPerfil.addEventListener('click', () => {
+                const user = window.DolarVE.usuario;
+                if (!user) return;
+
+                const meta = user.user_metadata || {};
+                
+                // Pre-llenar campos
+                document.getElementById('edit-firstname').value = meta.first_name || '';
+                document.getElementById('edit-lastname').value = meta.last_name || '';
+                document.getElementById('edit-dob').value = meta.dob || '';
+
+                // Alternar vistas
+                document.getElementById('auth-profile-view').style.display = 'none';
+                document.getElementById('auth-edit-view').style.display = 'block';
+            });
+        }
+
+        if (btnCancelarEdit) {
+            btnCancelarEdit.addEventListener('click', () => {
+                document.getElementById('auth-edit-view').style.display = 'none';
+                document.getElementById('auth-profile-view').style.display = 'block';
+            });
+        }
+
+        if (formEditarPerfil) {
+            formEditarPerfil.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const datos = {
+                    nombre: document.getElementById('edit-firstname').value,
+                    apellido: document.getElementById('edit-lastname').value,
+                    fechaNacimiento: document.getElementById('edit-dob').value
+                };
+                Autenticacion.actualizarPerfil(datos);
             });
         }
 
@@ -363,14 +411,31 @@ const Principal = {
 
         // Cerrar Auth Modal
         const closeAuth = document.getElementById('close-auth-modal');
+        const verifyOkBtn = document.getElementById('auth-verify-ok-btn');
+
+        const cerrarModalAuth = () => {
+            const modal = document.getElementById('auth-modal-overlay');
+            if (modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => { 
+                    modal.style.display = 'none';
+                    // Si estaba en la vista de verificación, la reseteamos al login para la próxima vez
+                    const loginView = document.getElementById('auth-login-view');
+                    const verifyView = document.getElementById('auth-verify-view');
+                    if (loginView && verifyView) {
+                        verifyView.style.display = 'none';
+                        loginView.style.display = 'block';
+                    }
+                }, 300);
+            }
+        };
+
         if (closeAuth) {
-            closeAuth.addEventListener('click', () => {
-                const modal = document.getElementById('auth-modal-overlay');
-                if (modal) {
-                    modal.style.opacity = '0';
-                    setTimeout(() => { modal.style.display = 'none'; }, 300);
-                }
-            });
+            closeAuth.addEventListener('click', cerrarModalAuth);
+        }
+
+        if (verifyOkBtn) {
+            verifyOkBtn.addEventListener('click', cerrarModalAuth);
         }
 
         // Botón de Compartir Tasa Diaria

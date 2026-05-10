@@ -207,16 +207,25 @@ const Divisas = {
                 tasas.clp = copData.rates.CLP;
             }
 
-            window.DolarVE.modoFuturoActivo = false;
+            // Auto-activar si hay tasa futura (Requerimiento de inmediatez)
+            if (window.DolarVE.hayTasaFutura) {
+                console.log("[DolarVE] ⚡ Aplicando Nueva Tasa automáticamente...");
+                this.toggleTasaFutura(true, false); // true = activar, false = sin toast notification
+            } else {
+                window.DolarVE.modoFuturoActivo = false;
+                this.actualizarVistasInicio();
+            }
 
-            this.actualizarVistasInicio();
             localStorage.setItem('dolarve_offline_data', JSON.stringify(tasas));
 
             // Actualizar hora
             const updateEl = document.getElementById('last-update-usd');
             if (updateEl) updateEl.innerText = `Actualizado: ${new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
             
-            this.evaluarBannerFuturo();
+            // Si no está activo el modo futuro, evaluamos si mostrar el teaser
+            if (!window.DolarVE.modoFuturoActivo) {
+                this.evaluarBannerFuturo();
+            }
 
         } catch (e) { console.error('[DolarVE] Error en carga rápida:', e); }
 
@@ -262,10 +271,11 @@ const Divisas = {
         if (typeof Calculadora !== 'undefined') Calculadora.actualizarPantalla();
         if (typeof Gasolina !== 'undefined') Gasolina.refrescarSurtidor();
         
-        // Disparar Alerta Glass
+        const day = new Date().getDay();
+        const destName = (day === 5 || day === 6 || day === 0) ? "del Lunes" : "de Mañana";
+
+        // Disparar Alerta Glass (Toast)
         if (animate && window.Interfaz) {
-            const day = new Date().getDay();
-            const destName = (day === 5 || day === 6 || day === 0) ? "del Lunes" : "de Mañana";
             if (activar) {
                 Interfaz.mostrarNotificacion(`✅ Modo Tasa ${destName} Activado`);
             } else {
@@ -280,15 +290,17 @@ const Divisas = {
                     <div class="future-rate-active-strip">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <i class="ph-fill ph-check-circle" style="color: var(--accent-green);"></i>
-                            <span>Modo Futuro Activado</span>
+                            <span>Nueva Tasa ${destName} Aplicada</span>
                         </div>
                         <button onclick="Divisas.toggleTasaFutura(false)" class="btn-future-restore">Volver</button>
                     </div>
                 `;
-                document.getElementById('usd-bcv-price').closest('.card').classList.add('future-active-card');
+                const bcvCard = document.getElementById('usd-bcv-price')?.closest('.card');
+                if (bcvCard) bcvCard.classList.add('future-active-card');
             } else {
-                document.getElementById('usd-bcv-price').closest('.card').classList.remove('future-active-card');
-                this.evaluarBannerFuturo(); // re-render the banner
+                const bcvCard = document.getElementById('usd-bcv-price')?.closest('.card');
+                if (bcvCard) bcvCard.classList.remove('future-active-card');
+                this.evaluarBannerFuturo(); // re-render the teaser banner
             }
         }
     },
