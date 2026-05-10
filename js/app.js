@@ -419,12 +419,25 @@ const Principal = {
                 modal.style.opacity = '0';
                 setTimeout(() => { 
                     modal.style.display = 'none';
-                    // Si estaba en la vista de verificación, la reseteamos al login para la próxima vez
+                    // Resetear la vista de verificación si estaba abierta
                     const loginView = document.getElementById('auth-login-view');
                     const verifyView = document.getElementById('auth-verify-view');
-                    if (loginView && verifyView) {
+                    if (verifyView && verifyView.style.display === 'block') {
                         verifyView.style.display = 'none';
-                        loginView.style.display = 'block';
+                        // Solo mostramos el login si el usuario no tiene sesión
+                        if (loginView && !window.DolarVE.usuario) {
+                            loginView.style.display = 'block';
+                        }
+                    }
+                    
+                    // También resetear la vista de edición si quedó abierta
+                    const editView = document.getElementById('auth-edit-view');
+                    const profileView = document.getElementById('auth-profile-view');
+                    if (editView && editView.style.display === 'block') {
+                        editView.style.display = 'none';
+                        if (profileView && window.DolarVE.usuario) {
+                            profileView.style.display = 'block';
+                        }
                     }
                 }, 300);
             }
@@ -700,8 +713,8 @@ const Principal = {
             if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
                 await navigator.share({
                     files: [archivo],
-                    title: 'DolarVE - Finanzas al Instante',
-                    text: 'Compartido desde DolarVE 🚀'
+                    title: 'DolarVE - Solicitud de Pago',
+                    text: window.DolarVE.ultimoReciboTexto || 'Compartido desde DolarVE 🚀'
                 });
             } else {
                 // Fallback: Descarga directa para escritorio o navegadores viejos

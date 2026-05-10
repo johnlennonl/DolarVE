@@ -222,6 +222,9 @@ const Calculadora = {
         document.getElementById('charge-id-val').innerText = `${cuenta.tipo_documento}${cuenta.numero_documento}`;
         document.getElementById('charge-date-val').innerText = `Fecha: ${new Date().toLocaleDateString('es-VE')}`;
 
+        // Guardar payload de texto formateado para que al compartir, se adjunte al mensaje
+        window.DolarVE.ultimoReciboTexto = `*PAGO MÓVIL*\n🏦 Banco: ${cuenta.banco_nombre}\n📱 Tel: ${cuenta.prefijo_tel}-${cuenta.numero_tel}\n💳 C.I/RIF: ${cuenta.tipo_documento}${cuenta.numero_documento}\n💰 Monto: ${montoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs`;
+
         Interfaz.mostrarNotificacion('Generando Solicitud... 💸');
 
         setTimeout(async () => {

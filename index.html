@@ -779,17 +779,6 @@
             <div class="settings-list">
                 <div class="settings-item">
                     <div>
-                        <div style="font-weight: 600;"><i class="ph-duotone ph-magic-wand"
-                                style="color: var(--accent-green); margin-right: 5px;"></i> Animaciones UI</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">Efectos de transición</div>
-                    </div>
-                    <div class="toggle-switch on" id="toggle-animations-btn">
-                        <div class="toggle-circle"></div>
-                    </div>
-                </div>
-
-                <div class="settings-item">
-                    <div>
                         <div style="font-weight: 600;"><i class="ph-duotone ph-bell"
                                 style="color: var(--accent-green); margin-right: 5px;"></i> Alertas en Tiempo Real</div>
                         <div style="font-size: 11px; color: var(--text-muted);">Recibe cambios de precio al instante
@@ -812,18 +801,7 @@
                         <div class="toggle-circle"></div>
                     </div>
                 </div>
-                <div class="settings-item">
-                    <div>
-                        <div style="font-weight: 600;"><i class="ph-duotone ph-globe"
-                                style="color: var(--accent-green); margin-right: 5px;"></i> Idioma</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">Seleccionar lenguaje</div>
-                    </div>
-                    <select id="lang-select"
-                        style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); padding: 5px; border-radius: 5px;">
-                        <option value="es" selected>Español</option>
-                        <option value="en">English</option>
-                    </select>
-                </div>
+
                 <div class="settings-item" id="open-accounts-btn" style="cursor: pointer;">
                     <div>
                         <div style="font-weight: 600;"><i class="ph-duotone ph-bank"
@@ -1087,8 +1065,8 @@
 
                 <p style="text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px;"
                     id="share-date-val">Actualizado: Hoy</p>
-                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 5px;">Descarga
-                    DolarVE y ten las tasas al instante.</p>
+                <p style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 5px;">Visita
+                    <span style="color: var(--accent-green); font-weight: 600;">dolar-ve.vercel.app</span></p>
             </div>
         </div>
     </div>
@@ -1122,10 +1100,9 @@
             <p style="text-align: center; margin-top: 25px;" class="capture-label" id="rec-date">Fecha</p>
             <div
                 style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
-                <p style="font-size: 11px; font-weight: 700; color: var(--accent-green); margin: 0;">🚀 Descarga DolarVE
-                    y ten las tasas al instante</p>
-                <p style="font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 1px;">
-                    DISPONIBLE PARA IOS Y ANDROID</p>
+                <p style="font-size: 11px; font-weight: 700; color: var(--accent-green); margin: 0;">🚀 DolarVE - Tu app financiera</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; letter-spacing: 1px;">
+                    dolar-ve.vercel.app</p>
             </div>
         </div>
     </div>
@@ -1169,10 +1146,9 @@
             <p style="text-align: center; margin-top: 25px;" class="capture-label" id="charge-date-val">Fecha</p>
             <div
                 style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
-                <p style="font-size: 11px; font-weight: 700; color: var(--accent-green); margin: 0;">🚀 Descarga DolarVE
-                    y ten las tasas al instante</p>
-                <p style="font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 1px;">
-                    DISPONIBLE PARA IOS Y ANDROID</p>
+                <p style="font-size: 11px; font-weight: 700; color: var(--accent-green); margin: 0;">🚀 DolarVE - Tu app financiera</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; letter-spacing: 1px;">
+                    dolar-ve.vercel.app</p>
             </div>
         </div>
     </div>
@@ -1586,42 +1562,39 @@
         </div>
     </div>
 
-    <!-- Modal de Novedades (v7.7.1) -->
+    <!-- Modal de Novedades (v12.1) -->
     <div id="update-modal-overlay" class="modal-overlay">
         <div id="update-modal" class="bottom-sheet">
             <div class="sheet-handle"></div>
             <div class="sheet-content">
                 <div class="update-header">
-                    <div class="update-badge">¡NUEVA VERSIÓN v7.7.1! 🚀</div>
-                    <h2>¡DolarVE se puso Pro!</h2>
-                    <p>Hemos escuchado tus sugerencias. Estas son las mejoras brutales de hoy:</p>
+                    <div class="update-badge">¡NUEVA VERSIÓN v12.1! 🚀</div>
+                    <h2>¡DolarVE se puso mejor!</h2>
+                    <p>Hemos escuchado tus sugerencias. Estas son las mejoras recientes:</p>
                 </div>
 
                 <div class="update-list">
                     <div class="update-item">
-                        <div class="update-icon blue"><i class="ph-duotone ph-map-pin"></i></div>
+                        <div class="update-icon blue"><i class="ph-duotone ph-paper-plane-tilt"></i></div>
                         <div class="update-text">
-                            <strong>¡Gasolineras Cercanas! ⛽</strong>
-                            <span>Detección por GPS para sugerirte las estaciones de servicio más próximas y abrir ruta
-                                en mapas.</span>
+                            <strong>Cobros más fáciles 💸</strong>
+                            <span>Al compartir un cobro, ahora se adjunta un texto automático con tus datos listos para copiar y pegar en el banco.</span>
                         </div>
                     </div>
 
                     <div class="update-item">
-                        <div class="update-icon green"><i class="ph-duotone ph-circles-three-plus"></i></div>
+                        <div class="update-icon green"><i class="ph-duotone ph-gas-pump"></i></div>
                         <div class="update-text">
-                            <strong>Liquid Glow Loader 💎</strong>
-                            <span>Experiencia premium desde el primer segundo con el nuevo cargador inteligente
-                                adaptativo.</span>
+                            <strong>Surtidor Ultra Preciso ⛽</strong>
+                            <span>Arreglamos los cálculos rápidos. Ahora deslizar el nivel de gasolina calcula tus Dólares y Bolívares al centavo exacto.</span>
                         </div>
                     </div>
 
                     <div class="update-item">
-                        <div class="update-icon green"><i class="ph-duotone ph-lightning"></i></div>
+                        <div class="update-icon green"><i class="ph-duotone ph-user-circle-gear"></i></div>
                         <div class="update-text">
-                            <strong>Live Feed Persistente</strong>
-                            <span>Corrección total en la visibilidad de noticias. ¡Información fluida en cada
-                                navegación!</span>
+                            <strong>Login y Menú Fluidos 💎</strong>
+                            <span>Depuramos botones sin uso y mejoramos el diseño para que todo cargue instantáneamente y sin errores visuales.</span>
                         </div>
                     </div>
                 </div>

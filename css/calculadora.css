@@ -414,11 +414,13 @@ body.light-theme .calc-actions-footer {
     box-sizing: border-box;       /* Crucial para que el padding no estire el ancho */
 }
 
-.capture-label { color: rgba(255,255,255,0.5) !important; font-size: 11px; }
-.capture-value { color: #ffffff !important; font-weight: 700; }
+.capture-label { color: rgba(255,255,255,0.5) !important; font-size: 11px; flex-shrink: 0; }
+.capture-value { color: #ffffff !important; font-weight: 700; text-align: right; word-break: break-word; }
 .capture-row { 
     display: flex; 
     justify-content: space-between; 
+    align-items: center;
+    gap: 15px;
     padding: 14px 0; 
     border-bottom: 1px solid rgba(255,255,255,0.08); 
 }

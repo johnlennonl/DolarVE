@@ -150,7 +150,7 @@ const Autenticacion = {
             authBtn.disabled = true;
             authBtn.style.opacity = '0.7';
             if (authBtnText) {
-                authBtnText.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spin"></i> Cargando...';
+                authBtnText.innerHTML = '<i class="ph-duotone ph-circle-notch ph-spinning"></i> Cargando...';
             }
         }
 

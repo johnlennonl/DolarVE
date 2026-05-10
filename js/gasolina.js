@@ -228,14 +228,15 @@ const Gasolina = {
         }
 
         const animarValor = (elemento, valorFinal, decimales = 2, sufijo = "") => {
+            if (elemento.dataset.animId) {
+                cancelAnimationFrame(parseInt(elemento.dataset.animId));
+            }
+            
             const soloDigitos = elemento.innerText.replace(/[^\d]/g, '');
             const valorInicial = (parseFloat(soloDigitos) || 0) / Math.pow(10, decimales);
             
-            const duracion = 500; 
+            const duracion = 300; 
             const inicio = performance.now();
-
-            if (elemento.dataset.animating === 'true') return;
-            elemento.dataset.animating = 'true';
 
             const actualizar = (ahora) => {
                 const transcurrido = ahora - inicio;
@@ -249,12 +250,15 @@ const Gasolina = {
                 })}${sufijo}`;
 
                 if (progreso < 1) {
-                    requestAnimationFrame(actualizar);
+                    elemento.dataset.animId = requestAnimationFrame(actualizar);
                 } else {
-                    elemento.dataset.animating = 'false';
+                    elemento.innerText = `${valorFinal.toLocaleString('es-VE', { 
+                        minimumFractionDigits: decimales, 
+                        maximumFractionDigits: decimales 
+                    })}${sufijo}`;
                 }
             };
-            requestAnimationFrame(actualizar);
+            elemento.dataset.animId = requestAnimationFrame(actualizar);
         };
 
         animarValor(pumpLitersEl, litrosNueva, 1);
