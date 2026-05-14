@@ -493,8 +493,37 @@ const Divisas = {
         const bcvHistory = [bcv * 0.97, bcv * 0.975, bcv * 0.985, bcv * 0.982, bcv * 0.99, bcv * 0.995, bcv];
         const parHistory = [par * 0.95, par * 0.965, par * 0.98, par * 0.99, par * 0.985, par * 0.99, par];
 
+        const isLight = document.body.classList.contains('light-theme') || localStorage.getItem('dolarve_theme') === 'light';
+        const textColor = isLight ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.5)';
+        const tooltipBg = isLight ? 'rgba(255,255,255,0.98)' : 'rgba(22, 27, 34, 0.95)';
+        const tooltipTitle = isLight ? '#8E8E93' : '#8B949E';
+        const tooltipBody = isLight ? '#000000' : '#ffffff';
+        const crosshairColor = isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)';
+
+        // Plugin para la línea vertical (Crosshair)
+        const verticalLinePlugin = {
+            id: 'verticalLine',
+            afterDraw: (chart) => {
+                if (chart.tooltip?._active?.length) {
+                    const x = chart.tooltip._active[0].element.x;
+                    const yAxis = chart.scales.y;
+                    const ctx = chart.ctx;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, yAxis.top);
+                    ctx.lineTo(x, yAxis.bottom);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = crosshairColor;
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
         window.bcvChartInstance = new Chart(ctx, {
             type: 'line',
+            plugins: [verticalLinePlugin],
             data: {
                 labels: labels,
                 datasets: [
@@ -502,20 +531,24 @@ const Divisas = {
                         label: 'Oficial BCV',
                         data: bcvHistory,
                         borderColor: '#00D084',
-                        backgroundColor: 'rgba(0, 208, 132, 0.1)',
+                        backgroundColor: 'rgba(0, 208, 132, 0.05)',
                         borderWidth: 3,
                         pointRadius: 4,
+                        pointHoverRadius: 6,
                         pointBackgroundColor: '#00D084',
+                        pointBorderColor: 'rgba(255,255,255,0.2)',
+                        pointBorderWidth: 2,
                         tension: 0.4,
                         fill: true
                     },
                     {
-                        label: 'Binance P2P 🔶',
+                        label: 'Binance 🔶',
                         data: parHistory,
                         borderColor: '#F3BA2F',
                         borderDash: [5, 5],
                         borderWidth: 2,
                         pointRadius: 0,
+                        pointHoverRadius: 4,
                         tension: 0.4,
                         fill: false
                     }
@@ -525,27 +558,38 @@ const Divisas = {
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: { intersect: false, mode: 'index' },
-                layout: { padding: { top: 35, bottom: 5 } },
+                layout: { padding: { top: 35, bottom: 5, left: 10, right: 10 } },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
                         enabled: true,
-                        backgroundColor: '#161B22',
-                        titleColor: '#8B949E',
-                        bodyColor: '#fff',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderWidth: 1,
-                        padding: 10,
+                        backgroundColor: tooltipBg,
+                        titleColor: tooltipTitle,
+                        titleFont: { size: 11, weight: '600' },
+                        bodyColor: tooltipBody,
+                        bodyFont: { size: 13, weight: '700' },
+                        padding: 12,
+                        cornerRadius: 14,
                         displayColors: true,
+                        usePointStyle: true,
+                        borderColor: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' Bs';
+                                return ` ${context.dataset.label}: ${context.parsed.y.toFixed(2)} Bs`;
                             }
                         }
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } } },
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { 
+                            color: textColor, 
+                            font: { size: 10, weight: '600' },
+                            padding: 10
+                        } 
+                    },
                     y: { display: false, grid: { display: false } }
                 }
             }

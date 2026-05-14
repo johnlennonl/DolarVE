@@ -82,6 +82,11 @@ const Interfaz = {
         localStorage.setItem('dolarve_theme', esClaro ? 'light' : 'dark');
         
         if (window.navigator.vibrate) window.navigator.vibrate(10);
+
+        // Re-inicializar el gráfico para aplicar los nuevos colores de tema
+        if (typeof Divisas !== 'undefined' && Divisas.inicializarGraficoPrincipal) {
+            Divisas.inicializarGraficoPrincipal();
+        }
     },
 
     // Cargar el tema que el usuario dejó la última vez
