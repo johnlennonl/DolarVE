@@ -18,16 +18,48 @@ header {
     align-items: center;
 }
 
-.header-title h1 {
-    font-size: 24px;
-    font-weight: 700;
+.header-brand {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.brand-name {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--text-main) 40%, var(--accent-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-accent {
+    color: var(--accent-green);
+}
+
+.brand-badge {
+    background: rgba(0, 208, 132, 0.1);
+    color: var(--accent-green);
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 208, 132, 0.2);
+    letter-spacing: 1px;
 }
 
 .header-subtitle {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+    font-weight: 600;
 }
 
 
@@ -125,9 +157,9 @@ header {
 /* Pull to Refresh Indicator */
 #ptr-indicator {
     position: fixed;
-    top: -60px;
+    top: env(safe-area-inset-top, 0px);
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -60px);
     width: 44px;
     height: 44px;
     background: var(--glass-bg);
@@ -148,7 +180,7 @@ header {
 }
 
 #ptr-indicator.refreshing {
-    transform: translate(-50%, 80px) !important;
+    transform: translate(-50%, 25px) !important;
     opacity: 1 !important;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
 }

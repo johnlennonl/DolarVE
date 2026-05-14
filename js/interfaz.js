@@ -138,7 +138,7 @@ const Interfaz = {
 
             if (deltaY > 0 && window.scrollY <= 0) {
                 // Hacia abajo
-                const pullDistance = Math.min(deltaY * 0.4, 80); 
+                const pullDistance = Math.min(deltaY * 0.4, 100); 
                 pTrIndicator.style.transform = `translate(-50%, ${pullDistance - 60}px)`;
                 pTrIndicator.style.opacity = Math.min(deltaY / 100, 1);
                 
