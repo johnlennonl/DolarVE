@@ -594,6 +594,94 @@ const Divisas = {
                 }
             }
         });
+    },
+
+    // --- Convertidor Rápido (Home Screen) ---
+    abrirConvertidorRapido(tipo = 'usd-bcv') {
+        const modal = document.getElementById('quick-calc-modal');
+        if (!modal) return;
+
+        const input = document.getElementById('qc-main-input');
+        const rateLabel = document.getElementById('qc-current-rate');
+        const rateSub = document.getElementById('qc-rate-label');
+        
+        this.qcTasaActual = window.DolarVE.tasas.usd; // Por defecto BCV
+        this.qcModoInvertido = false; // False = USD a VES
+
+        if (tipo === 'usd-bcv') {
+            rateSub.innerText = 'Oficial BCV';
+            this.qcTasaActual = window.DolarVE.tasas.usd;
+        }
+
+        rateLabel.innerText = `1 $ = ${this.qcTasaActual.toFixed(2)} Bs`;
+        input.value = "";
+        document.getElementById('qc-result-value').innerText = "0,00 Bs";
+        
+        modal.classList.add('active');
+        const sheet = modal.querySelector('.bottom-sheet');
+        if (sheet) setTimeout(() => sheet.classList.add('show'), 10);
+        
+        setTimeout(() => input.focus(), 300);
+
+        // Vincular evento de input si no existe
+        if (!input.dataset.linked) {
+            input.oninput = () => this.calcularConversionRapida();
+            input.dataset.linked = "true";
+        }
+    },
+
+    cerrarConvertidorRapido() {
+        const modal = document.getElementById('quick-calc-modal');
+        if (!modal) return;
+
+        const sheet = modal.querySelector('.bottom-sheet');
+        if (sheet) sheet.classList.remove('show');
+        
+        setTimeout(() => {
+            modal.classList.remove('active');
+        }, 400);
+    },
+
+    swapConvertidorRapido() {
+        this.qcModoInvertido = !this.qcModoInvertido;
+        
+        const inputLabel = document.getElementById('qc-input-label');
+        const resultLabel = document.getElementById('qc-result-label');
+        const input = document.getElementById('qc-main-input');
+        
+        if (this.qcModoInvertido) {
+            inputLabel.innerText = "Bolívares (Bs)";
+            resultLabel.innerText = "Total en Dólares ($)";
+        } else {
+            inputLabel.innerText = "Dólares ($)";
+            resultLabel.innerText = "Total en Bolívares (Bs)";
+        }
+
+        input.value = "";
+        this.calcularConversionRapida();
+        input.focus();
+        if (window.navigator.vibrate) window.navigator.vibrate(10);
+    },
+
+    calcularConversionRapida() {
+        const input = document.getElementById('qc-main-input');
+        const resultVal = document.getElementById('qc-result-value');
+        
+        let val = parseFloat(input.value.replace(',', '.'));
+        if (isNaN(val)) {
+            resultVal.innerText = this.qcModoInvertido ? "0,00 $" : "0,00 Bs";
+            return;
+        }
+
+        if (this.qcModoInvertido) {
+            // Bs a USD
+            const res = val / this.qcTasaActual;
+            resultVal.innerText = res.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " $";
+        } else {
+            // USD a Bs
+            const res = val * this.qcTasaActual;
+            resultVal.innerText = res.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " Bs";
+        }
     }
 };
 

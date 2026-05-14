@@ -118,8 +118,8 @@
                 </div>
             </div>
 
-            <div class="card"
-                style="position: relative; overflow: hidden; border: 1px solid var(--card-border); background: var(--card-bg);">
+            <div class="card" id="main-bcv-card" onclick="Divisas.abrirConvertidorRapido('usd-bcv')"
+                style="position: relative; overflow: hidden; border: 1px solid var(--card-border); background: var(--card-bg); cursor: pointer; transition: transform 0.2s ease;">
                 <!-- Flag Colors Glow Overlay -->
                 <div
                     style="position: absolute; top: 0; right: 0; bottom: 0; width: 100%; background: linear-gradient(135deg, rgba(255, 204, 0, 0.03) 0%, rgba(0, 51, 160, 0.03) 50%, rgba(206, 17, 38, 0.03) 100%); pointer-events: none;">
@@ -1712,6 +1712,57 @@
                     y ten las tasas al instante</p>
                 <p style="font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 1px;">
                     DISPONIBLE PARA IOS Y ANDROID</p>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Convertidor Rápido (Bottom Sheet) -->
+    <div id="quick-calc-modal" class="modal-overlay" style="z-index: 5000;">
+        <div class="modal-content bottom-sheet">
+            <div class="modal-header" style="padding: 25px 25px 15px; border-bottom: none;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div
+                        style="width: 44px; height: 44px; border-radius: 14px; background: rgba(0, 208, 132, 0.1); display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,208,132,0.1);">
+                        <i class="ph-duotone ph-calculator" style="color: var(--accent-green); font-size: 22px;"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">Conversor Rápido</h2>
+                        <p id="qc-rate-label" style="font-size: 12px; color: var(--text-muted); margin: 0; font-weight: 600;">Oficial BCV</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="Divisas.cerrarConvertidorRapido()" 
+                    style="width: 36px; height: 36px; border-radius: 50%; background: rgba(120, 120, 120, 0.1); border: none; color: var(--text-main); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s ease;">
+                    <i class="ph-bold ph-x" style="font-size: 16px;"></i>
+                </button>
+            </div>
+
+            <div style="padding: 20px;">
+                <div class="quick-calc-input-wrapper" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span id="qc-input-label" style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Dólares ($)</span>
+                        <span id="qc-current-rate" style="font-size: 11px; font-weight: 700; color: var(--accent-green);">1 $ = --- Bs</span>
+                    </div>
+                    <div style="position: relative;">
+                        <input type="text" id="qc-main-input" placeholder="0.00" inputmode="decimal"
+                            style="width: 100%; background: rgba(120, 120, 120, 0.05); border: 2px solid var(--card-border); border-radius: 16px; padding: 18px; font-size: 28px; font-weight: 800; color: var(--text-main); outline: none; transition: border-color 0.3s ease;">
+                        <button id="qc-swap-btn" onclick="Divisas.swapConvertidorRapido()"
+                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 12px; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                            <i class="ph-bold ph-arrows-left-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0, 208, 132, 0.05); border: 1px solid rgba(0, 208, 132, 0.1); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div id="qc-result-label" style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total en Bolívares</div>
+                        <div id="qc-result-value" style="font-size: 24px; font-weight: 800; color: var(--accent-green);">0,00 Bs</div>
+                    </div>
+                    <i class="ph-duotone ph-money" style="font-size: 28px; color: var(--accent-green); opacity: 0.3;"></i>
+                </div>
+                
+                <button onclick="Divisas.cerrarConvertidorRapido()" 
+                    style="width: 100%; margin-top: 25px; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 15px; background: #161B22; color: #ffffff; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s ease; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                    LISTO
+                </button>
             </div>
         </div>
     </div>

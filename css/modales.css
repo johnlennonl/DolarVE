@@ -244,6 +244,13 @@ body.light-theme #terms-modal header {
     display: none;
     opacity: 0;
     transition: opacity 0.4s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
 }
 
 .bottom-sheet {

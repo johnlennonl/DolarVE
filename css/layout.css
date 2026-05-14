@@ -188,3 +188,8 @@ header {
 #ptr-indicator.refreshing i {
     animation: ph-spin 1s linear infinite;
 }
+
+/* Feedback para tarjetas clickeables */
+#main-bcv-card:active {
+    transform: scale(0.96) !important;
+}
