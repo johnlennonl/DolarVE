@@ -125,10 +125,14 @@ const Divisas = {
     },
 
     async obtenerDatosTasas() {
+        const updateEl = document.getElementById('last-update-usd');
         if (!navigator.onLine) {
             this.cargarDatosCache();
+            if (updateEl) updateEl.innerHTML = `Sin conexión <i class="ph-duotone ph-wifi-slash" style="color: var(--accent-red); margin-left: 4px;"></i>`;
             return;
         }
+
+        if (updateEl) updateEl.innerHTML = `Sincronizando... <i class="ph-duotone ph-arrows-clockwise ph-spin" style="margin-left: 4px;"></i>`;
 
         const tasas = window.DolarVE.tasas;
         console.log('[DolarVE] 🚀 Iniciando carga rápida...');
@@ -219,8 +223,7 @@ const Divisas = {
             localStorage.setItem('dolarve_offline_data', JSON.stringify(tasas));
 
             // Actualizar hora
-            const updateEl = document.getElementById('last-update-usd');
-            if (updateEl) updateEl.innerText = `Actualizado: ${new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+            if (updateEl) updateEl.innerHTML = `Actualizado: ${new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true })} <i class="ph-fill ph-check-circle" style="color: var(--accent-green); margin-left: 4px;"></i>`;
             
             // Si no está activo el modo futuro, evaluamos si mostrar el teaser
             if (!window.DolarVE.modoFuturoActivo) {
