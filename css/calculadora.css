@@ -145,19 +145,7 @@ body.light-theme .rate-result-card {
     color: var(--accent-green);
 }
 
-/* Acento específico para Binance */
-.rate-result-card[data-rate="binance"] {
-    border-color: rgba(243, 186, 47, 0.4);
-    background: rgba(243, 186, 47, 0.03);
-}
 
-.rate-result-card[data-rate="binance"] .card-rate-header {
-    color: #F3BA2F;
-}
-
-.rate-result-card[data-rate="binance"] .card-rate-val {
-    color: #F3BA2F;
-}
 
 /* Selección forzada para todas las tarjetas incluyendo Binance */
 .rate-result-card.selected {
@@ -200,7 +188,7 @@ body.light-theme .calc-actions-footer {
     border: none;
     border-radius: 16px;
     padding: 14px 0;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     display: flex;
     align-items: center;

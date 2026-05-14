@@ -113,13 +113,46 @@ header {
     }
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+@keyframes ph-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .ph-spinning {
-    display: inline-block;
-    animation: spin 1s linear infinite;
+    animation: ph-spin 1s linear infinite;
 }
-
+
+/* Pull to Refresh Indicator */
+#ptr-indicator {
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    color: var(--accent-green);
+    font-size: 22px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#ptr-indicator.refreshing {
+    transform: translate(-50%, 80px) !important;
+    opacity: 1 !important;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+#ptr-indicator.refreshing i {
+    animation: ph-spin 1s linear infinite;
+}

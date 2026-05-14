@@ -46,6 +46,7 @@ const Principal = {
         // 8. Ponemos a valer las notificaciones y cookies
         Interfaz.inicializarPush();
         Interfaz.verificarCookies();
+        Interfaz.inicializarPullToRefresh();
 
         // 9. PWA e Instalación
         this.inicializarPWA();

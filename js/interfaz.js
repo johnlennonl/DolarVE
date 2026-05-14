@@ -108,6 +108,84 @@ const Interfaz = {
         });
     },
 
+    // --- Pull to Refresh Nativo ---
+    inicializarPullToRefresh() {
+        let touchstartY = 0;
+        let isPulling = false;
+        const pTrIndicator = document.getElementById('ptr-indicator');
+        const pTrIcon = pTrIndicator?.querySelector('i');
+
+        if (!pTrIndicator) return;
+
+        document.addEventListener('touchstart', e => {
+            if (window.scrollY <= 0) {
+                touchstartY = e.touches[0].clientY;
+                isPulling = true;
+                pTrIndicator.classList.remove('refreshing');
+                if (pTrIcon) {
+                    pTrIcon.className = 'ph-duotone ph-arrows-down';
+                    pTrIcon.style.transform = `rotate(0deg)`;
+                }
+            } else {
+                isPulling = false;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', e => {
+            if (!isPulling) return;
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchY - touchstartY;
+
+            if (deltaY > 0 && window.scrollY <= 0) {
+                // Hacia abajo
+                const pullDistance = Math.min(deltaY * 0.4, 80); 
+                pTrIndicator.style.transform = `translate(-50%, ${pullDistance - 60}px)`;
+                pTrIndicator.style.opacity = Math.min(deltaY / 100, 1);
+                
+                if (pTrIcon) {
+                    pTrIcon.style.transform = `rotate(${deltaY * 1.5}deg)`;
+                    if (pullDistance >= 70) {
+                        pTrIcon.className = 'ph-duotone ph-arrows-clockwise'; 
+                    } else {
+                        pTrIcon.className = 'ph-duotone ph-arrows-down';
+                    }
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', e => {
+            if (!isPulling) return;
+            isPulling = false;
+            
+            const touchY = e.changedTouches[0].clientY;
+            const deltaY = touchY - touchstartY;
+
+            pTrIndicator.style.transform = ''; 
+            pTrIndicator.style.opacity = '';
+
+            if (deltaY > 150 && window.scrollY <= 0) {
+                // Disparar recarga
+                pTrIndicator.classList.add('refreshing');
+                if (pTrIcon) {
+                    pTrIcon.className = 'ph-duotone ph-arrows-clockwise';
+                    pTrIcon.style.transform = '';
+                }
+                
+                if (window.navigator.vibrate) window.navigator.vibrate(20);
+                
+                if (typeof Divisas !== 'undefined' && Divisas.obtenerDatosTasas) {
+                    Divisas.obtenerDatosTasas().then(() => {
+                        setTimeout(() => pTrIndicator.classList.remove('refreshing'), 600);
+                    });
+                } else {
+                    setTimeout(() => pTrIndicator.classList.remove('refreshing'), 1000);
+                }
+            } else {
+                pTrIndicator.classList.remove('refreshing');
+            }
+        });
+    },
+
     // --- Notificaciones del Sistema (Push) ---
     VAPID_PUBLIC_KEY: 'BHSKdlZDseu4vvh53xG6BucMXIQ3YFqAu3Y46-we5r3rEIpBoRyeEQYzwwPffAzBZ2VZ2yAgHIQwBCKBntU78iE',
 
